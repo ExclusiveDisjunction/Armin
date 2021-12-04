@@ -191,7 +191,7 @@ namespace Armin::UI::Users
 		{
 		case 1:
 		{
-			File = LoadedSession;
+			File = LoadedProject;
 
 			if (!Ins::IsLoaded() || !File)
 			{

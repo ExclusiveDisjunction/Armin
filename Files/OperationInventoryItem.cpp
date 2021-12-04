@@ -6,13 +6,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	OperationInventoryItem::OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList) : InventoryBase(File, true)
+	OperationInventoryItem::OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList) : InventoryBase(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	OperationInventoryItem::OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList, OperationInventoryItem* ToClone) : InventoryBase(File, true)
+	OperationInventoryItem::OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList, OperationInventoryItem* ToClone) : InventoryBase(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -26,7 +26,7 @@ namespace Armin::Files
 			CurrentState = ToClone->CurrentState;
 		}
 	}
-	OperationInventoryItem::OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList, std::ifstream& InFile) : InventoryBase(File, false)
+	OperationInventoryItem::OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList, std::ifstream& InFile) : InventoryBase(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

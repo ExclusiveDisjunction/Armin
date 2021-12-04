@@ -5,7 +5,7 @@
 
 namespace Armin::Files
 {
-	class ArminSessionBase;
+	class ProjectBase;
 	class Component;
 	class ReferenceList;
 	class ReferenceIterator;
@@ -115,8 +115,8 @@ namespace Armin::Files
 
 	public:
 		ReferenceList();
-		ReferenceList(const String& Param, ArminSessionBase* File);
-		ReferenceList(const AString& Param, ArminSessionBase* File);
+		ReferenceList(const String& Param, ProjectBase* File);
+		ReferenceList(const AString& Param, ProjectBase* File);
 		ReferenceList(Type Obj);
 		ReferenceList(const Vector<Type>& Obj);
 		ReferenceList(const Vector<Component*>& Obj);

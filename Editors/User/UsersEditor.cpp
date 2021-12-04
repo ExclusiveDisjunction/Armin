@@ -16,7 +16,7 @@ namespace Armin::Editors::Users
 	UsersEditor::UsersEditor(UserSystem* System)
 	{
 		if (!System)
-			_System = dynamic_cast<UserSystem*>(LoadedSession);
+			_System = dynamic_cast<UserSystem*>(LoadedProject);
 		else
 			_System = System;
 	}

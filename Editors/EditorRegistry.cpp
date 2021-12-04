@@ -337,7 +337,7 @@ namespace Armin::Editors
             auto Result = MessageBoxW(GetAncestor(*Editor, GA_ROOT), L"Do you want to apply before closing?", static_cast<LPCWSTR>(Title), MB_YESNOCANCEL | MB_ICONWARNING);
             if (Result == IDYES)
             {
-                if (!Editor->Apply(LoadedSession, true))
+                if (!Editor->Apply(LoadedProject, true))
                 {
                     MessageBoxW(GetAncestor(*Editor, GA_ROOT), L"The editor could not be applied, and it will remain open.", static_cast<LPCWSTR>(Title), MB_OK | MB_ICONERROR);
                     return false;
@@ -403,7 +403,7 @@ namespace Armin::Editors
                     continue;
                 }
 
-                bool Result = Current->Apply(LoadedSession);
+                bool Result = Current->Apply(LoadedProject);
                 if (Result)
                     ToRemove.Add(Current);
 

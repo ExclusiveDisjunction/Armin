@@ -145,7 +145,7 @@ namespace Armin::UI::Users
 	}
 	void SignIn::TestCondition()
 	{
-		UserSystem* File = dynamic_cast<UserSystem*>(LoadedSession);
+		UserSystem* File = dynamic_cast<UserSystem*>(LoadedProject);
 		UserSet* Users = !File ? nullptr : File->Users;
 		if (!Users)
 		{

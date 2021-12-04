@@ -303,11 +303,11 @@ namespace Armin::UI
 	{
 		Vector<Component*> Targets = Mode ? RetriveFromList(Objects) : GetAllComponents(Objects);
 
-		RefrenceGroupList* Groups = LoadedSession->RefrenceGroups;
+		RefrenceGroupList* Groups = LoadedProject->RefrenceGroups;
 		if (!Groups)
 			return nullptr;
 
-		RefrenceGroup* New = new RefrenceGroup(LoadedSession, Groups);
+		RefrenceGroup* New = new RefrenceGroup(LoadedProject, Groups);
 		New->Targets = ComponentReference::Generate(Targets);
 
 		HasEdit = true;

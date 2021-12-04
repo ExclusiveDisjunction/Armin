@@ -251,7 +251,7 @@ namespace Armin::Editors::Tasks
 		AssuredBy->Target(nullptr);
 		TargetTask->Target(_Target);
 	}
-	bool CompleteTaskEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool CompleteTaskEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!File)
 			return false;

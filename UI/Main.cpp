@@ -23,7 +23,7 @@ namespace Armin::UI
 		EditorRegistry::SetHost(this);
 		EditorRegistry::Track(static_cast<FooterHost*>(this));
 
-		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version) + (Ins::IsLoaded() ? L" - " + FileFullName(LoadedSessionPath) : L" - Unloaded")), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
+		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version) + (Ins::IsLoaded() ? L" - " + FileFullName(LoadedProjectPath) : L" - Unloaded")), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 		ShowWindow(_Base, InsInstance->LastWindowState);
@@ -160,10 +160,10 @@ namespace Armin::UI
 
 		auto Function = [](HWND Param, UINT Message, UINT_PTR ID, DWORD Milliseconds) -> void
 		{
-			if (LoadedSession) //If a user file was loaded at start, then prompt a sign in.
+			if (LoadedProject) //If a user file was loaded at start, then prompt a sign in.
 			{
-				UserSystem* Conv = dynamic_cast<UserSystem*>(LoadedSession);
-				InventoryProject* InvConv = dynamic_cast<InventoryProject*>(LoadedSession);
+				UserSystem* Conv = dynamic_cast<UserSystem*>(LoadedProject);
+				InventoryProject* InvConv = dynamic_cast<InventoryProject*>(LoadedProject);
 				if (Conv)
 				{
 					KillTimer(Param, ID);

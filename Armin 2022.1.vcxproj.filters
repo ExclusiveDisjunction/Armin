@@ -386,6 +386,9 @@
     <ClInclude Include="UserRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UICommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

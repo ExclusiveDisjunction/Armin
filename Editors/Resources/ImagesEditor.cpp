@@ -12,7 +12,7 @@ namespace Armin::Editors::Resources
 	ImagesEditor::ImagesEditor(ResourceSystem* Target) : Add(nullptr), Remove(nullptr), View(nullptr), ObjectView(nullptr), ObjectScroll(nullptr)
 	{
 		if (!_System)
-			_System = dynamic_cast<ResourceSystem*>(LoadedSession);
+			_System = dynamic_cast<ResourceSystem*>(LoadedProject);
 		else
 			_System = Target;
 	}

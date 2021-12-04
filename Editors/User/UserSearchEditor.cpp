@@ -10,7 +10,7 @@ namespace Armin::Editors::Users
 	UserSearch::UserSearch(UserSystem* System)
 	{
 		if (!System)
-			_System = dynamic_cast<UserSystem*>(LoadedSession);
+			_System = dynamic_cast<UserSystem*>(LoadedProject);
 		else
 			_System = System;
 	}

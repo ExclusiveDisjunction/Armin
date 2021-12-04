@@ -13,7 +13,7 @@ namespace Armin::UI::Tool
 
 		_Multi = Multiselect;
 		if (!System)
-			System = dynamic_cast<InventorySystem*>(LoadedSession);
+			System = dynamic_cast<InventorySystem*>(LoadedProject);
 
 		_Base = CreateWindowExW(NULL, MAKEINTATOM(_ThisAtom), L"Group Selector", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400, 500, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -84,7 +84,7 @@ namespace Armin::UI::Tool
 
 	void GroupSelector::LoadControls(GroupSelectorSource Source, InventorySystem* System, bool Multi)
 	{
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 		if (!File)
 			return;
 

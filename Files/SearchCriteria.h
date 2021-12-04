@@ -6,7 +6,7 @@
 
 namespace Armin::Files
 {
-	class ArminSessionBase;
+	class ProjectBase;
 	class Component;
 	
 	/*
@@ -37,8 +37,8 @@ namespace Armin::Files
 			}
 		}
 
-		Vector<Component*> GetComponents(ArminSessionBase* File) const; //Returns a list of all components that match ALL of the masks and filters present in this object.
-		bool IsWithinCriteria(Component* Object, ArminSessionBase* File) const; //Returns true if the Object parameter is within the bounds set by this object.
+		Vector<Component*> GetComponents(ProjectBase* File) const; //Returns a list of all components that match ALL of the masks and filters present in this object.
+		bool IsWithinCriteria(Component* Object, ProjectBase* File) const; //Returns true if the Object parameter is within the bounds set by this object.
 
 		friend bool operator ==(const SearchCriteria& One, const SearchCriteria& Two); //Compares two Search Criteriums
 		friend bool operator !=(const SearchCriteria& One, const SearchCriteria& Two); //Compoares two Search Criteriums

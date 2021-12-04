@@ -6,13 +6,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList) : Component(File, true)
+	RefrenceGroup::RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone) : Component(File, true)
+	RefrenceGroup::RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -25,7 +25,7 @@ namespace Armin::Files
 			Targets = ToClone->Targets;
 		}
 	}
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, std::ifstream& InFile) : Component(File, false)
+	RefrenceGroup::RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

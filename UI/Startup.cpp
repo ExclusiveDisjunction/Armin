@@ -1,8 +1,9 @@
 #include "Startup.h"
 
+#include "..\UICommon.h"
 #include "..\Config\Ins.h"
 #include "..\Files\SessionControl.h"
-#include "..\..\resource.h"
+#include "..\resource.h"
 
 #include <time.h>
 #include <ObjIdl.h>

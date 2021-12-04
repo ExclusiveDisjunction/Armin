@@ -247,11 +247,11 @@ namespace Armin::Editors::Misc
 			break;
 		case 11: //Save Selection
 		{
-			RefrenceGroupList* RefGroups = LoadedSession->RefrenceGroups;
+			RefrenceGroupList* RefGroups = LoadedProject->RefrenceGroups;
 			if (!RefGroups)
 				break;
 
-			RefrenceGroup* New = new RefrenceGroup(LoadedSession, RefGroups);
+			RefrenceGroup* New = new RefrenceGroup(LoadedProject, RefGroups);
 			New->Targets = ComponentReference::Generate(ComponentViewer::GetAllComponents(Objects));
 
 			HasEdit = true;
@@ -405,7 +405,7 @@ namespace Armin::Editors::Misc
 		CriteriaObj.AllowedTypes = AllowedTypes;
 		CriteriaObj.Arguments = Criteria;
 
-		Vector<Component*> Components = CriteriaObj.GetComponents(LoadedSession);
+		Vector<Component*> Components = CriteriaObj.GetComponents(LoadedProject);
 		if (Components.Size == 0)
 			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"No results were found for your query.", L"Quick Search:", MB_OK | MB_ICONWARNING);
 		else

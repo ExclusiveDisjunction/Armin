@@ -265,9 +265,9 @@ namespace Armin::Editors::Tasks
 		DueBy->SetText(DateTime().ToString(DateStringFormat::ShortDate));
 		_IsMultiselect = false;
 	}
-	bool AddTaskEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool AddTaskEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
-		TaskSystem* TaskFile = dynamic_cast<class TaskSystem*>(LoadedSession);
+		TaskSystem* TaskFile = dynamic_cast<class TaskSystem*>(LoadedProject);
 		TaskList* Tasks = !TaskFile ? nullptr : TaskFile->Tasks;
 		if (!TaskFile || !Tasks)
 		{

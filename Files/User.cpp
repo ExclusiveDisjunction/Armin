@@ -6,7 +6,7 @@ using namespace std;
 
 namespace Armin::Files
 {
-	User::User(ArminSessionBase* File, UserSet* ParentList) : Component(File, true), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList) : Component(File, true), TimecardEntryParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -15,7 +15,7 @@ namespace Armin::Files
 		IsAdmin = IsAssurance = false;
 		Username = FirstName = MiddleName = LastName = Password = String();
 	}
-	User::User(ArminSessionBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), TimecardEntryParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -37,7 +37,7 @@ namespace Armin::Files
 				new TimecardEntry(File, TimecardEntries, ToClone->TimecardEntries->Item(i));
 		}
 	}
-	User::User(ArminSessionBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), TimecardEntryParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

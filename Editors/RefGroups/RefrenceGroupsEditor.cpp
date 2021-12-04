@@ -10,10 +10,10 @@ namespace Armin::Editors::RefGroups
 	using namespace Files;
 	using namespace UI;
 
-	ReferenceGroupsEditor::ReferenceGroupsEditor(ArminSessionBase* Source)
+	ReferenceGroupsEditor::ReferenceGroupsEditor(ProjectBase* Source)
 	{
 		if (!Source)
-			_Source = LoadedSession;
+			_Source = LoadedProject;
 		else
 			_Source = Source;
 	}
@@ -123,7 +123,7 @@ namespace Armin::Editors::RefGroups
 	}
 	void ReferenceGroupsEditor::FillObjects()
 	{
-		RefrenceGroupList* Groups = !LoadedSession ? nullptr : LoadedSession->RefrenceGroups;
+		RefrenceGroupList* Groups = !LoadedProject ? nullptr : LoadedProject->RefrenceGroups;
 		if (!Groups)
 			return;
 
@@ -253,7 +253,7 @@ namespace Armin::Editors::RefGroups
 					Targets.Add(Conv);
 			}
 
-			RefrenceGroupList* Groups = LoadedSession->RefrenceGroups;
+			RefrenceGroupList* Groups = LoadedProject->RefrenceGroups;
 			if (!Groups)
 				break;
 

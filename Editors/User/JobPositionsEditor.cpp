@@ -14,7 +14,7 @@ namespace Armin::Editors::Users
     JobPositionsEditor::JobPositionsEditor(UserSystem* System)
     {
         if (!System)
-            _System = dynamic_cast<UserSystem*>(LoadedSession);
+            _System = dynamic_cast<UserSystem*>(LoadedProject);
         else
             _System = System;
     }
@@ -33,7 +33,7 @@ namespace Armin::Editors::Users
         if (_Loaded)
             return;
 
-        UserSystem* File = dynamic_cast<class UserSystem*>(LoadedSession);
+        UserSystem* File = dynamic_cast<class UserSystem*>(LoadedProject);
         if (!File)
             return;
 

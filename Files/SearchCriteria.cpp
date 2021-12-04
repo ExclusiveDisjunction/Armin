@@ -7,7 +7,7 @@
 
 namespace Armin::Files
 {
-    Vector<Component*> SearchCriteria::GetComponents(ArminSessionBase* File) const
+    Vector<Component*> SearchCriteria::GetComponents(ProjectBase* File) const
     {
         if (!File)
             return Vector<Component*>();
@@ -274,7 +274,7 @@ namespace Armin::Files
 
         return Return;
     }
-    bool SearchCriteria::IsWithinCriteria(Component* Object, ArminSessionBase* File) const
+    bool SearchCriteria::IsWithinCriteria(Component* Object, ProjectBase* File) const
     {
         Vector<Component*> Range = GetComponents(File);
 

@@ -176,8 +176,12 @@ namespace Armin::Editors
 			delete This;
 			return Return;
 		}
-		case WM_SPECIALCOMMAND:
-			return This->SpecialCommand(reinterpret_cast<HMENU>(HIWORD(wp)), static_cast<uint>(LOWORD(wp)), lp);
+		case WM_SETFOCUS:
+			This->CurrentState |= EDS_Focus;
+			break;
+		case WM_KILLFOCUS:
+			This->CurrentState &= ~EDS_Focus;
+			break;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}

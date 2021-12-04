@@ -162,7 +162,7 @@ namespace Armin::Editors::Users
 		{
 		case 4: //Modify
 		{
-			ArminSessionBase* File = LoadedSession;
+			ProjectBase* File = LoadedProject;
 			if (!File || !Current)
 			{
 				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"An unexpected error occured.", L"Error:", MB_OK | MB_ICONERROR);
@@ -315,7 +315,7 @@ namespace Armin::Editors::Users
 		CloseControls(Positions);
 		Positions = ComponentViewer::GenerateListRef(Current->Positions, PositionView, NULL, _Multiselect, true, PositionScroll);
 	}
-	bool EditUserEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool EditUserEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		String Username = this->Username->GetText();
 		String Password = this->Password->GetText();

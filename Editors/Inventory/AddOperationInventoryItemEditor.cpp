@@ -30,7 +30,7 @@ namespace Armin::Editors::Inventory
 
 		_Loaded = true;
 
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 		OperationInventoryItemGroup* Inventory = !File ? nullptr : File->OperationInventoryItems;
 		if (!File || !Inventory)
 			return;
@@ -270,7 +270,7 @@ namespace Armin::Editors::Inventory
 		Group->SetText(String());
 		WorkingOrder->SetCheckState(true);
 	}
-	bool AddOperationInventoryItemEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool AddOperationInventoryItemEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		String SerialNumber = this->SerialNumber->GetText();
 		String Description = this->Description->GetText();

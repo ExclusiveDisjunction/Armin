@@ -7,6 +7,7 @@
 #include "UI\Controls.h"
 #include "..\Enums.h"
 #include "..\Common.h"
+#include "..\UICommon.h"
 #include "..\Files\ComponentTypes.h"
 #include "..\UI\ArminControls.h"
 
@@ -14,7 +15,7 @@ namespace Armin
 {
 	namespace Files
 	{
-		class ArminSessionBase;
+		class ProjectBase;
 		class CompletedTask;
 		class Component;
 		class Image;
@@ -27,6 +28,13 @@ namespace Armin
 		class TaskSystem;
 		class TimecardEntry;
 	}
+
+	enum EditorStates
+	{
+		EDS_None = 0,
+		EDS_AppendError = 1,
+		EDS_Focus = 2
+	};
 
 	namespace Editors
 	{
@@ -60,7 +68,6 @@ namespace Armin
 			virtual LRESULT MouseDown() { return 0; }
 			virtual LRESULT MouseUp() { return 0; }
 			virtual LRESULT Size() = 0;
-			virtual LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) { return 0; }
 
 			void BasicPaint(const String& FontName);
 
@@ -86,6 +93,8 @@ namespace Armin
 				_EditorAtom = RegisterClassW(&wn);
 			}
 
+			int _CurrentState = EDS_None;
+
 			inline static LRESULT __stdcall DummyProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 			{
 				return DefWindowProcW(Window, Message, wp, lp);
@@ -95,11 +104,16 @@ namespace Armin
 			friend EditorRegistry;
 			virtual ~EditorFrame();
 
+			int CurrentState() const { return _CurrentState; }
+			void CurrentState(int New);
+			void ClearState() { CurrentState(0); }
 			EditorHost* const& Host = _Host;
+			Vector<UI::EditorButton*> EditorButtons;
+
 			virtual EditorTypes EditorType() const = 0;
 			virtual bool IsApplyable() const = 0;
 			virtual bool ConditionSpecific() const = 0;
-			virtual bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) = 0; //DOES NOT CLOSE EDITOR AFTER COMPLETION
+			virtual bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) = 0; //DOES NOT CLOSE EDITOR AFTER COMPLETION
 			virtual Vector<void*> CondenseArgs() const = 0;
 			virtual bool TestOnCondition(Vector<void*> Args) const = 0;
 			virtual bool EquatableTo(EditorFrame* Other) const = 0;
@@ -156,7 +170,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_Tasks; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
@@ -195,7 +209,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_ViewTask; }
 				Vector<void*> CondenseArgs() const override { return { Source }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
@@ -234,7 +248,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override;
 				EditorTypes EditorType() const override { return EDT_EditTask; }
 				Vector<void*> CondenseArgs() const override { return { Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
@@ -272,7 +286,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				EditorTypes EditorType() const override { return EDT_AddTask; }
 				Vector<void*> CondenseArgs() const override { return {}; }
 				bool TestOnCondition(Vector<void*> Args) const override;
@@ -310,7 +324,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_CompletedTasks; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
@@ -352,7 +366,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				EditorTypes EditorType() const override { return EDT_CompleteTask; }
 				Vector<void*> CondenseArgs() const override { return { _Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
@@ -386,7 +400,7 @@ namespace Armin
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_ViewCompletedTask; }
 				Vector<void*> CondenseArgs() const override { return { Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
@@ -427,7 +441,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_JobPositions; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<JobPositionsEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
@@ -456,7 +470,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -494,7 +508,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Users; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UsersEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
@@ -532,7 +546,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_ViewUser; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { Current }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -569,7 +583,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_EditUser; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrmoptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PrmoptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return { Current }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -604,7 +618,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_CreateUser; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return false; }
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -640,7 +654,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_UserHomepage; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { _Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -675,7 +689,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Timecards; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override;
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -713,7 +727,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_UserSearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearch*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
@@ -751,7 +765,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Inventory; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -786,7 +800,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_OperationInventory; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<OperationInventoryEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
@@ -817,7 +831,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_AddInventoryItem; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -848,7 +862,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_AddOperationInventoryItem; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -893,7 +907,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_InventorySearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { (void*)_Mode }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<InventorySearchEditor*>(Other) != nullptr; }
@@ -931,7 +945,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_AddReferenceGroup; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return false; }
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -968,7 +982,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_ViewEditReferenceGroup; }
 				bool IsApplyable() const override { return _EditMode; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return { _Target, (void*)_EditMode }; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 2 && Args[0] == static_cast<void*>(_Target) && Args[1] == (void*)_EditMode; }
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -980,7 +994,7 @@ namespace Armin
 			class ReferenceGroupsEditor : public EditorFrame
 			{
 			private:
-				Files::ArminSessionBase* _Source;
+				Files::ProjectBase* _Source;
 
 				Label* ObjectCount;
 				Button* Add, * Remove, * Edit, * View, *SelectAll, *DeSelectAll, *Search;
@@ -999,12 +1013,12 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
-				ReferenceGroupsEditor(Files::ArminSessionBase* Source);
+				ReferenceGroupsEditor(Files::ProjectBase* Source);
 
 				EditorTypes EditorType() const override { return EDT_ReferenceGroups; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<ReferenceGroupsEditor*>(Other) == this; }
@@ -1037,7 +1051,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_ViewImage; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _Target; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -1072,7 +1086,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Images; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Other) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -1129,7 +1143,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_BasicEditor; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return { ThisTarget }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -1166,7 +1180,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_BasicViewer; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { ThisTarget }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -1204,7 +1218,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_QuickSearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<QuickSearchEditor*>(Other) != nullptr; }
@@ -1218,7 +1232,7 @@ namespace Armin
 			class ProjectSettingsEditor : public EditorFrame
 			{
 			private:
-				Files::ArminSessionBase* Target;
+				Files::ProjectBase* Target;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 				
@@ -1230,12 +1244,12 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 
 			public:
-				ProjectSettingsEditor(Files::ArminSessionBase* File = nullptr);
+				ProjectSettingsEditor(Files::ProjectBase* File = nullptr);
 
 				EditorTypes EditorType() const override { return EDT_ProjectSettings; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Target; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == (void*)Target; }
 				bool EquatableTo(EditorFrame* Other) const override;
@@ -1271,7 +1285,7 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Settings; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return true; }

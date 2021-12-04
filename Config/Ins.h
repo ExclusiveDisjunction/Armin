@@ -9,7 +9,7 @@ namespace Armin
 {
 	namespace Files
 	{
-		class ArminSessionBase;
+		class ProjectBase;
 	}
 
 	namespace Config

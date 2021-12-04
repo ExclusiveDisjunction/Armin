@@ -4,13 +4,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	JobPosition::JobPosition(ArminSessionBase* File, JobPositionList* ParentList) : Component(File, true)
+	JobPosition::JobPosition(ProjectBase* File, JobPositionList* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	JobPosition::JobPosition(ArminSessionBase* File, JobPositionList* ParentList, JobPosition* ToClone) : Component(File, true)
+	JobPosition::JobPosition(ProjectBase* File, JobPositionList* ParentList, JobPosition* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -22,7 +22,7 @@ namespace Armin::Files
 			Title(ToClone->Title());
 		}
 	}
-	JobPosition::JobPosition(ArminSessionBase* File, JobPositionList* ParentList, std::ifstream& InFile) : Component(File, false)
+	JobPosition::JobPosition(ProjectBase* File, JobPositionList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

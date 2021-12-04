@@ -13,7 +13,7 @@ namespace Armin::Files
 	{
 
 	}
-	Project::Project(String Path) : ArminSessionBase(Path), UserSystem(), TaskSystem(), InventorySystem()
+	Project::Project(String Path) : ProjectBase(Path), UserSystem(), TaskSystem(), InventorySystem()
 	{ 
 		Load();
 	}

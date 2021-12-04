@@ -242,7 +242,7 @@ namespace Armin::UI::Tool
 			return nullptr;
 		}
 
-		ResourceSystem* System = dynamic_cast<ResourceSystem*>(LoadedSession);
+		ResourceSystem* System = dynamic_cast<ResourceSystem*>(LoadedProject);
 		DirectoryList* Directories = !System ? nullptr : System->Directories;
 		ImageList* Images = !System ? nullptr : System->Images;
 		if (!System || !Directories || !Images)
@@ -258,7 +258,7 @@ namespace Armin::UI::Tool
 		else
 			TargetDirectory = Directories->Item(0);
 
-		AString ThisPath = static_cast<AString>(::FilePath(LoadedSessionPath)) + "\\" + (AString)FileFullName(LoadedSessionPath) + ".arminresource";
+		AString ThisPath = static_cast<AString>(::FilePath(LoadedProjectPath)) + "\\" + (AString)FileFullName(LoadedProjectPath) + ".arminresource";
 
 		if (!FileExists((String)TargetDirectory->TargetPath))
 			TargetDirectory->TargetPath = ThisPath;
@@ -272,7 +272,7 @@ namespace Armin::UI::Tool
 
 		Sector* TargetSector = TargetDirectory->CreateSector(Data, Size);	
 
-		Image* NewImage = new Image(LoadedSession, Images);
+		Image* NewImage = new Image(LoadedProject, Images);
 		NewImage->TargetDirectory = new ComponentReference(TargetDirectory);
 		NewImage->TargetSector = new ComponentReference(TargetSector);
 		NewImage->Title(Title->GetText());

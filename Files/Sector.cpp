@@ -4,8 +4,8 @@ using namespace std;
 
 namespace Armin::Files
 {
-	Sector::Sector(ArminSessionBase* File, SectorList* ParentList) : Sector(File, ParentList, nullptr) {}
-	Sector::Sector(ArminSessionBase* File, SectorList* ParentList, ifstream& InFile) : Component(File, false)
+	Sector::Sector(ProjectBase* File, SectorList* ParentList) : Sector(File, ParentList, nullptr) {}
+	Sector::Sector(ProjectBase* File, SectorList* ParentList, ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -13,7 +13,7 @@ namespace Armin::Files
 
 		Fill(InFile);
 	}
-	Sector::Sector(ArminSessionBase* File, SectorList* ParentList, Sector* ToClone) : Component(File, true)
+	Sector::Sector(ProjectBase* File, SectorList* ParentList, Sector* ToClone) : Component(File, true)
 	{
 		Last = Next = nullptr;
 

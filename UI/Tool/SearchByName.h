@@ -10,7 +10,7 @@ namespace Armin
 	namespace Files
 	{
 		class Component;
-		class ArminSessionBase;
+		class ProjectBase;
 	}
 
 	namespace UI
@@ -22,13 +22,13 @@ namespace Armin
 			class SearchByName
 			{
 			private:
-				SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, Files::ArminSessionBase* Target);
+				SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, Files::ProjectBase* Target);
 
 				HWND _Base;
 				bool _Loaded, _FirstRefresh = true;
 
 				Files::SearchCriteria Criteria;
-				Files::ArminSessionBase* File;
+				Files::ProjectBase* File;
 				Vector<Files::Component*> Return;
 
 				void LoadControls();
@@ -60,7 +60,7 @@ namespace Armin
 				/// <param name="Instance">The HINSTANCE to use.</param>
 				/// <param name="SourceFile">The source file to retrive all data from the SearchCriteria with. If this parameter is nullptr (default), it uses the currently loaded project.</param>
 				/// <returns>The list of selected components from the window, fitting the bounds of the Criteria.</returns>
-				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ArminSessionBase* SourceFile = nullptr);
+				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ProjectBase* SourceFile = nullptr);
 
 				SearchByName() = delete;
 				SearchByName(const SearchByName& Obj) = delete;

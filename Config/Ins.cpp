@@ -39,10 +39,10 @@ namespace Armin::Config
 	}
 	void Ins::Shutdown()
 	{
-		if (LoadedSession)
+		if (LoadedProject)
 		{
-			delete LoadedSession;
-			LoadedSession = nullptr;
+			delete LoadedProject;
+			LoadedProject = nullptr;
 		}
 
 		_Path.Clear();
@@ -55,7 +55,7 @@ namespace Armin::Config
 	}
 	bool Ins::IsLoaded()
 	{
-		return LoadedSession != nullptr;
+		return LoadedProject != nullptr;
 	}
 
 	void Ins::LoadData()

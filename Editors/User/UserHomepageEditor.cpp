@@ -119,7 +119,7 @@ namespace Armin::Editors::Users
 	}
 	void UserHomepageEditor::FillObjects()
 	{
-		TaskSystem* TaskSystem = dynamic_cast<class TaskSystem*>(LoadedSession);
+		TaskSystem* TaskSystem = dynamic_cast<class TaskSystem*>(LoadedProject);
 		TaskList* Tasks = !TaskSystem ? nullptr : TaskSystem->Tasks;
 		if (!Tasks)
 			return;

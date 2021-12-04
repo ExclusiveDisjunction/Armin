@@ -9,6 +9,18 @@ namespace Armin
 		WS_Minimized = 6
 	};
 
+	enum AppStates
+	{
+		APS_None = 0,
+		APS_FileLoaded = 1,
+		APS_HasEdit = 2,
+		APS_HasUser = 4,
+		APS_HasAdminUser = 8,
+		APS_ReadOnly = 16,
+		APS_Saving = 32,
+		APS_Appending = 64
+	};
+
 	enum EditorTypes
 	{
 		EDT_Tasks = 1,

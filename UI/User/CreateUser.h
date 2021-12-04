@@ -11,7 +11,7 @@ namespace Armin
 {
 	namespace Files
 	{
-		class ArminSessionBase;
+		class ProjectBase;
 		class User;
 		class UserParent;
 
@@ -30,7 +30,7 @@ namespace Armin
 			static void InitBase(HINSTANCE ins);
 			static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 
-			Files::ArminSessionBase* File;
+			Files::ProjectBase* File;
 			Files::ComponentList<Files::User, Files::UserParent>* Users;
 			bool Return = false;
 

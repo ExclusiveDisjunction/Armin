@@ -130,7 +130,7 @@ namespace Armin::Editors::Users
 		Title->SetText(String());
 		Description->SetText(String());
 	}
-	bool AddJobPositionEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool AddJobPositionEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		UserSystem* ConvFile = dynamic_cast<UserSystem*>(File);
 		JobPositionList* Positions = ConvFile ? ConvFile->Positions : nullptr;

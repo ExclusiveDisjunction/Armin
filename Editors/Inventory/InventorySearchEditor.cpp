@@ -14,7 +14,7 @@ namespace Armin::Editors::Inventory
 	InventorySearchEditor::InventorySearchEditor(InventorySystem* System, bool Mode)
 	{
 		if (!System)
-			_System = dynamic_cast<InventorySystem*>(LoadedSession);
+			_System = dynamic_cast<InventorySystem*>(LoadedProject);
 		else
 			_System = System;
 		_Mode = Mode;

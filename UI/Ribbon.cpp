@@ -17,7 +17,7 @@ namespace Armin::UI
 
 	void Main::SetRibbonStatus(int New)
 	{
-		ArminSessionBase* Current = LoadedSession;
+		ProjectBase* Current = LoadedProject;
 		InventorySystem* RInvFile = dynamic_cast<InventorySystem*>(Current);
 		UserSystem* RUsrFile = dynamic_cast<UserSystem*>(Current);
 		TaskSystem* RTskFile = dynamic_cast<TaskSystem*>(Current);
@@ -477,11 +477,11 @@ namespace Armin::UI
 			//File
 		case 10: //Open
 			if (SessionControl::Open(ins))
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedSessionPath)));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedProjectPath)));
 			break;
 		case 11: //New
 			if (SessionControl::NewFile(ins))
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedSessionPath)));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedProjectPath)));
 			break;
 		case 12: //Close
 			if (SessionControl::Close(ins))

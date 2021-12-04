@@ -14,7 +14,7 @@ namespace Armin::Editors::Tasks
 	CompletedTasksEditor::CompletedTasksEditor(TaskSystem* System)
 	{
 		if (!System)
-			_System = dynamic_cast<TaskSystem*>(LoadedSession);
+			_System = dynamic_cast<TaskSystem*>(LoadedProject);
 		else
 			_System = System;
 	}

@@ -6,8 +6,8 @@ using namespace std;
 
 namespace Armin::Files
 {
-	Directory::Directory(ArminSessionBase* File, DirectoryList* ParentList) : Directory(File, ParentList, nullptr) { }
-	Directory::Directory(ArminSessionBase* File, DirectoryList* ParentList, Directory* ToClone) : Component(File, true), SectorParent(File)
+	Directory::Directory(ProjectBase* File, DirectoryList* ParentList) : Directory(File, ParentList, nullptr) { }
+	Directory::Directory(ProjectBase* File, DirectoryList* ParentList, Directory* ToClone) : Component(File, true), SectorParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -15,7 +15,7 @@ namespace Armin::Files
 
 		//Directories cannot be copied/cloned, as the data stored within each instance is not consisitent.
 	}
-	Directory::Directory(ArminSessionBase* File, DirectoryList* ParentList, ifstream& InFile) : Component(File, false), SectorParent(File)
+	Directory::Directory(ProjectBase* File, DirectoryList* ParentList, ifstream& InFile) : Component(File, false), SectorParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

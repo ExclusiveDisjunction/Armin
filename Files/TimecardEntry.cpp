@@ -7,13 +7,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	TimecardEntry::TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList) : Component(File, true)
+	TimecardEntry::TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	TimecardEntry::TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList, TimecardEntry* ToClone) : Component(File, true)
+	TimecardEntry::TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, TimecardEntry* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -27,7 +27,7 @@ namespace Armin::Files
 			Description = ToClone->Description;
 		}
 	}
-	TimecardEntry::TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList, std::ifstream& InFile) : Component(File, false)
+	TimecardEntry::TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

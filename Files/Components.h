@@ -10,8 +10,8 @@
 #include "Str.h"
 
 /*
-* All components, lists, and projects are stored as pointers. Like PHS, if you delete the ArminSessionBase, all of its objects will be deleted as well.
-* NEVER delete the pointers if they do not inherit ArminSessionBase. They are automaticly deleted. 
+* All components, lists, and projects are stored as pointers. Like PHS, if you delete the ProjectBase, all of its objects will be deleted as well.
+* NEVER delete the pointers if they do not inherit ProjectBase. They are automaticly deleted. 
 */
 
 namespace Armin::Files
@@ -86,9 +86,9 @@ namespace Armin::Files
 		ConfigItemParent* _Parent;
 	public:
 		ConfigItem() = delete;
-		ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList);
-		ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList, ConfigItem* ToClone);
-		ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList, std::ifstream& InFile);
+		ConfigItem(ProjectBase* File, ConfigItemSet* ParentList);
+		ConfigItem(ProjectBase* File, ConfigItemSet* ParentList, ConfigItem* ToClone);
+		ConfigItem(ProjectBase* File, ConfigItemSet* ParentList, std::ifstream& InFile);
 		ConfigItem(const ConfigItem& Obj) = delete;
 		ConfigItem(const ConfigItem&& Obj) = delete;
 		~ConfigItem();
@@ -112,7 +112,7 @@ namespace Armin::Files
 	private:
 		ConfigItemSet* _ConfigItems;
 	protected:
-		ConfigItemParent(ArminSessionBase* File) : _ConfigItems(new ConfigItemSet(File, this)) {}
+		ConfigItemParent(ProjectBase* File) : _ConfigItems(new ConfigItemSet(File, this)) {}
 		ConfigItemParent() : _ConfigItems(nullptr) {}
 	public:
 		~ConfigItemParent()
@@ -133,9 +133,9 @@ namespace Armin::Files
 		SectorParent* _Parent;
 	public:
 		Sector() = delete;
-		Sector(ArminSessionBase* File, SectorList* ParentList);
-		Sector(ArminSessionBase* File, SectorList* ParentList, std::ifstream& InFile);
-		Sector(ArminSessionBase* File, SectorList* ParentList, Sector* ToClone);
+		Sector(ProjectBase* File, SectorList* ParentList);
+		Sector(ProjectBase* File, SectorList* ParentList, std::ifstream& InFile);
+		Sector(ProjectBase* File, SectorList* ParentList, Sector* ToClone);
 		Sector(const Sector& Obj) = delete;
 		Sector(const Sector&& Obj) = delete;
 		~Sector();
@@ -162,7 +162,7 @@ namespace Armin::Files
 	private:
 		SectorList* _Sectors;
 	protected:
-		SectorParent(ArminSessionBase* File) : _Sectors(new SectorList(File, this)) {}
+		SectorParent(ProjectBase* File) : _Sectors(new SectorList(File, this)) {}
 		SectorParent() : _Sectors(nullptr) {}
 	public:
 		~SectorParent()
@@ -181,9 +181,9 @@ namespace Armin::Files
 		DirectoryParent* _Parent;
 	public:
 		Directory() = delete;
-		Directory(ArminSessionBase* File, DirectoryList* ParentList);
-		Directory(ArminSessionBase* File, DirectoryList* ParentList, std::ifstream& InFile);
-		Directory(ArminSessionBase* File, DirectoryList* ParentList, Directory* ToClone);
+		Directory(ProjectBase* File, DirectoryList* ParentList);
+		Directory(ProjectBase* File, DirectoryList* ParentList, std::ifstream& InFile);
+		Directory(ProjectBase* File, DirectoryList* ParentList, Directory* ToClone);
 		Directory(const Directory& Obj) = delete;
 		Directory(const Directory&& Obj) = delete;
 		~Directory();
@@ -194,7 +194,7 @@ namespace Armin::Files
 		Directory* Next, * Last;
 		DirectoryParent* const& Parent = _Parent;
 		inline static const String ThisName = L"Directory";
-		ArminSessionBase* ParentFile() override { return _ParentFile; }
+		ProjectBase* ParentFile() override { return _ParentFile; }
 
 		String Title() const override { return L"<,.>"; }
 		void Title(String New) override {}
@@ -218,7 +218,7 @@ namespace Armin::Files
 	private:
 		DirectoryList* _Directories;
 	protected:
-		DirectoryParent(ArminSessionBase* File) : _Directories(new DirectoryList(File, this)) {}
+		DirectoryParent(ProjectBase* File) : _Directories(new DirectoryList(File, this)) {}
 		DirectoryParent() : _Directories(nullptr) {}
 	public:
 		~DirectoryParent()
@@ -237,9 +237,9 @@ namespace Armin::Files
 		ImageParent* _Parent;
 	public:
 		Image() = delete;
-		Image(ArminSessionBase* File, ImageList* ParentList);
-		Image(ArminSessionBase* File, ImageList* ParentList, std::ifstream& InFile);
-		Image(ArminSessionBase* File, ImageList* ParentList, Image* ToClone);
+		Image(ProjectBase* File, ImageList* ParentList);
+		Image(ProjectBase* File, ImageList* ParentList, std::ifstream& InFile);
+		Image(ProjectBase* File, ImageList* ParentList, Image* ToClone);
 		Image(const Image& Obj) = delete;
 		Image(const Image&& Obj) = delete;
 		~Image();
@@ -269,7 +269,7 @@ namespace Armin::Files
 		ImageList* _Images;
 	protected:
 		ImageParent() : _Images(nullptr) {}
-		ImageParent(ArminSessionBase* File) : _Images(new ImageList(File, this)) {}
+		ImageParent(ProjectBase* File) : _Images(new ImageList(File, this)) {}
 	public:
 		~ImageParent()
 		{
@@ -291,9 +291,9 @@ namespace Armin::Files
 		JobPositionParent* _Parent;
 	public:
 		JobPosition() = delete;
-		JobPosition(ArminSessionBase* File, JobPositionList* ParentList);
-		JobPosition(ArminSessionBase* File, JobPositionList* ParentList, JobPosition* ToClone);
-		JobPosition(ArminSessionBase* File, JobPositionList* ParentList, std::ifstream& InFile);
+		JobPosition(ProjectBase* File, JobPositionList* ParentList);
+		JobPosition(ProjectBase* File, JobPositionList* ParentList, JobPosition* ToClone);
+		JobPosition(ProjectBase* File, JobPositionList* ParentList, std::ifstream& InFile);
 		JobPosition(const JobPosition& Obj) = delete;
 		JobPosition(const JobPosition&& Obj) = delete;
 		~JobPosition();
@@ -320,7 +320,7 @@ namespace Armin::Files
 	private:
 		JobPositionList* _Positions;
 	protected:
-		JobPositionParent(ArminSessionBase* File) : _Positions(new JobPositionList(File, this)) {}
+		JobPositionParent(ProjectBase* File) : _Positions(new JobPositionList(File, this)) {}
 		JobPositionParent() : _Positions(nullptr) {}
 	public:
 		~JobPositionParent()
@@ -339,9 +339,9 @@ namespace Armin::Files
 		TimecardEntryParent* _Parent;
 	public:
 		TimecardEntry() = delete;
-		TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList);
-		TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList, TimecardEntry* ToClone);
-		TimecardEntry(ArminSessionBase* File, TimecardEntryList* ParentList, std::ifstream& InFile);
+		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList);
+		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, TimecardEntry* ToClone);
+		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, std::ifstream& InFile);
 		TimecardEntry(const TimecardEntry& Obj) = delete;
 		TimecardEntry(const TimecardEntry&& Obj) = delete;
 		~TimecardEntry();
@@ -368,7 +368,7 @@ namespace Armin::Files
 	private:
 		TimecardEntryList* _TimecardEntries;
 	protected:
-		TimecardEntryParent(ArminSessionBase* File) : _TimecardEntries(new TimecardEntryList(File, this)) {}
+		TimecardEntryParent(ProjectBase* File) : _TimecardEntries(new TimecardEntryList(File, this)) {}
 		TimecardEntryParent() : _TimecardEntries(nullptr) {}
 	public:
 		~TimecardEntryParent()
@@ -387,9 +387,9 @@ namespace Armin::Files
 		UserParent* _Parent;
 	public:
 		User() = delete;
-		User(ArminSessionBase* File, UserSet* Parent);
-		User(ArminSessionBase* File, UserSet* Parent, User* ToClone);
-		User(ArminSessionBase* File, UserSet* Parent, std::ifstream& InFile);
+		User(ProjectBase* File, UserSet* Parent);
+		User(ProjectBase* File, UserSet* Parent, User* ToClone);
+		User(ProjectBase* File, UserSet* Parent, std::ifstream& InFile);
 		User(const User& Obj) = delete;
 		User(const User&& Obj) = delete;
 		~User();
@@ -400,7 +400,7 @@ namespace Armin::Files
 		User* Next, * Last;
 		UserParent* const& Parent = _Parent;
 		inline static const String ThisName = L"User";
-		ArminSessionBase* ParentFile() override { return _ParentFile; }
+		ProjectBase* ParentFile() override { return _ParentFile; }
 
 		String Title() const override {	return Username; }
 		void Title(String New) override { Username = New; }
@@ -420,7 +420,7 @@ namespace Armin::Files
 	private:
 		UserSet* _Users;
 	protected:		
-		UserParent(ArminSessionBase* File) : _Users(new UserSet(File, this)) {}
+		UserParent(ProjectBase* File) : _Users(new UserSet(File, this)) {}
 		UserParent() : _Users(nullptr) {}
 	public:
 		~UserParent()
@@ -439,7 +439,7 @@ namespace Armin::Files
 	class InventoryBase : public Component
 	{
 	protected:
-		InventoryBase(ArminSessionBase* File, bool GetID) : Component(File, GetID) {}
+		InventoryBase(ProjectBase* File, bool GetID) : Component(File, GetID) {}
 	public:
 		virtual ~InventoryBase()
 		{
@@ -462,9 +462,9 @@ namespace Armin::Files
 		InventoryItemParent* _Parent;
 	public:
 		InventoryItem() = delete;
-		InventoryItem(ArminSessionBase* File, InventoryItemGroup* ParentList);
-		InventoryItem(ArminSessionBase* File, InventoryItemGroup* ParentList, InventoryItem* ToClone);
-		InventoryItem(ArminSessionBase* File, InventoryItemGroup* ParentList, std::ifstream& InFile);
+		InventoryItem(ProjectBase* File, InventoryItemGroup* ParentList);
+		InventoryItem(ProjectBase* File, InventoryItemGroup* ParentList, InventoryItem* ToClone);
+		InventoryItem(ProjectBase* File, InventoryItemGroup* ParentList, std::ifstream& InFile);
 		InventoryItem(const InventoryItem& Obj) = delete;
 		InventoryItem(const InventoryItem&& Obj) = delete;
 		~InventoryItem();
@@ -489,7 +489,7 @@ namespace Armin::Files
 	private:
 		InventoryItemGroup* _InventoryItems;
 	protected:
-		InventoryItemParent(ArminSessionBase* File) : _InventoryItems(new InventoryItemGroup(File, this)) {}
+		InventoryItemParent(ProjectBase* File) : _InventoryItems(new InventoryItemGroup(File, this)) {}
 		InventoryItemParent() : _InventoryItems(nullptr) {}
 	public:
 		~InventoryItemParent()
@@ -508,9 +508,9 @@ namespace Armin::Files
 		OperationInventoryItemParent* _Parent;
 	public:
 		OperationInventoryItem() = delete;
-		OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList);
-		OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList, OperationInventoryItem* ToClone);
-		OperationInventoryItem(ArminSessionBase* File, OperationInventoryItemGroup* ParentList, std::ifstream& InFile);
+		OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList);
+		OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList, OperationInventoryItem* ToClone);
+		OperationInventoryItem(ProjectBase* File, OperationInventoryItemGroup* ParentList, std::ifstream& InFile);
 		OperationInventoryItem(const OperationInventoryItem& Obj) = delete;
 		OperationInventoryItem(const OperationInventoryItem&& Obj) = delete;
 		~OperationInventoryItem();
@@ -549,7 +549,7 @@ namespace Armin::Files
 	private:
 		OperationInventoryItemGroup* _OperationInventoryItems;
 	protected:
-		OperationInventoryItemParent(ArminSessionBase* File) : _OperationInventoryItems(new OperationInventoryItemGroup(File, this)) {}
+		OperationInventoryItemParent(ProjectBase* File) : _OperationInventoryItems(new OperationInventoryItemGroup(File, this)) {}
 		OperationInventoryItemParent() : _OperationInventoryItems(nullptr) {}
 	public:
 		~OperationInventoryItemParent()
@@ -572,9 +572,9 @@ namespace Armin::Files
 		TaskParent* _Parent;
 	public:
 		Task() = delete;
-		Task(ArminSessionBase* File, TaskList* ParentList);
-		Task(ArminSessionBase* File, TaskList* ParentList, Task* ToClone);
-		Task(ArminSessionBase* File, TaskList* ParentList, std::ifstream& InFile);
+		Task(ProjectBase* File, TaskList* ParentList);
+		Task(ProjectBase* File, TaskList* ParentList, Task* ToClone);
+		Task(ProjectBase* File, TaskList* ParentList, std::ifstream& InFile);
 		Task(const Task& Obj) = delete;
 		Task(const Task&& Obj) = delete;
 		~Task();
@@ -601,7 +601,7 @@ namespace Armin::Files
 	private:
 		TaskList* _Tasks;
 	protected:
-		TaskParent(ArminSessionBase* File) : _Tasks(new TaskList(File, this)) {}
+		TaskParent(ProjectBase* File) : _Tasks(new TaskList(File, this)) {}
 		TaskParent() : _Tasks(nullptr) {}
 	public:
 		~TaskParent()
@@ -620,9 +620,9 @@ namespace Armin::Files
 		CompletedTaskParent* _Parent;
 	public:
 		CompletedTask() = delete;
-		CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList);
-		CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList, CompletedTask* ToClone);
-		CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList, std::ifstream& InFile);
+		CompletedTask(ProjectBase* File, CompletedTaskList* ParentList);
+		CompletedTask(ProjectBase* File, CompletedTaskList* ParentList, CompletedTask* ToClone);
+		CompletedTask(ProjectBase* File, CompletedTaskList* ParentList, std::ifstream& InFile);
 		CompletedTask(const CompletedTask& Obj) = delete;
 		CompletedTask(const CompletedTask&& Obj) = delete;
 		~CompletedTask();
@@ -642,7 +642,7 @@ namespace Armin::Files
 		ComponentReference* AssuredBy;
 		String ActionsDone;
 
-		ArminSessionBase* ParentFile() override { return _ParentFile; }
+		ProjectBase* ParentFile() override { return _ParentFile; }
 
 		ComponentTypes ObjectType() const override { return ComponentTypes::CT_CompletedTask; }
 		String ToString() const override { return L"Completed Task | Completed On: " + DateCompleted.ToString(DateStringFormat::LongDate) + L" | Assured By: " + (!AssuredBy || !AssuredBy->Target() ? L"No Data" : dynamic_cast<User*>(AssuredBy->Target())->Username) + L" | Title: " + (Tasks->Count == 0 ? L"No Data" : Tasks->Item(0)->Title()); }
@@ -655,7 +655,7 @@ namespace Armin::Files
 	private:
 		CompletedTaskList* _CompletedTasks;
 	protected:
-		CompletedTaskParent(ArminSessionBase* File) : _CompletedTasks(new CompletedTaskList(File, this)) {}
+		CompletedTaskParent(ProjectBase* File) : _CompletedTasks(new CompletedTaskList(File, this)) {}
 		CompletedTaskParent() : _CompletedTasks(nullptr) {}
 	public:
 		~CompletedTaskParent()
@@ -676,9 +676,9 @@ namespace Armin::Files
 		RefrenceGroupParent* _Parent;
 	public:
 		RefrenceGroup() = delete;
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList);
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone);
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, std::ifstream& OutFile);
+		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList);
+		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone);
+		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, std::ifstream& OutFile);
 		RefrenceGroup(const RefrenceGroup& Obj) = delete;
 		RefrenceGroup(const RefrenceGroup&& Obj) = delete;
 		~RefrenceGroup();
@@ -703,7 +703,7 @@ namespace Armin::Files
 	private:
 		RefrenceGroupList* _RefrenceGroups;
 	protected:
-		RefrenceGroupParent(ArminSessionBase* File) : _RefrenceGroups(new RefrenceGroupList(File, this)) { }
+		RefrenceGroupParent(ProjectBase* File) : _RefrenceGroups(new RefrenceGroupList(File, this)) { }
 		RefrenceGroupParent() : _RefrenceGroups(nullptr) {}
 	public:
 		~RefrenceGroupParent()
@@ -715,7 +715,7 @@ namespace Armin::Files
 		RefrenceGroupList* const& RefrenceGroups = _RefrenceGroups;
 	};
 
-	class ArminSessionBase : public ConfigItemParent, public RefrenceGroupParent
+	class ProjectBase : public ConfigItemParent, public RefrenceGroupParent
 	{
 	private:
 		String _Path;
@@ -724,15 +724,15 @@ namespace Armin::Files
 		void SetID(unsigned long long ID) { _ID = ID; }
 
 	public:
-		ArminSessionBase(String Path) : ArminSessionBase()
+		ProjectBase(String Path) : ProjectBase()
 		{ 
 			_Path = Path; 
 		}
-		ArminSessionBase() : ConfigItemParent(this), RefrenceGroupParent(this)
+		ProjectBase() : ConfigItemParent(this), RefrenceGroupParent(this)
 		{
 			_ID = 0;
 		}
-		virtual ~ArminSessionBase() {}
+		virtual ~ProjectBase() {}
 
 		String Title;
 

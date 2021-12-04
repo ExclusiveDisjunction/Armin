@@ -8,7 +8,7 @@ namespace Armin::Files
 	{
 
 	}
-	ReferenceList::ReferenceList(const String& Param, ArminSessionBase* File) : ReferenceList()
+	ReferenceList::ReferenceList(const String& Param, ProjectBase* File) : ReferenceList()
 	{
 		StringList Parts = Param.Split(L'*');
 
@@ -20,7 +20,7 @@ namespace Armin::Files
 				Add(Target);
 		}
 	}
-	ReferenceList::ReferenceList(const AString& Param, ArminSessionBase* File) : ReferenceList()
+	ReferenceList::ReferenceList(const AString& Param, ProjectBase* File) : ReferenceList()
 	{
 		Clear();
 		

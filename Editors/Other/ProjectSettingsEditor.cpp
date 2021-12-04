@@ -8,9 +8,9 @@ namespace Armin::Editors::Misc
 {
 	using namespace Files;
 
-	ProjectSettingsEditor::ProjectSettingsEditor(ArminSessionBase* File)
+	ProjectSettingsEditor::ProjectSettingsEditor(ProjectBase* File)
 	{
-		Target = !File ? LoadedSession: File;
+		Target = !File ? LoadedProject: File;
 	}
 
 	LRESULT __stdcall ProjectSettingsEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -144,7 +144,7 @@ namespace Armin::Editors::Misc
 		return 0;
 	}
 
-	bool ProjectSettingsEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool ProjectSettingsEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		File = Target;
 

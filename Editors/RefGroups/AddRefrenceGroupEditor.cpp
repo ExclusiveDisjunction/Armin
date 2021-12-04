@@ -192,7 +192,7 @@ namespace Armin::Editors::RefGroups
 		return 0;
 	}
 
-	bool AddReferenceGroupEditor::Apply(Files::ArminSessionBase* File, bool PromptErrors)
+	bool AddReferenceGroupEditor::Apply(Files::ProjectBase* File, bool PromptErrors)
 	{
 		String Title = this->Name->GetText();
 		Vector<Component*> Targets = ComponentViewer::GetAllComponents(Objects);

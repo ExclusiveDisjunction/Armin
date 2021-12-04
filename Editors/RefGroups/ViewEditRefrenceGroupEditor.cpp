@@ -241,7 +241,7 @@ namespace Armin::Editors::RefGroups
 		ViewEditReferenceGroupEditor* Conv = dynamic_cast<ViewEditReferenceGroupEditor*>(Other);
 		return Conv && Conv->_EditMode == _EditMode && Conv->_Target == _Target;
 	}
-	bool ViewEditReferenceGroupEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool ViewEditReferenceGroupEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!_EditMode)
 			return true;

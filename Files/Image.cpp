@@ -12,17 +12,17 @@ using namespace std;
 
 namespace Armin::Files
 {
-	Image::Image(ArminSessionBase* File, ImageList* ParentList) : Image(File, ParentList, nullptr)
+	Image::Image(ProjectBase* File, ImageList* ParentList) : Image(File, ParentList, nullptr)
 	{
 	}
-	Image::Image(ArminSessionBase* File, ImageList* ParentList, std::ifstream& InFile) : Component(File, false)
+	Image::Image(ProjectBase* File, ImageList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 
 		Fill(InFile);
 	}
-	Image::Image(ArminSessionBase* File, ImageList* ParentList, Image* ToClone) : Component(File, !ToClone)
+	Image::Image(ProjectBase* File, ImageList* ParentList, Image* ToClone) : Component(File, !ToClone)
 	{
 		Next = Last = nullptr;
 

@@ -20,7 +20,7 @@ namespace Armin::UI::Import
 		if (!_ThisAtom)
 			InitBase(ins);
 
-		ToPath = LoadedSessionPath;
+		ToPath = LoadedProjectPath;
 
 		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), L"Import From CSV", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 750, 550, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -581,7 +581,7 @@ namespace Armin::UI::Import
 
 	void ImportFromCSV::BeginImport()
 	{
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 		InventoryItemGroup* Inventory = !File ? nullptr : File->InventoryItems;
 		if (!File || !Inventory)
 		{

@@ -4,13 +4,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	ConfigItem::ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList) : Component(File, true)
+	ConfigItem::ConfigItem(ProjectBase* File, ConfigItemSet* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	ConfigItem::ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList, ConfigItem* ToClone) : Component(File, true)
+	ConfigItem::ConfigItem(ProjectBase* File, ConfigItemSet* ParentList, ConfigItem* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -22,7 +22,7 @@ namespace Armin::Files
 			Value = ToClone->Value;
 		}
 	}
-	ConfigItem::ConfigItem(ArminSessionBase* File, ConfigItemSet* ParentList, std::ifstream& InFile) : Component(File, false)
+	ConfigItem::ConfigItem(ProjectBase* File, ConfigItemSet* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

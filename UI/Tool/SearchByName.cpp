@@ -9,10 +9,10 @@ namespace Armin::UI::Search
 {
 	using namespace Files;
 
-	SearchByName::SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, ArminSessionBase* File)
+	SearchByName::SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, ProjectBase* File)
 	{
 		this->Criteria = Criteria;
-		this->File = !File ? LoadedSession : File;
+		this->File = !File ? LoadedProject : File;
 
 		if (!_ThisAtom)
 			InitBase(ins);
@@ -26,7 +26,7 @@ namespace Armin::UI::Search
 		LoadControls();
 	}
 
-	Vector<Component*> SearchByName::Execute(Files::SearchCriteria& Criteria, HINSTANCE ins, ArminSessionBase* File)
+	Vector<Component*> SearchByName::Execute(Files::SearchCriteria& Criteria, HINSTANCE ins, ProjectBase* File)
 	{
 		SearchByName* Item = new SearchByName(Criteria, ins, File);
 

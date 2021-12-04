@@ -266,7 +266,7 @@ namespace Armin::Editors::Users
 		PositionsView->Move(0, 0, 910, 32);
 		PositionsScroll->Reset();
 	}
-	bool CreateUserEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool CreateUserEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!File)
 			return false;

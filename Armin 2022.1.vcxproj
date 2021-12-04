@@ -264,6 +264,7 @@
     <ClInclude Include="Files\SearchCriteria.h" />
     <ClInclude Include="Files\SessionControl.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="UICommon.h" />
     <ClInclude Include="UI\About.h" />
     <ClInclude Include="UI\ArminControls.h" />
     <ClInclude Include="UI\ComponentViewer.h" />

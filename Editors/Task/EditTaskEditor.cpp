@@ -293,7 +293,7 @@ namespace Armin::Editors::Tasks
 
 		FillAssigned();
 	}
-	bool EditTaskEditor::Apply(ArminSessionBase* File, bool ProptErrors)
+	bool EditTaskEditor::Apply(ProjectBase* File, bool ProptErrors)
 	{
 		String Title = this->Title->GetText();
 		String Instructions = this->Instructions->GetText();

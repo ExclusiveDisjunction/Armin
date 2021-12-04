@@ -508,7 +508,7 @@ namespace Armin::Editors::Misc
 		}
 
 	}
-	bool BasicEditorEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool BasicEditorEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!ThisTarget)
 			return false;
@@ -531,7 +531,7 @@ namespace Armin::Editors::Misc
 			String Description = TB3->GetText();
 			Image* TargetImage = dynamic_cast<Image*>(CV1->Target());
 
-			InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+			InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 			InventoryItemGroup* Inv = !File ? nullptr : File->InventoryItems;
 			if (!File || !Inv)
 			{
@@ -600,7 +600,7 @@ namespace Armin::Editors::Misc
 			else
 				NewState = OperationInventoryItem::IS_NotInPossession;
 
-			InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+			InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 			OperationInventoryItemGroup* Inv = !File ? nullptr : File->OperationInventoryItems;
 			if (!File || !Inv)
 			{

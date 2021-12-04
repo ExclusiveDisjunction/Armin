@@ -2,6 +2,7 @@
 
 #include "Files\Stream.h"
 #include "UI\Controls.h"
+#include "..\UICommon.h"
 #include "..\Config\Ins.h"
 #include "..\Config\Recent.h"
 #include "..\Files\SessionControl.h"
