@@ -1,0 +1,17 @@
+The folders are oranized like so:
+
+Config/ : Controls all things that deal with internal configuration that must be stored and recalled.
+Controls/ : The custom controls that come with Armin.
+Editors/ : Contains the editor registry, editor frame, and all derived editors. This is what the main part of Armins user interaction is laid out.
+	Editors/Inventory/ Contains all Inventory Editors
+	Editors/Other/ Contains all Other General Component Editors.
+	Editors/RefGroups/ Contains all Refrence Group Editors.
+	Editors/Task/ Contains all Task editors.
+	Editors/User/ Contains all User Editors.
+Files/ : Manages the reading and writing to files (projects), and lays out the data in the form of the Componet Model.
+Windows/ : Contains the basic UI of Armin. The Main & Editor Popout are simply sockets for editor frame(s), and the rest are tool windows used by Armin and the Editors.
+	Windows/Import/ All Importing tool windows.
+	Windows/Tool/ All tool windows.
+	Windows/User/ All user windows.
+
+The namespaces of objects depends on which folder their in, and in most instances, the namespace names and folder names match.
