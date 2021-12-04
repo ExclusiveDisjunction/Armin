@@ -52,7 +52,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-ID_ARMINICO             ICON                    "rc\\Armin Logo.ico"
+ID_ARMINICO             ICON                    "Resource\\Armin Logo.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,9 +60,9 @@ ID_ARMINICO             ICON                    "rc\\Armin Logo.ico"
 // PNG
 //
 
-Armin_LogoPNG           PNG                     "rc\\Armin Logo.png"
+Armin_LogoPNG           PNG                     "Resource\\Armin Logo.png"
 
-Armin_StartupImage      PNG                     "rc\\startup.png"
+Armin_StartupImage      PNG                     "Resource\\startup.png"
 
 
 /////////////////////////////////////////////////////////////////////////////

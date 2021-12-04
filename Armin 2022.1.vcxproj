@@ -97,6 +97,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\Aaron\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,6 +113,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\Aaron\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +129,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\Aaron\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,6 +145,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\Aaron\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +158,141 @@
     <ProjectReference Include="..\..\..\Libraries\Aaron\Aaron.vcxproj">
       <Project>{7f1b16fc-cf5c-4bb9-b513-01ccb433a2af}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Config\Ins.cpp" />
+    <ClCompile Include="Config\Recent.cpp" />
+    <ClCompile Include="Editors\EditorButtonHost.cpp" />
+    <ClCompile Include="Editors\EditorFrame.cpp" />
+    <ClCompile Include="Editors\EditorHost.cpp" />
+    <ClCompile Include="Editors\EditorRegistry.cpp" />
+    <ClCompile Include="Editors\Inventory\AddInventoryItemEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\AddOperationInventoryItemEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\InventoryEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\InventorySearchEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\OperationInventoryEditor.cpp" />
+    <ClCompile Include="Editors\Other\BasicEditorEditor.cpp" />
+    <ClCompile Include="Editors\Other\BasicViewerEditor.cpp" />
+    <ClCompile Include="Editors\Other\ProjectSettingsEditor.cpp" />
+    <ClCompile Include="Editors\Other\QuickSearchEditor.cpp" />
+    <ClCompile Include="Editors\Other\SettingsEditor.cpp" />
+    <ClCompile Include="Editors\RefGroups\AddRefrenceGroupEditor.cpp" />
+    <ClCompile Include="Editors\RefGroups\RefrenceGroupsEditor.cpp" />
+    <ClCompile Include="Editors\RefGroups\ViewEditRefrenceGroupEditor.cpp" />
+    <ClCompile Include="Editors\Resources\ImagesEditor.cpp" />
+    <ClCompile Include="Editors\Resources\ViewImageEditor.cpp" />
+    <ClCompile Include="Editors\Task\AddTaskEditor.cpp" />
+    <ClCompile Include="Editors\Task\CompletedTasksEditor.cpp" />
+    <ClCompile Include="Editors\Task\CompleteTaskEditor.cpp" />
+    <ClCompile Include="Editors\Task\EditTaskEditor.cpp" />
+    <ClCompile Include="Editors\Task\TasksEditor.cpp" />
+    <ClCompile Include="Editors\Task\ViewCompletedTaskEditor.cpp" />
+    <ClCompile Include="Editors\Task\ViewTaskEditor.cpp" />
+    <ClCompile Include="Editors\Timecards\Timeclock.cpp" />
+    <ClCompile Include="Editors\User\AddJobPositionEditor.cpp" />
+    <ClCompile Include="Editors\User\CreateUserEditor.cpp" />
+    <ClCompile Include="Editors\User\EditUserEditor.cpp" />
+    <ClCompile Include="Editors\User\JobPositionsEditor.cpp" />
+    <ClCompile Include="Editors\User\TimecardsEditor.cpp" />
+    <ClCompile Include="Editors\User\UserHomepageEditor.cpp" />
+    <ClCompile Include="Editors\User\UserSearchEditor.cpp" />
+    <ClCompile Include="Editors\User\UsersEditor.cpp" />
+    <ClCompile Include="Editors\User\ViewUserEditor.cpp" />
+    <ClCompile Include="Entry.cpp" />
+    <ClCompile Include="Files\ArminSessions.cpp" />
+    <ClCompile Include="Files\BaseTypes.cpp" />
+    <ClCompile Include="Files\CompletedTask.cpp" />
+    <ClCompile Include="Files\ComponentRefrence.cpp" />
+    <ClCompile Include="Files\ConfigItem.cpp" />
+    <ClCompile Include="Files\Directory.cpp" />
+    <ClCompile Include="Files\Image.cpp" />
+    <ClCompile Include="Files\InventoryItem.cpp" />
+    <ClCompile Include="Files\InventoryProject.cpp" />
+    <ClCompile Include="Files\InventoryProjectRc.cpp" />
+    <ClCompile Include="Files\JobPosition.cpp" />
+    <ClCompile Include="Files\OperationInventoryItem.cpp" />
+    <ClCompile Include="Files\Project.cpp" />
+    <ClCompile Include="Files\ProjectRc.cpp" />
+    <ClCompile Include="Files\ReferenceList.cpp" />
+    <ClCompile Include="Files\RefrenceGroup.cpp" />
+    <ClCompile Include="Files\SearchCriteria.cpp" />
+    <ClCompile Include="Files\Sector.cpp" />
+    <ClCompile Include="Files\SessionControl.cpp" />
+    <ClCompile Include="Files\Task.cpp" />
+    <ClCompile Include="Files\TeamProject.cpp" />
+    <ClCompile Include="Files\TeamProjectRc.cpp" />
+    <ClCompile Include="Files\TimecardEntry.cpp" />
+    <ClCompile Include="Files\User.cpp" />
+    <ClCompile Include="UI\About.cpp" />
+    <ClCompile Include="UI\ComponentViewer.cpp" />
+    <ClCompile Include="UI\EditorButton.cpp" />
+    <ClCompile Include="UI\EditorPopout.cpp" />
+    <ClCompile Include="UI\Import\ImportFromCSV.cpp" />
+    <ClCompile Include="UI\Main.cpp" />
+    <ClCompile Include="UI\Ribbon.cpp" />
+    <ClCompile Include="UI\RibbonHost.cpp" />
+    <ClCompile Include="UI\SideHost.cpp" />
+    <ClCompile Include="UI\Startup.cpp" />
+    <ClCompile Include="UI\Tool\ComponentListRenderer.cpp" />
+    <ClCompile Include="UI\Tool\CreateImage.cpp" />
+    <ClCompile Include="UI\Tool\DatePicker.cpp" />
+    <ClCompile Include="UI\Tool\FileProgress.cpp" />
+    <ClCompile Include="UI\Tool\GroupSelector.cpp" />
+    <ClCompile Include="UI\Tool\PasswordInput.cpp" />
+    <ClCompile Include="UI\Tool\SearchByName.cpp" />
+    <ClCompile Include="UI\User\CreateUser.cpp" />
+    <ClCompile Include="UI\User\SignIn.cpp" />
+    <ClCompile Include="UI\Welcome.cpp" />
+    <ClCompile Include="UserRegistry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Config\Ins.h" />
+    <ClInclude Include="Config\Recent.h" />
+    <ClInclude Include="Editors\EditorButtonHost.h" />
+    <ClInclude Include="Editors\EditorFrame.h" />
+    <ClInclude Include="Editors\EditorHost.h" />
+    <ClInclude Include="Editors\EditorRegistry.h" />
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Files\ArminSessions.h" />
+    <ClInclude Include="Files\BaseTypes.h" />
+    <ClInclude Include="Files\ComponentRefrence.h" />
+    <ClInclude Include="Files\Components.h" />
+    <ClInclude Include="Files\ComponentTypes.h" />
+    <ClInclude Include="Files\FileFragmentation.h" />
+    <ClInclude Include="Files\SearchCriteria.h" />
+    <ClInclude Include="Files\SessionControl.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="UI\About.h" />
+    <ClInclude Include="UI\ArminControls.h" />
+    <ClInclude Include="UI\ComponentViewer.h" />
+    <ClInclude Include="UI\EditorButton.h" />
+    <ClInclude Include="UI\EditorPopout.h" />
+    <ClInclude Include="UI\Import\ImportFromCSV.h" />
+    <ClInclude Include="UI\Main.h" />
+    <ClInclude Include="UI\RibbonHost.h" />
+    <ClInclude Include="UI\SideHost.h" />
+    <ClInclude Include="UI\Startup.h" />
+    <ClInclude Include="UI\Tool\ComponentListRenderer.h" />
+    <ClInclude Include="UI\Tool\CreateImage.h" />
+    <ClInclude Include="UI\Tool\DatePicker.h" />
+    <ClInclude Include="UI\Tool\FileProgress.h" />
+    <ClInclude Include="UI\Tool\GroupSelector.h" />
+    <ClInclude Include="UI\Tool\PasswordInput.h" />
+    <ClInclude Include="UI\Tool\SearchByName.h" />
+    <ClInclude Include="UI\User\CreateUser.h" />
+    <ClInclude Include="UI\User\SignIn.h" />
+    <ClInclude Include="UI\Welcome.h" />
+    <ClInclude Include="UserRegistry.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\Armin Logo.ico" />
+    <Image Include="Resource\Armin Logo.png" />
+    <Image Include="Resource\startup.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,15 +5,15 @@
 #pragma comment(lib, "Gdiplus.lib")
 
 #include "Files\Stream.h"
-#include "src\Common.h"
-#include "src\Config\Ins.h"
-#include "src\Config\Recent.h"
-#include "src\Editors\EditorRegistry.h"
-#include "src\Files\SessionControl.h"
-#include "src\UI\Main.h"
-#include "src\UI\SideHost.h"
-#include "src\UI\Startup.h"
-#include "src\UI\Welcome.h"
+#include "Common.h"
+#include "Config\Ins.h"
+#include "Config\Recent.h"
+#include "Editors\EditorRegistry.h"
+#include "Files\SessionControl.h"
+#include "UI\Main.h"
+#include "UI\SideHost.h"
+#include "UI\Startup.h"
+#include "UI\Welcome.h"
 
 using namespace std;
 using namespace Gdiplus;
