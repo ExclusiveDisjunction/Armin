@@ -202,8 +202,6 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
-				LRESULT Destroy() override;
-				LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) override;
 			public:
 				ViewTaskEditor(Files::Task* Target, bool EditMode = true);
 
@@ -537,8 +535,6 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
-				LRESULT Destroy() override;
-				LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) override;
 			public:
 				ViewUserEditor(Files::User* Target);
 				~ViewUserEditor();
