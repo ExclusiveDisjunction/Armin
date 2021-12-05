@@ -1,0 +1,40 @@
+
+AppStates
+	Centralized numerical value that represents the whole scope of the program, instead of multiple headers.
+
+File Locking
+	Partitions locked?
+	Locking files for ONLY ONE system to write data (Read Only).
+	Create a seprate file to prevent racing for a file.
+
+EditorButtons Improvements using EditorStates
+	Coloring and shading based on errors, view status, and location.
+	Change their painting status as soon as the editor does.
+
+Editor improving.
+	Dragable editors?
+	Scrolling Editors
+	Right hand editor dock mode
+	Appending rules:
+		Mode 1: Close editor on proper append.
+		Mode 2: Clear editor and leave open.
+		Mode 3: Leave editor open.
+	Editor notes under title.
+	Create const int BaseYCoord in EditorFrame & remove local versions of this variable.
+
+Timecards, Calendars, and Reminders
+	Implement timecards into the UI, use Calendar Pro, and create reminders for users.
+
+UI simplification
+	When component viewers are all of the same object, format different strings.
+	
+		[Type] | Property ...
+		Identifyer Property
+
+Text Box improvements.
+	Enable multiline text boxes.
+	Add click locations.
+	Better overall experience.
+
+Server
+	Allow for Aaron Server?

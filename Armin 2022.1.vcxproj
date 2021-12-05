@@ -295,6 +295,9 @@
     <Image Include="Resource\Armin Logo.png" />
     <Image Include="Resource\startup.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="2022.1 Roadmap" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
