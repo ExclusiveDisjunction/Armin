@@ -144,9 +144,6 @@
     <ClCompile Include="Files\ConfigItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\Directory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Files\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,9 +175,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\SearchCriteria.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Sector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\SessionControl.cpp">

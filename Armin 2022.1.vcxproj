@@ -205,7 +205,6 @@
     <ClCompile Include="Files\CompletedTask.cpp" />
     <ClCompile Include="Files\ComponentRefrence.cpp" />
     <ClCompile Include="Files\ConfigItem.cpp" />
-    <ClCompile Include="Files\Directory.cpp" />
     <ClCompile Include="Files\Image.cpp" />
     <ClCompile Include="Files\InventoryItem.cpp" />
     <ClCompile Include="Files\InventoryProject.cpp" />
@@ -217,7 +216,6 @@
     <ClCompile Include="Files\ReferenceList.cpp" />
     <ClCompile Include="Files\RefrenceGroup.cpp" />
     <ClCompile Include="Files\SearchCriteria.cpp" />
-    <ClCompile Include="Files\Sector.cpp" />
     <ClCompile Include="Files\SessionControl.cpp" />
     <ClCompile Include="Files\Task.cpp" />
     <ClCompile Include="Files\TeamProject.cpp" />
