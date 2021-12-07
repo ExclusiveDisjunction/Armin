@@ -401,6 +401,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="2022.1 Roadmap.txt" />
+    <None Include="2022.1 Roadmap" />
   </ItemGroup>
 </Project>

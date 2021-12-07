@@ -77,13 +77,4 @@ Files:
 		Inventory & Oper.Inv Items have more than one image.
 	User:
 		User images are supported.
-		Job position searching in UserSearch editor
-
-	Requsts:
-		A new component that is like a task, but created by a standard/assurance user, and does not have any requirement of assurance.
-		Anyone can edit this component.
-		Visible only to those in the receptient list.
-
-	Lists
-		A list of things to do for someone.
-		Child of User, and can only be seen by a user.
+		Job position searching in UserSearch editor.
