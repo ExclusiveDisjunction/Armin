@@ -38,3 +38,37 @@ Text Box improvements.
 
 Server
 	Allow for Aaron Server?
+
+Files:
+	Improvements on how files will be created
+		Separate dialouge to create files
+	Custom data storage
+	
+	References:
+		Project to Project references
+			For each project to reference, create an object called ProjectReference that accepts a file path and has an ID.
+		ComponentReference has ToString && operator<< functions:
+			Used to give id's the format of [FILE]:[ID].
+			[FILE] = 0 when it is part of the current document.
+			[FILE] != 0 when it is not part of the current project, and it is the Id of the ProjectReference object.
+			[ID] is the ID of the target.
+	ID Compression:
+		Keep Root Admin as 1, and make each object remove each blank id.
+		Aids in file size.	
+	File tree viewer
+		Renders a project with all dependancies, and components.
+		Admin Only.
+	Linked projects
+		Make each project loaded together and linked with dynamic daisy-chain lists.
+		For comparing projects together.
+	ComponentShell class
+		A mirror of the Component Model class tree, but each child ONLY contains the data of the object, including ID.
+		A clone PURE clone of a Component, and each Component class will be able to convert to, and a Component can accept a Shell as an input to copy (unique ID).
+
+		Used for when a referenced file's data is loaded without actually loading the whole model.
+
+	Inventory:
+		Inventory & Oper.Inv Items have more than one image.
+	User:
+		User images are supported.
+		Job position searching in UserSearch editor.
