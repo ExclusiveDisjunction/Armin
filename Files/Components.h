@@ -126,6 +126,7 @@ namespace Armin::Files
 
 #pragma region Resources
 
+	/*
 	class Sector : public Component
 	{
 	private:
@@ -173,8 +174,9 @@ namespace Armin::Files
 
 		SectorList* const& Sectors = _Sectors;
 	};
+	*/
 
-	class Directory : public Component, public SectorParent
+	/*class Directory : public Component, public SectorParent
 	{
 	private:
 		DirectoryList* _ParentList;
@@ -229,6 +231,7 @@ namespace Armin::Files
 
 		DirectoryList* const& Directories = _Directories;
 	};
+	*/
 
 	class Image : public Component
 	{
@@ -251,8 +254,7 @@ namespace Armin::Files
 		Image& operator=(const Image& Obj) = delete;
 		Image& operator=(const Image&& Obj) = delete;
 
-		ComponentReference* TargetDirectory;
-		ComponentReference* TargetSector;
+		std::streampos Begin, End;
 
 		HGLOBAL GetHandle();
 		void SetHandle(HGLOBAL Data);

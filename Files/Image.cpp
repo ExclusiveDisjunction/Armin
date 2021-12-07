@@ -1,6 +1,7 @@
 #include "Components.h"
 
 #include "AString.h"
+#include "ArminSessions.h"
 #include "Files\Stream.h"
 #include "..\Common.h"
 #include "..\Config\Ins.h"
@@ -31,8 +32,9 @@ namespace Armin::Files
 
 		if (ToClone)
 		{
-			TargetSector = new ComponentReference(ToClone->TargetSector);
-			TargetDirectory = new ComponentReference(ToClone->TargetDirectory);
+			Begin = ToClone->Begin;
+			End = ToClone->End;
+			Title(ToClone->Title());
 		}
 	}
 	Image::~Image()
@@ -42,13 +44,29 @@ namespace Armin::Files
 
 	HGLOBAL Image::GetHandle()
 	{
-		if (!TargetDirectory || !TargetSector || !TargetDirectory->Target() || !TargetSector->Target())
+		ResourceSystem* System = dynamic_cast<ResourceSystem*>(_ParentFile);
+		if (!System)
 			return nullptr;
 
-		Directory* Dir = dynamic_cast<Directory*>(TargetDirectory->Target());
-		Sector* Sector = dynamic_cast<class Sector*>(TargetSector->Target());
+		String Path = System->ResourcePath;
+		ifstream InFile(Path, ios::binary | ios::beg);
+		if (!InFile)
+			return nullptr;
+		
+		streampos& Begin = this->Begin, & End = this->End;
+		unsigned long long Size = End - Begin;
 
-		return Dir->ReadSector(Sector);
+		InFile.seekg(Begin);
+		if (!InFile)
+			return nullptr;
+
+		HGLOBAL Return = GlobalAlloc(GMEM_MOVEABLE, Size);
+		char* Data = (char*)GlobalLock(Return);
+
+		InFile.read(Data, Size);
+		GlobalUnlock(Return);
+		InFile.close();
+		return Return;
 	}
 	void Image::SetHandle(HGLOBAL ToCopy)
 	{	
@@ -58,14 +76,27 @@ namespace Armin::Files
 		SetHandle(Data, Size);
 	}
 	void Image::SetHandle(void* Data, unsigned long long Size)
-	{
-		if (!TargetDirectory || !TargetSector || !TargetDirectory->Target() || !TargetSector->Target())
+	{	
+		streampos& Begin = this->Begin, & End = this->End;
+		unsigned long long ThisSize = (unsigned long long)(End - Begin);
+
+		ResourceSystem* System = dynamic_cast<ResourceSystem*>(_ParentFile);
+		if (!System)
 			return;
 
-		Directory* Dir = dynamic_cast<Directory*>(TargetDirectory->Target());
-		Sector* Sector = dynamic_cast<class Sector*>(TargetSector->Target());
+		String Path = System->ResourcePath;
+		ofstream OutFile(Path, ios::binary | ios::app);
+		if (!OutFile)
+			return;
 
-		Dir->WriteToSector(Sector, Data, Size);
+		if (ThisSize > Size)
+		{
+			OutFile.seekp(0, ios::end);
+			Begin = OutFile.tellp();
+		}
+
+		OutFile.write((char*)Data, Size);
+		End = OutFile.tellp();
 	}
 
 	void Image::Fill(std::ifstream& InFile)
@@ -107,28 +138,8 @@ namespace Armin::Files
 			for (uint j = 2; j < ArgPart.Size; j++)
 				Value += ':' + ArgPart[j];
 
-			if (Name == "TargetDirectory")
-			{
-				delete TargetDirectory;
-
-				unsigned long long ID = Value.ToULong();
-				Component* Target = _ParentFile->GetFromID(ID, CT_Directory);
-				if (Target)
-					TargetDirectory = new ComponentReference(Target);
-				else
-					TargetDirectory = nullptr;
-			}
-			else if (Name == "TargetSector")
-			{
-				delete TargetSector;
-
-				unsigned long long ID = Value.ToULong();
-				Component* Target = _ParentFile->GetFromID(ID, CT_Sector);
-				if (Target)
-					TargetSector = new ComponentReference(Target);
-				else
-					TargetSector = nullptr;
-			}
+			if (Name == "Begin") Begin = (streampos)Value.ToULong();
+			else if (Name == "End") End = (streampos)Value.ToULong();
 			else if (Name == "Title") _Title = (String)Value;
 			else if (Name == "ID") _ID = Value.ToULong();
 		}
@@ -140,6 +151,6 @@ namespace Armin::Files
 			TabIndexValue += L'\t';
 
 		OutFile << TabIndexValue << "begin~Image";
-		OutFile << "~TargetDirectory:" << (!TargetDirectory || !TargetDirectory->Target() ? 0 : TargetDirectory->Target()->ID) << "~TargetSector:" << (!TargetSector || !TargetSector->Target() ? 0 : TargetSector->Target()->ID) << "~Title:" << (AString)Title() << "~ID:" << ID << "~end" << endl;
+		OutFile << "~Begin:" << (unsigned long long)Begin << "~End:" << (unsigned long long)End << "~Title:" << (AString)Title() << "~ID:" << ID << "~end" << endl;
 	}
 }
