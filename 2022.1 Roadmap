@@ -67,6 +67,11 @@ Files:
 
 		Used for when a referenced file's data is loaded without actually loading the whole model.
 
+	Images:
+		Remove directories and sectors, direct write.
+		Make one singlular file for resources instead of doing directories.
+		Updated quality issues with image rendering.
+
 	Inventory:
 		Inventory & Oper.Inv Items have more than one image.
 	User:
