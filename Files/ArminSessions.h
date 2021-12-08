@@ -22,10 +22,10 @@ namespace Armin::Files
 	public:
 		TaskSystem() : ProjectBase(), TaskParent(this), CompletedTaskParent(this) { }
 	};
-	class ResourceSystem : virtual public ProjectBase, public ImageParent, public DirectoryParent
+	class ResourceSystem : virtual public ProjectBase, public ImageParent
 	{
 	public:
-		ResourceSystem() : ProjectBase(), ImageParent(this), DirectoryParent(this)	{ }
+		ResourceSystem() : ProjectBase(), ImageParent(this)	{ }
 
 		String ResourcePath;
 		bool CheckResources(Vector<AString>& MissingPaths);
