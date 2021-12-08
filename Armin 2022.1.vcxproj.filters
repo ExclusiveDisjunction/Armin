@@ -264,6 +264,9 @@
     <ClCompile Include="UserRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Tool\NewFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config\Ins.h">
@@ -383,6 +386,9 @@
     <ClInclude Include="UICommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Tool\NewFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -402,5 +408,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="2022.1 Roadmap.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Local ToDo.txt" />
   </ItemGroup>
 </Project>

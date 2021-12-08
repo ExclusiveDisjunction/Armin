@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Color.h"
+#include "Common.h"
 #include <Windows.h>
 
 namespace Armin

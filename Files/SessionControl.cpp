@@ -12,6 +12,7 @@
 #include "..\UI\User\CreateUser.h"
 #include "..\UI\Tool\FileProgress.h"
 #include "..\UI\Tool\PasswordInput.h"
+#include "..\UI\Tool\NewFile.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -158,6 +159,8 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Closing File...");
 
+        bool HasEdit = AppState & APS_HasEdit;
+
         if (HasEdit || EditorRegistry::ApplyableEditorRunning())
         {
             int Result = MessageBoxW(NULL, L"Do you want to save before closing the current project?", L"Armin:", MB_YESNOCANCEL | MB_ICONWARNING);
@@ -204,7 +207,24 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Creating New File...");
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        if (AppState & APS_HasEdit)
+        {
+            int Result = MessageBoxW(nullptr, L"Would you like to save first?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
+            if (Result == IDYES)
+            {
+                if (!Save(ins))
+                {
+                    Result = MessageBoxW(nullptr, L"Save failed. Would you still like to create a new file?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
+                    if (Result == IDNO || Result == IDCANCEL)
+                        return false;
+                }
+            }
+            else if (Result == IDCANCEL)
+                return false;
+        }
+
+        String Path = NewFile::Execute(ins);
+       //String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
         bool Return = false;
 
         if (Path == L"")
@@ -250,9 +270,6 @@ namespace Armin::Files
                 return false;
             }
 
-            LoadedProject->Save();
-            HasEdit = false;
-
             Return = true;
         }
         else if (FileExt == L"armininvproj" || FileExt == L"arminrcinvproj")
@@ -272,7 +289,6 @@ namespace Armin::Files
             else if (FileExt == L"arminrcinvproj")
                 LoadedProject = new InventoryProjectRc();
             LoadedProject->ChangePath(Path);
-
             Return = true;
         }
 
@@ -280,6 +296,10 @@ namespace Armin::Files
         {
             RecentInstance->AddRecent(Path);
             InsInstance->LastLoaded = Path;
+
+            LoadedProject->Save();
+            AppState = 0; //Resets app state
+            AppState |= APS_FileLoaded; //Loads a file up.
 
             UserSystem* ConvFile = dynamic_cast<UserSystem*>(LoadedProject);
             UserRegistry::Initalize(ConvFile, ins);

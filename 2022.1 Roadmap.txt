@@ -25,16 +25,20 @@ Editor improving.
 Timecards, Calendars, and Reminders
 	Implement timecards into the UI, use Calendar Pro, and create reminders for users.
 
-UI simplification
+UI:
 	When component viewers are all of the same object, format different strings.
 	
 		[Type] | Property ...
 		Identifyer Property
 
-Text Box improvements.
-	Enable multiline text boxes.
-	Add click locations.
-	Better overall experience.
+	Text Box improvements.
+		Enable multiline text boxes.
+		Add click locations.
+		Better overall experience.
+
+	Multithreaded approach to User Interface.
+		When Armin is launched, a base thread is created. This runs the core features.
+		Each instance of Main is it's own thread, and therefore when a new file is opened, it can open as it's own independant thread.
 
 Server
 	Allow for Aaron Server?
@@ -78,6 +82,8 @@ Files:
 	User:
 		User images are supported.
 		Job position searching in UserSearch editor
+	Tasks:
+		Tasks assigned to no-one are assigned to everyone.
 
 	Requsts:
 		A new component that is like a task, but created by a standard/assurance user, and does not have any requirement of assurance.
