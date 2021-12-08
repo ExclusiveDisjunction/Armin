@@ -1,5 +1,6 @@
 #include "GroupSelector.h"
 
+#include "..\..\UICommon.h"
 #include "..\..\Files\ArminSessions.h"
 
 namespace Armin::UI::Tool

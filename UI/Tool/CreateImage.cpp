@@ -8,6 +8,7 @@ using namespace std;
 
 #include "Files\Stream.h"
 #include "..\..\Common.h"
+#include "..\..\UICommon.h"
 #include "..\..\Editors\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\Components.h"
@@ -243,44 +244,39 @@ namespace Armin::UI::Tool
 		}
 
 		ResourceSystem* System = dynamic_cast<ResourceSystem*>(LoadedProject);
-		DirectoryList* Directories = !System ? nullptr : System->Directories;
 		ImageList* Images = !System ? nullptr : System->Images;
-		if (!System || !Directories || !Images)
+		if (!System || !Images)
 		{
 			MessageBoxW(_Base, L"The current project does not support images or resources.\n\nPlease load a resource file and try again.", L"Create Image:", MB_OK | MB_ICONERROR);
 			DestroyWindow(_Base);
 			return nullptr;
 		}
 
-		Directory* TargetDirectory;
-		if (Directories->Count == 0)
-			TargetDirectory = new Directory(System, Directories);
-		else
-			TargetDirectory = Directories->Item(0);
-
-		AString ThisPath = static_cast<AString>(::FilePath(LoadedProjectPath)) + "\\" + (AString)FileFullName(LoadedProjectPath) + ".arminresource";
-
-		if (!FileExists((String)TargetDirectory->TargetPath))
-			TargetDirectory->TargetPath = ThisPath;
+		AString ThisPath = !FileExists((String)System->ResourcePath) ? static_cast<AString>(::FilePath(LoadedProjectPath)) + "\\" + (AString)FileFullName(LoadedProjectPath) + ".arminresource" : System->ResourcePath;
+		System->ResourcePath = ThisPath;
 
 		ifstream Stream(Path, ios::binary | ios::ate);
 		unsigned long long Size = Stream.tellg();
 		char* Data = new char[Size];
 
-		Stream.seekg(0);
+		Stream.seekg(0, ios::beg);
 		Stream.read(Data, Size);
 
-		Sector* TargetSector = TargetDirectory->CreateSector(Data, Size);	
-
-		Image* NewImage = new Image(LoadedProject, Images);
-		NewImage->TargetDirectory = new ComponentReference(TargetDirectory);
-		NewImage->TargetSector = new ComponentReference(TargetSector);
-		NewImage->Title(Title->GetText());
+		ofstream Out(ThisPath, ios::binary | ios::app | ios::ate);
+		streampos Begin = Out.tellp();
+		Out.write(Data, Size);
+		streampos End = Out.tellp();
 
 		Stream.close();
+		Out.close();
 		delete[] Data;
 
-		HasEdit = true;
+		Image* NewImage = new Image(LoadedProject, Images);
+		NewImage->Title(Title->GetText());
+		NewImage->Begin = Begin;
+		NewImage->End = End;
+
+		AppState |= APS_HasEdit;
 		Editors::EditorRegistry::ResetEditorOfType(EDT_Images);
 		return NewImage;
 	}

@@ -2,6 +2,7 @@
 
 #include "Misc.h"
 #include "Files\Stream.h"
+#include "..\..\UICommon.h"
 #include "..\..\Editors\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 
@@ -646,7 +647,7 @@ namespace Armin::UI::Import
 		DestroyWindow(_Base);
 
 		File->Save();
-		HasEdit = false;
+		AppState &= ~APS_HasEdit;
 
 		EditorRegistry::ResetEditorOfType(EDT_Inventory);
 		return;

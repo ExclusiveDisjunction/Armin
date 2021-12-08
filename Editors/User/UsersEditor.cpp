@@ -205,7 +205,7 @@ namespace Armin::Editors::Users
 			}
 
 			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			break;
 		}
 		case 8: //View

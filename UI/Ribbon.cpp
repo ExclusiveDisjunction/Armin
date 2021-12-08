@@ -41,8 +41,7 @@ namespace Armin::UI
 			(TaskFile && SignedIn ? CT_Task | CT_CompletedTask : 0) |
 			(UserFile && SignedIn ? CT_User | CT_JobPosition : 0) | 
 			(File && SignedIn ? CT_RefrenceGroup : 0) |
-			(ResourceFile && SignedIn ? CT_Image : 0) | 
-			(ResourceFile && SignedIn ? CT_Directory : 0);
+			(ResourceFile && SignedIn ? CT_Image : 0);
 		int AllowedForEdit = !File ? 0 :
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
 			(InventoryFile && SignedIn ? CT_OperationInventoryItem : 0) |
@@ -50,8 +49,7 @@ namespace Armin::UI
 			(UserFile && AdminSignedIn ? CT_User : 0) |
 			(UserFile && SignedIn ? CT_JobPosition : 0) |
 			(File && SignedIn ? CT_RefrenceGroup : 0) | 
-			(ResourceFile && SignedIn ? CT_Image : 0) | 
-			(ResourceFile && SignedIn ? CT_Directory : 0);
+			(ResourceFile && SignedIn ? CT_Image : 0);
 
 		HideRibbonGrids();
 		ShowWindow(*FileGrid, SW_SHOW);

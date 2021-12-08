@@ -259,14 +259,6 @@ namespace Armin::Editors::Tasks
 
         return 0;
 	}
-	LRESULT ViewTaskEditor::Destroy()
-	{
-        return 0;
-	}
-	LRESULT ViewTaskEditor::SpecialCommand(HMENU ID, uint Command, LPARAM Sender)
-	{
-        return 0;
-	}
 
 	void ViewTaskEditor::Reset()
 	{

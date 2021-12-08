@@ -160,7 +160,7 @@ namespace Armin::Editors::Misc
 		File->RequiresPassword(RequiresPassword);
 		File->Password(Password);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		return true;
 	}
 	bool ProjectSettingsEditor::EquatableTo(EditorFrame* Other) const

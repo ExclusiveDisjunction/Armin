@@ -1,6 +1,7 @@
 #include "CreateUser.h"
 
 #include "..\Tool\SearchByName.h"
+#include "..\..\UICommon.h"
 #include "..\..\Config\Ins.h"
 #include "..\..\Editors\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -257,7 +258,7 @@ namespace Armin::UI::Users
 				New->Positions = ComponentReference::Generate(NewPositions);
 			}
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 
 			MessageBoxW(_Base, L"The user has been created successfully.", L"Create User:", MB_OK | MB_ICONINFORMATION);
 			Return = true;

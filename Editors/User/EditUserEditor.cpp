@@ -366,7 +366,7 @@ namespace Armin::Editors::Users
 		EditorRegistry::ResetEditorOfType(EDT_ViewUser);
 		EditorRegistry::ResetEditorOfType(EDT_Users);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		return true;
 	}
 	bool EditUserEditor::TestOnCondition(Vector<void*> Args) const

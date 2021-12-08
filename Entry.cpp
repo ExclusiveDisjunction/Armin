@@ -6,6 +6,7 @@
 
 #include "Files\Stream.h"
 #include "Common.h"
+#include "UICommon.h"
 #include "Config\Ins.h"
 #include "Config\Recent.h"
 #include "Editors\EditorRegistry.h"
@@ -40,8 +41,6 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCm
 		RecentInstance = new Recent();
 		RecentInstance->LoadData();
 	}
-
-	LoadAllColors();
 
 	if (!InsInstance->DevMode)
 	{

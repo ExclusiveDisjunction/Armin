@@ -2,6 +2,7 @@
 
 #include "UI\Controls.h"
 #include "..\..\Common.h"
+#include "..\..\UICommon.h"
 #include "..\..\Files\Components.h"
 #include "..\..\UI\ArminControls.h"
 

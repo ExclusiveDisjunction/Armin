@@ -64,7 +64,7 @@ namespace Armin::UI
 		case WM_DESTROY:
 		{
 			SetWindowLongPtr(Window, GWLP_USERDATA, 0);
-			delete This;
+			PostQuitMessage(0);
 			return 0;
 		}
 		default:
@@ -86,6 +86,34 @@ namespace Armin::UI
 		wn.style = CS_HREDRAW | CS_VREDRAW;
 
 		_ThisAtom = RegisterClassW(&wn);
+	}
+	
+	LRESULT NewFile::Paint()
+	{
+		PAINTSTRUCT ps;
+		HDC Dc = BeginPaint(_Base, &ps);
+
+		RECT WndRect;
+		GetClientRect(_Base, &WndRect);
+
+		HBRUSH Bk = CreateSolidBrush(Background1);
+		FillRect(Dc, &WndRect, Bk);
+
+		DeleteObject(Bk);
+		EndPaint(_Base, &ps);
+		return 0;
+	}
+	LRESULT NewFile::Size()
+	{
+		return 0;
+	}
+	LRESULT NewFile::Command(WPARAM wp, LPARAM lp)
+	{
+		return 0;
+	}
+	LRESULT NewFile::KeyDown(WPARAM wp)
+	{
+		return 0;
 	}
 
 	LRESULT NewFile::RunMessageLoop(NewFile* Object, HINSTANCE ins, bool* Running)
@@ -117,7 +145,7 @@ namespace Armin::UI
 
 		Thread.detach();
 		delete Running;
-		String Return = Obj->Return;
+		String Return = String(Obj->Return);
 		delete Obj;
 
 		return Return;

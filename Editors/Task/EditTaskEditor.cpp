@@ -323,7 +323,7 @@ namespace Armin::Editors::Tasks
 		Target->AssignedTo = ComponentReference::Generate(AssignedTo);
 		Target->RequiresAssurance = RequiresAssurance;
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_ViewTask, { Target });
 		EditorRegistry::ResetEditorOfType(EDT_Tasks | EDT_UserHomepage);
 		return true;

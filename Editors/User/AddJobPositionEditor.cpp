@@ -156,7 +156,7 @@ namespace Armin::Editors::Users
 		New->Title(Title);
 		New->Description = Description;
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_JobPositions);
 		return true;
 	}

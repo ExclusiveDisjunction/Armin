@@ -1,5 +1,7 @@
 #include "DatePicker.h"
 
+#include "..\..\UICommon.h"
+
 namespace Armin::UI::Tool
 {
     DatePicker::DatePicker(const DateTime& Prev, HINSTANCE ins, bool HasDate) : _HasDate(HasDate)

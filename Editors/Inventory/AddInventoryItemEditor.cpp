@@ -273,7 +273,7 @@ namespace Armin::Editors::Inventory
 		New->IsInPossession = IsInPossession;
 		New->TargetImage = new ComponentReference(TargetImage);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_Inventory);
 
 		return true;

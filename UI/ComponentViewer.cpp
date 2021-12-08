@@ -227,8 +227,6 @@ namespace Armin::UI
 				case CT_Image:
 					Open = UserRegistry::IsSignedIn();
 					break;
-				case CT_Sector:
-				case CT_Directory:
 				case CT_CompletedTask:
 				case CT_ConfigItem:
 				default:
@@ -272,8 +270,6 @@ namespace Armin::UI
 				case CT_Image:
 					Open = UserRegistry::IsSignedIn();
 					break;
-				case CT_Sector:
-				case CT_Directory:
 				case CT_ConfigItem:
 				default:
 					Open = false;
@@ -310,7 +306,7 @@ namespace Armin::UI
 		RefrenceGroup* New = new RefrenceGroup(LoadedProject, Groups);
 		New->Targets = ComponentReference::Generate(Targets);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(New, true), nullptr);
 		EditorRegistry::ResetEditorOfType(EDT_ReferenceGroups);
 		return New;

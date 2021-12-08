@@ -349,7 +349,7 @@ namespace Armin::Files
         if (Return)
             EditorRegistry::CloseEditor(Host, false);
 
-        HasEdit |= Return;
+        AppState |= APS_HasEdit;     
         return Return;
     }
     bool SessionControl::ApplyAll()
@@ -371,7 +371,7 @@ namespace Armin::Files
     bool SessionControl::Save(HINSTANCE ins)
     {
         bool HasError = false;
-        bool Return = HasEdit;
+        bool Return = AppState & APS_HasEdit;
         {
             Vector<EditorFrame*> Apply = EditorRegistry::CurrentApplyableEditors();
             bool DoAppylyable = false;
@@ -410,7 +410,7 @@ namespace Armin::Files
             FileProgress* Progress = new FileProgress(true, ins);
 
             LoadedProject->Save();
-            HasEdit = false;
+            AppState &= ~APS_HasEdit;
 
             delete Progress;
         }
@@ -492,7 +492,7 @@ namespace Armin::Files
         ProjectBase* File = LoadedProject;
         File->ChangePath(Path);
         File->Save();
-        HasEdit = false;
+        AppState &= ~APS_HasEdit;
 
         if (!Save(ins))
         {

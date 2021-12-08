@@ -239,15 +239,7 @@ namespace Armin::Editors::Resources
 				Obj->CheckState(wp == 8);
 			break;
 		case 10: //Compress
-		{
-			DirectoryList* Dir = !_System ? nullptr : _System->Directories;
-			if (!Dir)
-				break;
-
-			for (uint i = 0; i < Dir->Count; i++)
-				Dir->Item(i)->CompressSectors();
 			break;
-		}
 		}
 		return 0;
 	}

@@ -331,7 +331,7 @@ namespace Armin::Editors::Inventory
 		New->CurrentState = State;
 		New->TargetImage = new ComponentReference(TargetImage);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_OperationInventory);
 
 		return true;

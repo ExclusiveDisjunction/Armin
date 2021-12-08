@@ -254,7 +254,7 @@ namespace Armin::Editors::Misc
 			RefrenceGroup* New = new RefrenceGroup(LoadedProject, RefGroups);
 			New->Targets = ComponentReference::Generate(ComponentViewer::GetAllComponents(Objects));
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(New, true), nullptr);
 			break;
 		}

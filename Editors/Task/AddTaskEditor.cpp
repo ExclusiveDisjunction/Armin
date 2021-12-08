@@ -304,7 +304,7 @@ namespace Armin::Editors::Tasks
 		New->Instructions = Instructions;
 		New->RequiresAssurance = RequiresAssurance;
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_Tasks);
 		EditorRegistry::ResetEditorOfType(EDT_UserHomepage);
 

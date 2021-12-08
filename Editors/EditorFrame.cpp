@@ -177,14 +177,16 @@ namespace Armin::Editors
 			return Return;
 		}
 		case WM_SETFOCUS:
-			This->CurrentState |= EDS_Focus;
+			This->_CurrentState |= EDS_Focus;
 			break;
 		case WM_KILLFOCUS:
-			This->CurrentState &= ~EDS_Focus;
+			This->_CurrentState &= ~EDS_Focus;
 			break;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}
+
+		return 0;
 	}
 
 	LRESULT EditorFrame::Paint()

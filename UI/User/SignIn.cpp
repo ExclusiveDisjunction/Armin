@@ -1,5 +1,6 @@
 #include "SignIn.h"
 
+#include "..\..\UICommon.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\UI\Main.h"
 

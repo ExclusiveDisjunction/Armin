@@ -27,7 +27,7 @@ namespace Armin::Files
 	public:
 		ResourceSystem() : ProjectBase(), ImageParent(this)	{ }
 
-		String ResourcePath;
+		AString ResourcePath;
 		bool CheckResources(Vector<AString>& MissingPaths);
 	};
 

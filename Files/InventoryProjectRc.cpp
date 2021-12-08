@@ -9,8 +9,6 @@ namespace Armin::Files
 		ofstream OutFile((AString)Path);
 
 		OutFile << "begin~InventoryProjectRc~ID:" << CurrentID << endl;
-		if (Directories)
-			Directories->Push(OutFile, 1);
 		if (Images)
 			Images->Push(OutFile, 1);
 		if (InventoryItems)
@@ -69,8 +67,6 @@ namespace Armin::Files
 						RefrenceGroups->Fill(InFile);
 					else if (ThisParts[1] == ConfigItems->Name)
 						ConfigItems->Fill(InFile);
-					else if (ThisParts[1] == Directories->Name)
-						Directories->Fill(InFile);
 					else if (ThisParts[1] == Images->Name)
 						Images->Fill(InFile);
 					else
@@ -108,34 +104,12 @@ namespace Armin::Files
 
 		if (Images && (Filter & CT_Image))
 		{
+			bool Imgs = Filter & CT_Image;
 			for (uint i = 0; i < Images->Count; i++)
 			{
 				Image* This = Images->Item(i);
-				if (This->ID == ID)
-					Return = This;
-			}
-		}
-		if (Directories && ((Filter & CT_Directory) || (Filter & CT_Sector)))
-		{
-			bool Dir = Filter & CT_Directory;
-			bool Sec = Filter & CT_Sector;
-
-			for (uint i = 0; i < Directories->Count; i++)
-			{
-				Directory* This = Directories->Item(i);
-				if (This->ID == ID && Dir)
-					Return = This;
-
-				SectorList* Sectors = This->Sectors;
-				if (Sectors && Sectors->Count && Sec)
-				{
-					for (uint j = 0; j < Sectors->Count; j++)
-					{
-						Sector* Current = Sectors->Item(i);
-						if (Current->ID == ID)
-							Return = Current;
-					}
-				}
+				if (Imgs && This->ID == ID)
+					Return = This;				
 			}
 		}
 

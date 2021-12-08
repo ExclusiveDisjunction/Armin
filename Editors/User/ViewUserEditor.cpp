@@ -151,10 +151,6 @@ namespace Armin::Editors::Users
 		}
 		return 0;
 	}
-	LRESULT ViewUserEditor::SpecialCommand(HMENU ID, uint Command, LPARAM Sender)
-	{
-		return 0;
-	}
 	LRESULT ViewUserEditor::KeyDown(WPARAM Key)
 	{
 		return SendMessageW(GetAncestor(_Base, GA_ROOT), WM_KEYDOWN, Key, 0);
@@ -243,12 +239,6 @@ namespace Armin::Editors::Users
 			PositionScroll->Move(XCoord, YCoord, Width, Height);
 			ComponentViewer::ReSizeList(Positions, PositionView, PositionScroll);
 		}
-
-		return 0;
-	}
-	LRESULT ViewUserEditor::Destroy()
-	{
-		Current = nullptr;
 
 		return 0;
 	}

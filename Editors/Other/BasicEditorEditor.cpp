@@ -568,7 +568,7 @@ namespace Armin::Editors::Misc
 			else
 				ConvTarget->TargetImage = new ComponentReference(TargetImage);
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_Inventory);
 			break;
 		}
@@ -637,7 +637,7 @@ namespace Armin::Editors::Misc
 			else
 				ConvTarget->TargetImage = new ComponentReference(TargetImage);
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_OperationInventory);
 
 			break;
@@ -671,7 +671,7 @@ namespace Armin::Editors::Misc
 			ConvTarget->Title(Title);
 			ConvTarget->Description = Description;
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_JobPositions);
 			break;
 		}
@@ -679,6 +679,8 @@ namespace Armin::Editors::Misc
 		{
 			Image* ConvTarget = dynamic_cast<Image*>(ThisTarget);
 			ConvTarget->Title(TB1->GetText());
+
+			AppState |= APS_HasEdit;
 			break;
 		}
 		}

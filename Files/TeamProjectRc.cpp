@@ -10,8 +10,6 @@ namespace Armin::Files
 
 		OutFile << "begin~ProjectRc" << "~ID:" << CurrentID << endl;
 
-		if (Directories)
-			Directories->Push(OutFile, 1);
 		if (Images)
 			Images->Push(OutFile, 1);
 		if (ConfigItems)
@@ -79,8 +77,6 @@ namespace Armin::Files
 						ConfigItems->Fill(InFile);
 					else if (ThisParts[1] == Images->Name)
 						Images->Fill(InFile);
-					else if (ThisParts[1] == Directories->Name)
-						Directories->Fill(InFile);
 					else
 						InFile.seekg(ThisPos);
 				}
@@ -164,29 +160,6 @@ namespace Armin::Files
 				Image* This = Images->Item(i);
 				if (This->ID == ID)
 					Return = This;
-			}
-		}
-
-		if (Directories && ((Filter & CT_Directory) || (Filter & CT_Sector)))
-		{
-			bool Dir = Filter & CT_Directory;
-			bool Sec = Filter & CT_Sector;
-			for (uint i = 0; i < Directories->Count; i++)
-			{
-				Directory* Current = Directories->Item(i);
-				if (Current->ID == ID && Dir)
-					Return = Current;
-
-				SectorList* Sectors = Current->Sectors;
-				if (Sectors && Sectors->Count && Sec)
-				{
-					for (uint j = 0; j < Sectors->Count; j++)
-					{
-						Sector* ThisSec = Sectors->Item(i);
-						if (ThisSec->ID == ID)
-							Return = ThisSec;
-					}
-				}
 			}
 		}
 

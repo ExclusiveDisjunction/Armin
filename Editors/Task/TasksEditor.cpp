@@ -295,7 +295,7 @@ namespace Armin::Editors::Tasks
 
 			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			break;
 		}
 		case 7: //View

@@ -179,7 +179,7 @@ namespace Armin::Editors::Inventory
 				delete Viewer;
 			}
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
 			break;
 		}

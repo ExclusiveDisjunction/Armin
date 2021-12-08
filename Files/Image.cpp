@@ -48,7 +48,7 @@ namespace Armin::Files
 		if (!System)
 			return nullptr;
 
-		String Path = System->ResourcePath;
+		AString Path = System->ResourcePath;
 		ifstream InFile(Path, ios::binary | ios::beg);
 		if (!InFile)
 			return nullptr;
@@ -84,7 +84,7 @@ namespace Armin::Files
 		if (!System)
 			return;
 
-		String Path = System->ResourcePath;
+		AString Path = System->ResourcePath;
 		ofstream OutFile(Path, ios::binary | ios::app);
 		if (!OutFile)
 			return;

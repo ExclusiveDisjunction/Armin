@@ -223,7 +223,7 @@ namespace Armin::Editors::RefGroups
 		New->Title(Title);
 		New->Targets = ComponentReference::Generate(Targets);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_ReferenceGroups);
 		return true;
 	}

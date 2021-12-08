@@ -1,7 +1,8 @@
 #include "About.h"
 
+#include "..\UICommon.h"
+#include "..\resource.h"
 #include "..\Config\Ins.h"
-#include "..\..\resource.h"
 
 namespace Armin::UI
 {

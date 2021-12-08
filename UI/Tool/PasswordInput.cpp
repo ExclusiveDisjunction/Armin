@@ -1,5 +1,7 @@
 #include "PasswordInput.h"
 
+#include "..\..\UICommon.h"
+
 namespace Armin::UI::Tool
 {
 	PasswordInput::PasswordInput(HINSTANCE ins)

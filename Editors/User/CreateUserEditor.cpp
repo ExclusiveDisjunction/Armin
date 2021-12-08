@@ -321,7 +321,7 @@ namespace Armin::Editors::Users
 		New->IsAssurance = IsAssurance;
 		New->Positions = ComponentReference::Generate(Positions);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_Users);
 		return true;
 	}

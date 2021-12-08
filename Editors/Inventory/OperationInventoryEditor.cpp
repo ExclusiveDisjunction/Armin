@@ -171,7 +171,7 @@ namespace Armin::Editors::Inventory
 				delete Current;
 			}
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 
 			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
 			break;
