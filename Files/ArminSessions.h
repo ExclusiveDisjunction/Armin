@@ -7,21 +7,33 @@
 
 namespace Armin::Files
 {
+	/// <summary>
+	/// Represents a collection system of Inventory tools.
+	/// </summary>
 	class InventorySystem : virtual public ProjectBase, public InventoryItemParent, public OperationInventoryItemParent
 	{
 	public:
 		InventorySystem() : ProjectBase(), InventoryItemParent(this), OperationInventoryItemParent(this) { }
 	};
+	/// <summary>
+	/// Represents a collection system of User tools.
+	/// </summary>
 	class UserSystem : virtual public ProjectBase, public UserParent, public JobPositionParent
 	{
 	public:
 		UserSystem() : ProjectBase(), UserParent(this), JobPositionParent(this) { }
 	};
+	/// <summary>
+	/// Represents a collection system of Taslk tools.
+	/// </summary>
 	class TaskSystem : virtual public ProjectBase, public TaskParent, public CompletedTaskParent
 	{
 	public:
 		TaskSystem() : ProjectBase(), TaskParent(this), CompletedTaskParent(this) { }
 	};
+	/// <summary>
+	/// Represents a collection system of Resource tools.
+	/// </summary>
 	class ResourceSystem : virtual public ProjectBase, public ImageParent
 	{
 	public:
@@ -31,6 +43,39 @@ namespace Armin::Files
 		bool CheckResources(Vector<AString>& MissingPaths);
 	};
 
+	/// <summary>
+	/// Used to configure a UniProject's systems and what data it can store.
+	/// </summary>
+	enum UniProjConfig
+	{
+		UPC_Users = 1,
+		UPC_Tasks = 2,
+		UPC_Inventory = 4,
+		UPC_Resource = 8,
+		UPC_All = UPC_Users | UPC_Tasks | UPC_Inventory | UPC_Resource
+	};
+
+	/// <summary>
+	/// Represents the root node of the Component Model tree. This class is dynamic and can support different types of systems.
+	/// </summary>
+	class UniProject : public UserSystem, public TaskSystem, public InventorySystem, public ResourceSystem
+	{
+	public:
+		UniProject();
+		UniProject(String Path);
+
+		int Config = UPC_All;
+		void ConfigureMemory();
+
+		void Save() override;
+		void Load() override;
+
+		ProjectBase* ParentFile() override { return this; }
+
+		Component* GetFromID(unsigned long long ID, int Filter) const override;
+	};
+
+	/*
 	class Project : public UserSystem, public TaskSystem, public InventorySystem
 	{
 	public:
@@ -42,12 +87,6 @@ namespace Armin::Files
 
 		ProjectBase* ParentFile() override { return this; }
 
-		/**
-		* Retrives a Component* From the current project. If the object does not exist, or the object is not of the type specified in Filter, it returns nullptr.
-		*
-		* @param The ID of the object to retrive. Must be non-zero.
-		* @param The type of object to retreive. This may be of diffrent types. By default, this is set to CT_All
-		*/
 		Component* GetFromID(unsigned long long ID, int Filter) const override;
 	};
 
@@ -120,6 +159,7 @@ namespace Armin::Files
 
 		Component* GetFromID(unsigned long long ID, int Filter) const override;
 	};
+	*/
 }
 
 #endif

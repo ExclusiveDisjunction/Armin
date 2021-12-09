@@ -150,22 +150,10 @@
     <ClCompile Include="Files\InventoryItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\InventoryProject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\InventoryProjectRc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Files\JobPosition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\OperationInventoryItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Project.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\ProjectRc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\ReferenceList.cpp">
@@ -181,12 +169,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\Task.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\TeamProject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\TeamProjectRc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\TimecardEntry.cpp">
@@ -265,6 +247,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\Tool\NewFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Files\UniProject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

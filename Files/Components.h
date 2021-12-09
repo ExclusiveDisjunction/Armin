@@ -24,14 +24,6 @@ namespace Armin::Files
 
 	//ResourceSystem
 
-	class Sector;
-	class SectorParent;
-	using SectorList = ComponentList<Sector, SectorParent>;
-
-	class Directory;
-	class DirectoryParent;
-	using DirectoryList = ComponentList<Directory, DirectoryParent>;
-
 	class Image;
 	class ImageParent;
 	using ImageList = ComponentList<Image, ImageParent>;
@@ -121,7 +113,7 @@ namespace Armin::Files
 			_ConfigItems = nullptr;
 		}
 
-		ConfigItemSet* const& ConfigItems = _ConfigItems;
+		ConfigItemSet*& ConfigItems = _ConfigItems;
 	};
 
 #pragma region Resources
@@ -279,7 +271,7 @@ namespace Armin::Files
 			_Images = nullptr;
 		}
 
-		ImageList* const& Images = _Images;
+		ImageList*& Images = _Images;
 	};
 
 #pragma endregion
@@ -331,7 +323,7 @@ namespace Armin::Files
 			_Positions = nullptr;
 		}
 
-		JobPositionList* const& Positions = _Positions;
+		JobPositionList*& Positions = _Positions;
 	};
 
 	class TimecardEntry : public Component
@@ -379,7 +371,7 @@ namespace Armin::Files
 			_TimecardEntries = nullptr;
 		}
 
-		TimecardEntryList* const& TimecardEntries = _TimecardEntries;
+		TimecardEntryList*& TimecardEntries = _TimecardEntries;
 	};
 
 	class User : public Component, public TimecardEntryParent
@@ -431,7 +423,7 @@ namespace Armin::Files
 			_Users = nullptr;
 		}
 
-		UserSet* const& Users = _Users;
+		UserSet*& Users = _Users;
 	};
 
 #pragma endregion 
@@ -500,7 +492,7 @@ namespace Armin::Files
 			_InventoryItems = nullptr;
 		}
 
-		InventoryItemGroup* const& InventoryItems = _InventoryItems;
+		InventoryItemGroup*& InventoryItems = _InventoryItems;
 	};
 
 	class OperationInventoryItem : public InventoryBase
@@ -560,7 +552,7 @@ namespace Armin::Files
 			_OperationInventoryItems = nullptr;
 		}
 
-		OperationInventoryItemGroup* const& OperationInventoryItems = _OperationInventoryItems;
+		OperationInventoryItemGroup*& OperationInventoryItems = _OperationInventoryItems;
 	};
 
 #pragma endregion
@@ -612,7 +604,7 @@ namespace Armin::Files
 			_Tasks = nullptr;
 		}
 
-		TaskList* const& Tasks = _Tasks;
+		TaskList*& Tasks = _Tasks;
 	};
 
 	class CompletedTask : public Component, public OperationInventoryItemParent, public TaskParent
@@ -666,7 +658,7 @@ namespace Armin::Files
 			_CompletedTasks = nullptr;
 		}
 
-		CompletedTaskList* const& CompletedTasks = _CompletedTasks;
+		CompletedTaskList*& CompletedTasks = _CompletedTasks;
 	};
 
 #pragma endregion
@@ -714,7 +706,7 @@ namespace Armin::Files
 			_RefrenceGroups = nullptr;
 		}
 
-		RefrenceGroupList* const& RefrenceGroups = _RefrenceGroups;
+		RefrenceGroupList*& RefrenceGroups = _RefrenceGroups;
 	};
 
 	class ProjectBase : public ConfigItemParent, public RefrenceGroupParent
