@@ -229,7 +229,8 @@ namespace Armin::Editors::RefGroups
 	}
 	void AddReferenceGroupEditor::Reset()
 	{
-		Name->SetText(String());
+		String Blank;
+		Name->SetText(Blank);
 		CloseControls(Objects);
 	}
 }

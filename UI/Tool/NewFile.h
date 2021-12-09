@@ -3,6 +3,7 @@
 #include "UI\Button.h"
 #include "UI\CheckableButton.h"
 #include "UI\TextBox.h"
+#include "UI\Grid.h"
 #include "..\..\UICommon.h"
 
 namespace Armin::UI
@@ -13,7 +14,14 @@ namespace Armin::UI
 		HWND _Base;
 		bool _Loaded;
 
-		String _Return;
+		String _Return, _Username, _Password;
+
+		Vector<ControlBase*> MiscControls; //Labels and such
+		TextBox* Name = nullptr, * Directory = nullptr; //Location & File Name
+		Button* SelectDirectory = nullptr, * Submit = nullptr, * Cancel = nullptr; //Buttons for Commands
+		CheckableButton* InventorySys = nullptr, * TaskSys = nullptr, * UserSys = nullptr, * ResourceSys = nullptr; //Options for different systems in armin.
+		TextBox* Username = nullptr, * Password = nullptr; //Username and Password for Root User.
+		Button* StdProj = nullptr, * InvProj = nullptr, * TaskProj = nullptr;
 
 		void CreateBase(HINSTANCE ins);
 
@@ -27,10 +35,20 @@ namespace Armin::UI
 		static void InitBase(HINSTANCE ins);
 	public:
 		NewFile();
+		NewFile(const NewFile& Obj) = delete;
+		NewFile(const NewFile&& Obj) = delete;
+		~NewFile()
+		{
+			SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+			DestroyWindow(_Base);
+		}
+
+		NewFile& operator=(const NewFile& Obj) = delete;
+		NewFile& operator=(const NewFile&& Obj) = delete;
 
 		static LRESULT RunMessageLoop(NewFile* Object, HINSTANCE ins, bool* Running);
 	
 		String const& Return = _Return;
-		static String Execute(HINSTANCE ins);
+		static String Execute(HINSTANCE ins, String& Username, String& Password);
 	};
 }

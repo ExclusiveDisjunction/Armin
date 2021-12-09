@@ -1,7 +1,10 @@
 #include "NewFile.h"
 
+#include "UI\Label.h"
+
 #include <iostream>
 #include <thread>
+#include <ShlObj.h>
 
 using namespace std;
 
@@ -16,7 +19,7 @@ namespace Armin::UI
 		if (!_ThisAtom)
 			InitBase(ins);
 
-		_Base = CreateWindowEx(0l, MAKEINTATOM(_ThisAtom), L"Create File:", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 700, 550, nullptr, nullptr, ins, nullptr);
+		_Base = CreateWindowEx(0l, MAKEINTATOM(_ThisAtom), L"Create File:", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 900, 550, nullptr, nullptr, ins, nullptr);
 		ShowWindow(_Base, SW_NORMAL);
 		SetWindowLongPtr(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 		UpdateWindow(_Base);
@@ -33,6 +36,12 @@ namespace Armin::UI
 		TextStyle.FontSize = 13;
 		TextStyle.Foreground = FontColor;
 
+		AaColor BaseBk = Style.BaseBackground;
+		int BaseYCoord = 10;
+
+		RECT WndRect;
+		GetClientRect(_Base, &WndRect);
+
 		_Loaded = true;
 		
 		{
@@ -41,7 +50,97 @@ namespace Armin::UI
 			int Width = 130;
 			int Height = 27;
 
+			TextStyle.Alignment = TA_RightAlignment;
+			TextStyle.Bold = true;
 
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Project Name:", BaseBk, TextStyle, false));
+			YCoord += 10 + Height;
+
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Place Project In:", BaseBk, TextStyle, false));
+
+			BaseYCoord = YCoord;
+			YCoord -= 10 + Height;
+			XCoord += 10 + Width;
+			Width = WndRect.right - (10 + XCoord);
+			TextStyle.Alignment = TA_LeftAlignment;
+			TextStyle.Bold = false;
+				
+			Name = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			YCoord += 10 + Height;
+
+			int ButtonSize = Height;
+			Width -= 5 + ButtonSize;
+			Directory = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			XCoord += 5 + Width;
+			SelectDirectory = new Button(XCoord, YCoord, ButtonSize, ButtonSize, L"...", _Base, (HMENU)1, ins, Style, TextStyle);
+			XCoord -= 5 + ButtonSize;
+			BaseYCoord = YCoord += 10 + Height;
+			BaseYCoord += 30;
+		}
+
+		//Left Half
+		{
+			int XCoord = 15;
+			int YCoord = BaseYCoord;
+			int Width = (WndRect.right / 2) - (10 + XCoord);
+			int Height = 27;
+
+			InventorySys = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, nullptr, true, L"Inventory System", CBT_CheckBox, Style, TextStyle);
+			YCoord += 10 + Height;
+
+			TaskSys = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, true, L"Task System", CBT_CheckBox, Style, TextStyle);
+			YCoord += 10 + Height;
+
+			UserSys = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)5, true, L"User System", CBT_CheckBox, Style, TextStyle);
+			YCoord += 10 + Height;
+
+			ResourceSys = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, nullptr, true, L"Resource System", CBT_CheckBox, Style, TextStyle);
+			YCoord += 10 + Height;
+
+			Width = ((WndRect.right / 2) - 35) / 2; //35 is the sum of 10 from left bound, 15 from right bound, and 10 from spacing.
+
+			StdProj = new Button(XCoord, YCoord, Width, Height, L"Standard Project", _Base, (HMENU)6, ins, Style, TextStyle);
+			XCoord += 10 + Width;
+
+			InvProj = new Button(XCoord, YCoord, Width, Height, L"Inventory Project", _Base, (HMENU)7, ins, Style, TextStyle);
+			YCoord += 10 + Height;
+			XCoord -= 10 + Width;
+			XCoord += Width / 2;
+
+			TaskProj = new Button(XCoord, YCoord, Width, Height, L"Task Project", _Base, (HMENU)8, ins, Style, TextStyle);
+		}
+
+		//Right Half
+		{
+			int XCoord = (WndRect.right / 2) + 10;
+			int YCoord = BaseYCoord;
+			int Width = WndRect.right - (15 + XCoord);
+			int Height = 27;
+
+			TextStyle.Bold = true;
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Username:", BaseBk, TextStyle, false));
+			TextStyle.Bold = false;
+			YCoord += 10 + Height;
+
+			Username = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			YCoord += 20 + Height;
+
+			TextStyle.Bold = true;
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Password:", BaseBk, TextStyle, false));
+			TextStyle.Bold = false;
+			YCoord += 10 + Height;
+
+			Password = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, false, true);
+
+			YCoord = WndRect.bottom - (15 + Height);
+			XCoord = (WndRect.right / 2) + 10;
+			Width = ((WndRect.right / 2) - 35) / 2; //35 is the sum of 10 from left bound, 15 from right bound, and 10 from spacing.
+
+			Submit = new Button(XCoord, YCoord, Width, Height, L"Create Project", _Base, (HMENU)2, ins, Style, TextStyle);
+			XCoord += 10 + Width;
+
+			Style.BorderBrush = 0xFFFF0000;
+			Cancel = new Button(XCoord, YCoord, Width, Height, L"Cancel", _Base, (HMENU)3, ins, Style, TextStyle);
 		}
 	}
 
@@ -109,6 +208,109 @@ namespace Armin::UI
 	}
 	LRESULT NewFile::Command(WPARAM wp, LPARAM lp)
 	{
+		switch (wp)
+		{
+		case 1: //Selete Directory
+		{
+
+			auto FolderCallback = [](HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) -> int
+			{
+				if (uMsg == BFFM_INITIALIZED) {
+					LPCTSTR path = reinterpret_cast<LPCTSTR>(lpData);
+					::SendMessage(hwnd, BFFM_SETSELECTION, true, (LPARAM)path);
+				}
+				return 0;
+			};
+			
+			HRESULT ThisResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+			if (ThisResult != S_OK)
+				MessageBoxW(_Base, L"no ok", L"Other", MB_OK);
+
+			TCHAR my_documents[MAX_PATH];
+			HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, my_documents);
+
+			BROWSEINFO binf = { 0 };
+			
+				binf.lParam = reinterpret_cast<LPARAM>(my_documents);
+			binf.lpfn = FolderCallback;
+			binf.ulFlags = BIF_USENEWUI;
+			binf.hwndOwner = _Base;
+			binf.lpszTitle = L"Please select your location for your new Project.";
+
+			auto Result = SHBrowseForFolder(&binf);
+			wchar_t* Text = new wchar_t[MAX_PATH];
+			SHGetPathFromIDList(Result, Text);
+			
+			String NewText = Text;
+			delete[] Text;
+
+			if (NewText != L"")
+			{
+				NewText += L'\\';
+				Directory->SetText(NewText);
+			}
+
+			break;
+		}
+		case 2: //Submit
+		{
+			bool Inv = InventorySys->GetCheckState(), User = UserSys->GetCheckState(), Task = TaskSys->GetCheckState(), Resource = ResourceSys->GetCheckState();
+
+			if (Task && !User)
+			{
+				User = true;
+				EnableWindow(*Username, true);
+				EnableWindow(*Password, true);
+			}
+
+			if (User)
+			{
+				String Usern = Username->GetText();
+				String Pass = Password->GetText();
+
+				if (Usern == L"" || Pass == L"")
+				{
+					MessageBoxW(_Base, L"Please supply a Username and/or Password.", L"New File:", MB_OK | MB_ICONERROR);
+					break;
+				}
+
+				if (Usern.Contains(L'~') || Pass.Contains(L'~'))
+				{
+					MessageBoxW(_Base, L"The Username and/or Password cannot contain a tilde ('~').\n\nPlease remove them and try again.", L"New File:", MB_OK | MB_ICONERROR);
+					break;
+				}
+			}
+
+
+		}
+		case 3: //Cancel
+			DestroyWindow(_Base);
+			break;
+		case 4: //TaskSys
+		{
+			if (TaskSys->GetCheckState())
+				UserSys->SetCheckState(true);
+
+			bool State = UserSys->GetCheckState();
+			EnableWindow(*Username, State);
+			EnableWindow(*Password, State);
+			break;
+		}
+		case 5: //UserSys
+		{
+			if (!UserSys->GetCheckState())
+				TaskSys->SetCheckState(false);
+
+			bool State = UserSys->GetCheckState();
+			EnableWindow(*Username, State);
+			EnableWindow(*Password, State);
+			break;
+		}
+		case 6:
+		case 7:
+		case 8:
+			break;
+		}
 		return 0;
 	}
 	LRESULT NewFile::KeyDown(WPARAM wp)
