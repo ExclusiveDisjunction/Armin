@@ -1,6 +1,7 @@
 #include "EditorFrame.h"
 
 #include "EditorRegistry.h"
+#include "UI\StyleButton.h"
 #include "..\Files\SessionControl.h"
 #include "..\UI\EditorPopout.h"
 
@@ -98,15 +99,17 @@ namespace Armin::Editors
 		Style.Background = 0xFF313131;
 		Style.Radius = 20;
 
-		Close = new Button(XCoord, YCoord, Width, Height, L"X", _Base, (HMENU)1, ins, Style, TextStyle);
+		RECT Border = { 0, 0, 0, Style.BorderThickness };
+
+		Close = new StyleButton(XCoord, YCoord, Width, Height, L"X", _Base, (HMENU)1, ins, Style, TextStyle, Border);
 		XCoord -= 10 + Width;
 
 		Style.BorderBrush = Accent2;
 
-		Move = new Button(XCoord, YCoord, Width, Height, L"^", _Base, (HMENU)2, ins, Style, TextStyle);
+		Move = new StyleButton(XCoord, YCoord, Width, Height, L"^", _Base, (HMENU)2, ins, Style, TextStyle, Border);
 		XCoord -= 10 + Width;
 
-		_Apply = new Button(XCoord, YCoord, Width, Height, L"A", _Base, (HMENU)3, ins, Style, TextStyle);
+		_Apply = new StyleButton(XCoord, YCoord, Width, Height, L"A", _Base, (HMENU)3, ins, Style, TextStyle, Border);
 		EnableWindow(*_Apply, this->IsApplyable());
 	}
 	void EditorFrame::MoveUpperButtons(RECT WndRect)
