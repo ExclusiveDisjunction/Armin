@@ -2,6 +2,8 @@
 
 #include "ArminSessions.h"
 #include "Components.h"
+#include "2021.2/ArminSessions.h"
+#include "2021.2/Components.h"
 #include "Files\Stream.h"
 #include "..\UserRegistry.h"
 #include "..\Editors\EditorFrame.h"
@@ -75,20 +77,37 @@ namespace Armin::Files
 
         try
         {
-            LoadedProject = new UniProject(Path);
+            if (Ext == L"arminuni")
+                LoadedProject = new UniProject(Path);
 
-            if (Ext == L"arminproj")
-                LoadedProject = new Project(Path);
-            else if (Ext == L"arminrcproj")
-                LoadedProject = new ProjectRc(Path);
-            else if (Ext == L"armininvproj")
-                LoadedProject = new InventoryProject(Path);
-            else if (Ext == L"arminrcinvproj")
-                LoadedProject = new InventoryProjectRc(Path);
-            else if (Ext == L"arminteamproj")
-                LoadedProject = new TeamProject(Path);
-            else if (Ext == L"arminrcteamproj")
-                LoadedProject = new TeamProjectRc(Path);
+            else
+            {
+                V2021::ArminSessionBase* Proj = nullptr;
+
+                if (Ext == L"arminproj")
+                    Proj = new V2021::Project(Path);
+                else if (Ext == L"arminrcproj")
+                    Proj = new V2021::ProjectRc(Path);
+                else if (Ext == L"armininvproj")
+                    Proj = new V2021::InventoryProject(Path);
+                else if (Ext == L"arminrcinvproj")
+                    Proj = new V2021::InventoryProjectRc(Path);
+                else if (Ext == L"arminteamproj")
+                    Proj = new V2021::TeamProject(Path);
+                else if (Ext == L"arminrcteamproj")
+                    Proj = new V2021::TeamProjectRc(Path);
+
+                int Result = MessageBoxW(nullptr, L"The file type selected is no longer supported. Would you like to upgrade to the current version of file?\n\nIf not, Armin cannot open the file.", L"Unsuported Types:", MB_ICONWARNING | MB_YESNOCANCEL);
+                if (Result == IDYES)
+                {
+                    //Write Converter here.
+                }
+                else if (Result == IDNO || Result == IDCANCEL)
+                {
+                    delete Progress;
+                    return false;
+                }
+            }            
         }
         catch (...)
         {

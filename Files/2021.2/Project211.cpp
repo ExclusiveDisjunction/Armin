@@ -1,57 +1,29 @@
 #include "ArminSessions.h"
 
-#include <iostream>
-#include <fstream>
+#include "Arithmetic.h"
+#include <sstream>
+#include <math.h>
+#include <random>
+
 using namespace std;
 
-namespace Armin::Files
+namespace Armin::Files::V2021
 {
-	UniProject::UniProject() 
+	Project::Project() : UserSystem(), TaskSystem(), InventorySystem()
 	{
 
 	}
-	UniProject::UniProject(String Path)
-	{
-
+	Project::Project(String Path) : ArminSessionBase(Path), UserSystem(), TaskSystem(), InventorySystem()
+	{ 
+		Load();
 	}
 
-	void UniProject::ConfigureMemory()
+	void Project::Save()
 	{
-		delete InventoryItems;
-		delete OperationInventoryItems;
-		delete Users;
-		delete Positions;
-		delete Tasks;
-		delete CompletedTasks;
-		delete Images;
+		ofstream OutFile(Path, ios::trunc | ios::out);
 
-		if (Config & UPC_Users)
-		{
-			Positions = new JobPositionList(this, this);
-			Users = new UserSet(this, this);
-		}
-		if (Config & UPC_Tasks)
-		{
-			Tasks = new TaskList(this, this);
-			CompletedTasks = new CompletedTaskList(this, this);
-		}
-		if (Config & UPC_Inventory)
-		{
-			InventoryItems = new InventoryItemGroup(this, this);
-			OperationInventoryItems = new OperationInventoryItemGroup(this, this);
-		}
-		if (Config & UPC_Resource)
-			Images = new ImageList(this, this);
-	}
+		OutFile << "begin~Project~ID:" << CurrentID << endl;
 
-	void UniProject::Save()
-	{
-		ofstream OutFile((AString)Path, ios::trunc | ios::beg);
-
-		OutFile << "begin~UniProject" << "~ID:" << CurrentID << "~Config:" << Config << endl;
-
-		if (Images)
-			Images->Push(OutFile, 1);
 		if (ConfigItems)
 			ConfigItems->Push(OutFile, 1);
 		if (Positions)
@@ -69,11 +41,11 @@ namespace Armin::Files
 		if (RefrenceGroups)
 			RefrenceGroups->Push(OutFile, 1);
 
-		OutFile << "end~UniProject";
+		OutFile << "end~Project";
 	}
-	void UniProject::Load()
+	void Project::Load()
 	{
-		ifstream InFile((AString)Path, ios::beg);
+		ifstream InFile((AString)Path, ios::in);
 
 		AString Header;
 		getline(InFile, Header);
@@ -82,12 +54,6 @@ namespace Armin::Files
 		bool Multiline = Parts[Parts.Size - 1] != "end";
 
 		SetID(Parts[2].ToLong());
-
-		if ((Multiline ? Parts.Size : Parts.Size - 1) >= 4)
-			Config = Parts[3].ToLong();
-		else
-			Config = UPC_All;
-		ConfigureMemory();
 
 		if (Multiline)
 		{
@@ -113,24 +79,22 @@ namespace Armin::Files
 						continue;
 
 					InFile.seekg(PrePos);
-					if (ThisParts[1] == Positions->Name && (Config & UPC_Users))
+					if (ThisParts[1] == Positions->Name)
 						Positions->Fill(InFile);
-					else if (ThisParts[1] == Users->Name && (Config & UPC_Users))
+					else if (ThisParts[1] == Users->Name)
 						Users->Fill(InFile);
-					else if (ThisParts[1] == InventoryItems->Name && (Config & UPC_Inventory))
+					else if (ThisParts[1] == InventoryItems->Name)
 						InventoryItems->Fill(InFile);
-					else if (ThisParts[1] == OperationInventoryItems->Name && (Config & UPC_Inventory))
+					else if (ThisParts[1] == OperationInventoryItems->Name)
 						OperationInventoryItems->Fill(InFile);
-					else if (ThisParts[1] == Tasks->Name && (Config & UPC_Tasks))
+					else if (ThisParts[1] == Tasks->Name)
 						Tasks->Fill(InFile);
-					else if (ThisParts[1] == CompletedTasks->Name && (Config & UPC_Tasks))
+					else if (ThisParts[1] == CompletedTasks->Name)
 						CompletedTasks->Fill(InFile);
 					else if (ThisParts[1] == RefrenceGroups->Name)
 						RefrenceGroups->Fill(InFile);
 					else if (ThisParts[1] == ConfigItems->Name)
 						ConfigItems->Fill(InFile);
-					else if (ThisParts[1] == Images->Name && (Config & UPC_Resource))
-						Images->Fill(InFile);
 					else
 						InFile.seekg(ThisPos);
 				}
@@ -138,7 +102,7 @@ namespace Armin::Files
 		}
 	}
 
-	Component* UniProject::GetFromID(unsigned long long ID, int Filter) const
+	Component* Project::GetFromID(unsigned long long ID, int Filter) const
 	{
 		Component* Return = nullptr;
 		if (ID == 0)
@@ -154,26 +118,15 @@ namespace Armin::Files
 			}
 		}
 
-		if (Users && ((Filter & CT_User) || (Filter & CT_TimecardEntry)))
+		if (Users && (Filter & CT_User))
 		{
 			bool User = Filter & CT_User;
-			bool Timecard = Filter & CT_TimecardEntry;
 
 			for (uint i = 0; i < Users->Count; i++)
 			{
 				class User* Current = Users->Item(i);
 				if (Current->ID == ID && Users)
 					Return = Current;
-
-				if (Timecard)
-				{
-					for (uint i = 0; i < Current->TimecardEntries->Count; i++)
-					{
-						TimecardEntry* Time = Current->TimecardEntries->Item(i);
-						if (Time->ID == ID)
-							Return = Current;
-					}
-				}
 			}
 		}
 
@@ -226,16 +179,6 @@ namespace Armin::Files
 				RefrenceGroup* Group = RefrenceGroups->Item(i);
 				if (Group->ID == ID)
 					Return = Group;
-			}
-		}
-
-		if (Images && (Filter & CT_Image))
-		{
-			for (uint i = 0; i < Images->Count; i++)
-			{
-				Image* This = Images->Item(i);
-				if (This->ID == ID)
-					Return = This;
 			}
 		}
 
