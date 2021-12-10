@@ -10,9 +10,9 @@ namespace Armin::Files
 	{
 
 	}
-	UniProject::UniProject(String Path)
+	UniProject::UniProject(String Path) : ProjectBase(Path)
 	{
-
+		Load();
 	}
 
 	void UniProject::ConfigureMemory()
