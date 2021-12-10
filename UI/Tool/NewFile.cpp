@@ -347,6 +347,9 @@ namespace Armin::UI
 
 		Thread.detach();
 		delete Running;
+		Username = Obj->_Username;
+		Password = Obj->_Password;
+		Config = Obj->_Config;
 		String Return = String(Obj->Return);
 		delete Obj;
 
