@@ -159,17 +159,17 @@ namespace Armin::UI
 		EditorPlacement.bottom += Height;
 
 		auto Function = [](HWND Param, UINT Message, UINT_PTR ID, DWORD Milliseconds) -> void
-		{
+		{ //TODO: convert to multithreaded function.
 			if (LoadedProject) //If a user file was loaded at start, then prompt a sign in.
 			{
 				UserSystem* Conv = dynamic_cast<UserSystem*>(LoadedProject);
-				InventoryProject* InvConv = dynamic_cast<InventoryProject*>(LoadedProject);
+				UniProject* InvConv = dynamic_cast<UniProject*>(LoadedProject);
 				if (Conv)
 				{
 					KillTimer(Param, ID);
 					UserRegistry::SignIn();
 				}
-				else if (InvConv)
+				else if (InvConv && InvConv->Config == UPC_Inventory)
 					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
 			}
 

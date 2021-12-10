@@ -244,7 +244,9 @@ namespace Armin::Files
                 return false;
         }
 
-        String Path = NewFile::Execute(ins);
+        String Username, Password;
+        int Config = 0;
+        String Path = NewFile::Execute(ins, Username, Password, Config);
        //String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
         bool Return = false;
 
@@ -258,16 +260,46 @@ namespace Armin::Files
             DeleteFileW(static_cast<const wchar_t*>(Path));
 
         String FileExt = ::FileExt(Path);
-
-        if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
+        std::ofstream OutFile(Path);
+        if (!OutFile)
         {
-            std::ofstream OutFile(Path);
-            if (!OutFile)
+            MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        OutFile.close();
+
+        UniProject* Proj = new UniProject();
+        Proj->Config = Config;
+        Proj->ConfigureMemory();
+        Proj->ChangePath(Path);
+
+        LoadedProject = Proj;
+        LoadedProjectPath = Path;
+
+        if (Config & UPC_Users)
+        {
+            UserSet* Users = Proj->Users;
+            if (Username == String() || Password == String() || !Users)
             {
-                MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+                MessageBoxW(nullptr, L"The new project cannot be created without a User. Please try again later.", L"New File:", MB_OK | MB_ICONERROR);
                 return false;
             }
 
+            User* New = new User(Proj, Users);
+            New->FirstName = New->LastName = New->MiddleName = String();
+            New->IsAdmin = true;
+            New->IsAssurance = false;
+            New->Username = Username;
+            New->Password = Password;
+
+            Return = true;
+        }
+        else
+            Return = true;
+   
+
+        /*if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
+        {
             OutFile.close();
 
             LoadedProjectPath = Path;
@@ -312,6 +344,7 @@ namespace Armin::Files
             LoadedProject->ChangePath(Path);
             Return = true;
         }
+        */
 
         if (Return)
         {

@@ -15,6 +15,7 @@ namespace Armin::UI
 		bool _Loaded;
 
 		String _Return, _Username, _Password;
+		int _Config;
 
 		Vector<ControlBase*> MiscControls; //Labels and such
 		TextBox* Name = nullptr, * Directory = nullptr; //Location & File Name
@@ -49,6 +50,6 @@ namespace Armin::UI
 		static LRESULT RunMessageLoop(NewFile* Object, HINSTANCE ins, bool* Running);
 	
 		String const& Return = _Return;
-		static String Execute(HINSTANCE ins, String& Username, String& Password);
+		static String Execute(HINSTANCE ins, String& Username, String& Password, int& Config);
 	};
 }

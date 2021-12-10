@@ -336,7 +336,7 @@ namespace Armin::UI
 		*Running = false;
 		return msg.wParam;
 	}
-	String NewFile::Execute(HINSTANCE ins)
+	String NewFile::Execute(HINSTANCE ins, String& Username, String& Password, int& Config)
 	{
 		NewFile* Obj = new NewFile();
 
