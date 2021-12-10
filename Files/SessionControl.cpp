@@ -2,6 +2,8 @@
 
 #include "ArminSessions.h"
 #include "Components.h"
+#include "2021.2/ArminSessions.h"
+#include "2021.2/Components.h"
 #include "Files\Stream.h"
 #include "..\UserRegistry.h"
 #include "..\Editors\EditorFrame.h"
@@ -75,18 +77,37 @@ namespace Armin::Files
 
         try
         {
-            if (Ext == L"arminproj")
-                LoadedProject = new Project(Path);
-            else if (Ext == L"arminrcproj")
-                LoadedProject = new ProjectRc(Path);
-            else if (Ext == L"armininvproj")
-                LoadedProject = new InventoryProject(Path);
-            else if (Ext == L"arminrcinvproj")
-                LoadedProject = new InventoryProjectRc(Path);
-            else if (Ext == L"arminteamproj")
-                LoadedProject = new TeamProject(Path);
-            else if (Ext == L"arminrcteamproj")
-                LoadedProject = new TeamProjectRc(Path);
+            if (Ext == L"arminuni")
+                LoadedProject = new UniProject(Path);
+
+            else
+            {
+                V2021::ArminSessionBase* Proj = nullptr;
+
+                if (Ext == L"arminproj")
+                    Proj = new V2021::Project(Path);
+                else if (Ext == L"arminrcproj")
+                    Proj = new V2021::ProjectRc(Path);
+                else if (Ext == L"armininvproj")
+                    Proj = new V2021::InventoryProject(Path);
+                else if (Ext == L"arminrcinvproj")
+                    Proj = new V2021::InventoryProjectRc(Path);
+                else if (Ext == L"arminteamproj")
+                    Proj = new V2021::TeamProject(Path);
+                else if (Ext == L"arminrcteamproj")
+                    Proj = new V2021::TeamProjectRc(Path);
+
+                int Result = MessageBoxW(nullptr, L"The file type selected is no longer supported. Would you like to upgrade to the current version of file?\n\nIf not, Armin cannot open the file.", L"Unsuported Types:", MB_ICONWARNING | MB_YESNOCANCEL);
+                if (Result == IDYES)
+                {
+                    //Write Converter here.
+                }
+                else if (Result == IDNO || Result == IDCANCEL)
+                {
+                    delete Progress;
+                    return false;
+                }
+            }            
         }
         catch (...)
         {
@@ -223,7 +244,9 @@ namespace Armin::Files
                 return false;
         }
 
-        String Path = NewFile::Execute(ins);
+        String Username, Password;
+        int Config = 0;
+        String Path = NewFile::Execute(ins, Username, Password, Config);
        //String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
         bool Return = false;
 
@@ -237,16 +260,46 @@ namespace Armin::Files
             DeleteFileW(static_cast<const wchar_t*>(Path));
 
         String FileExt = ::FileExt(Path);
-
-        if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
+        std::ofstream OutFile(Path);
+        if (!OutFile)
         {
-            std::ofstream OutFile(Path);
-            if (!OutFile)
+            MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        OutFile.close();
+
+        UniProject* Proj = new UniProject();
+        Proj->Config = Config;
+        Proj->ConfigureMemory();
+        Proj->ChangePath(Path);
+
+        LoadedProject = Proj;
+        LoadedProjectPath = Path;
+
+        if (Config & UPC_Users)
+        {
+            UserSet* Users = Proj->Users;
+            if (Username == String() || Password == String() || !Users)
             {
-                MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+                MessageBoxW(nullptr, L"The new project cannot be created without a User. Please try again later.", L"New File:", MB_OK | MB_ICONERROR);
                 return false;
             }
 
+            User* New = new User(Proj, Users);
+            New->FirstName = New->LastName = New->MiddleName = String();
+            New->IsAdmin = true;
+            New->IsAssurance = false;
+            New->Username = Username;
+            New->Password = Password;
+
+            Return = true;
+        }
+        else
+            Return = true;
+   
+
+        /*if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
+        {
             OutFile.close();
 
             LoadedProjectPath = Path;
@@ -291,6 +344,7 @@ namespace Armin::Files
             LoadedProject->ChangePath(Path);
             Return = true;
         }
+        */
 
         if (Return)
         {
