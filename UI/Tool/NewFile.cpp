@@ -1,6 +1,7 @@
 #include "NewFile.h"
 
 #include "UI\Label.h"
+#include "..\..\Files\ArminSessions.h"
 
 #include <iostream>
 #include <thread>
@@ -10,6 +11,8 @@ using namespace std;
 
 namespace Armin::UI
 {
+	using namespace Files;
+
 	NewFile::NewFile() : _Base(nullptr), _Loaded(false)
 	{
 
@@ -107,7 +110,7 @@ namespace Armin::UI
 			XCoord -= 10 + Width;
 			XCoord += Width / 2;
 
-			TaskProj = new Button(XCoord, YCoord, Width, Height, L"Task Project", _Base, (HMENU)8, ins, Style, TextStyle);
+			TaskProj = new Button(XCoord, YCoord, Width, Height, L"Team Project", _Base, (HMENU)8, ins, Style, TextStyle);
 		}
 
 		//Right Half
@@ -208,11 +211,17 @@ namespace Armin::UI
 	}
 	LRESULT NewFile::Command(WPARAM wp, LPARAM lp)
 	{
+		auto EnableBttn = [](CheckableButton* UserSys, TextBox* Username, TextBox* Password) -> void
+		{
+			bool State = UserSys->GetCheckState();
+			EnableWindow(*Username, State);
+			EnableWindow(*Password, State);
+		};
+
 		switch (wp)
 		{
 		case 1: //Selete Directory
 		{
-
 			auto FolderCallback = [](HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) -> int
 			{
 				if (uMsg == BFFM_INITIALIZED) {
@@ -221,7 +230,7 @@ namespace Armin::UI
 				}
 				return 0;
 			};
-			
+
 			HRESULT ThisResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 			if (ThisResult != S_OK)
 				MessageBoxW(_Base, L"no ok", L"Other", MB_OK);
@@ -230,8 +239,8 @@ namespace Armin::UI
 			HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, my_documents);
 
 			BROWSEINFO binf = { 0 };
-			
-				binf.lParam = reinterpret_cast<LPARAM>(my_documents);
+
+			binf.lParam = reinterpret_cast<LPARAM>(my_documents);
 			binf.lpfn = FolderCallback;
 			binf.ulFlags = BIF_USENEWUI;
 			binf.hwndOwner = _Base;
@@ -240,7 +249,7 @@ namespace Armin::UI
 			auto Result = SHBrowseForFolder(&binf);
 			wchar_t* Text = new wchar_t[MAX_PATH];
 			SHGetPathFromIDList(Result, Text);
-			
+
 			String NewText = Text;
 			delete[] Text;
 
@@ -279,9 +288,14 @@ namespace Armin::UI
 					MessageBoxW(_Base, L"The Username and/or Password cannot contain a tilde ('~').\n\nPlease remove them and try again.", L"New File:", MB_OK | MB_ICONERROR);
 					break;
 				}
+
+				_Username = Usern;
+				_Password = Pass;
 			}
 
-
+			_Config = (Inv ? UPC_Inventory : 0) | (User ? UPC_Users : 0) | (Task ? UPC_Tasks : 0) | (Resource ? UPC_Resource : 0);
+			String Dir = Directory->GetText();
+			_Return = Dir + (Dir[Dir.Length() - 1] == L'\\' ? String() : L"\\") + Name->GetText() + L".arminuni";
 		}
 		case 3: //Cancel
 			DestroyWindow(_Base);
@@ -291,9 +305,7 @@ namespace Armin::UI
 			if (TaskSys->GetCheckState())
 				UserSys->SetCheckState(true);
 
-			bool State = UserSys->GetCheckState();
-			EnableWindow(*Username, State);
-			EnableWindow(*Password, State);
+			EnableBttn(UserSys, Username, Password);
 			break;
 		}
 		case 5: //UserSys
@@ -301,15 +313,39 @@ namespace Armin::UI
 			if (!UserSys->GetCheckState())
 				TaskSys->SetCheckState(false);
 
-			bool State = UserSys->GetCheckState();
-			EnableWindow(*Username, State);
-			EnableWindow(*Password, State);
+			EnableBttn(UserSys, Username, Password);
 			break;
 		}
-		case 6:
-		case 7:
-		case 8:
+		case 6: //Std Proj
+		{
+			UserSys->SetCheckState(true);
+			TaskSys->SetCheckState(true);
+			InventorySys->SetCheckState(true);
+			ResourceSys->SetCheckState(true);
+
+			EnableBttn(UserSys, Username, Password);
 			break;
+		}
+		case 7: //Inv Proj
+		{
+			UserSys->SetCheckState(false);
+			TaskSys->SetCheckState(false);
+			InventorySys->SetCheckState(true);
+			ResourceSys->SetCheckState(true);
+
+			EnableBttn(UserSys, Username, Password);
+			break;
+		}
+		case 8: //Team Proj
+		{
+			UserSys->SetCheckState(true);
+			TaskSys->SetCheckState(true);
+			InventorySys->SetCheckState(false);
+			ResourceSys->SetCheckState(true);
+
+			EnableBttn(UserSys, Username, Password);
+			break;
+		}
 		}
 		return 0;
 	}
