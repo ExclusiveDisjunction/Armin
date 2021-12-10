@@ -81,6 +81,12 @@ namespace Armin::Files
 		AStringList Parts = Header.Split('~');
 		bool Multiline = Parts[Parts.Size - 1] != "end";
 
+		uint Size = Multiline ? Parts.Size : Parts.Size - 1;
+		for (uint i = 2; i < Size; i++)
+		{
+			
+		}
+
 		SetID(Parts[2].ToLong());
 		Config = Parts[3].ToLong();
 		ConfigureMemory();

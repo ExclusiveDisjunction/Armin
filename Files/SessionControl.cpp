@@ -75,6 +75,8 @@ namespace Armin::Files
 
         try
         {
+            LoadedProject = new UniProject(Path);
+
             if (Ext == L"arminproj")
                 LoadedProject = new Project(Path);
             else if (Ext == L"arminrcproj")
