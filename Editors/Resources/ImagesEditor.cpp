@@ -199,7 +199,7 @@ namespace Armin::Editors::Resources
 		switch (wp)
 		{
 		case 4: //Add
-			new CreateImage(reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
+			CreateImage::Execute(reinterpret_cast<HINSTANCE>(GetWindowLongPtr(_Base, GWLP_HINSTANCE)), false);
 			break;
 		case 5: //Remove
 		{

@@ -31,7 +31,6 @@ namespace Armin::UI::Tool
 		static void InitBase(HINSTANCE ins);
 		static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 	public:
-		PasswordInput() = delete;
 		PasswordInput(const PasswordInput& Obj) = delete;
 		PasswordInput(const PasswordInput&& Obj) = delete;
 		~PasswordInput()

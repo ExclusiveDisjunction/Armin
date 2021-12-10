@@ -540,9 +540,7 @@ namespace Armin::UI
 			break;
 		case 39: //CreateImage			
 		{
-			Image* Target = Tool::CreateImage::Execute(ins);
-			if (Target)
-				EditorRegistry::OpenEditor(new Resources::ViewImageEditor(Target), nullptr);
+			Image* Target = Tool::CreateImage::Execute(ins, false);
 			break;
 		}
 
