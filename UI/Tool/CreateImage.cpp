@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 #include "Files\Stream.h"
@@ -17,7 +19,16 @@ namespace Armin::UI::Tool
 {
 	using namespace Files;
 
-	CreateImage::CreateImage(HINSTANCE ins)
+	CreateImage::CreateImage()
+	{
+	}
+	CreateImage::~CreateImage()
+	{
+		SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+		DestroyWindow(_Base);
+	}
+
+	void CreateImage::Construct(HINSTANCE ins)
 	{
 		if (!_ThisAtom)
 			InitBase(ins);
@@ -29,11 +40,6 @@ namespace Armin::UI::Tool
 		UpdateWindow(_Base);
 
 		LoadControls();
-	}
-	CreateImage::~CreateImage()
-	{
-		SetWindowLongPtrW(_Base, GWLP_USERDATA, 0);
-		DestroyWindow(_Base);
 	}
 
 	ATOM CreateImage::_ThisAtom = ATOM();
@@ -65,6 +71,10 @@ namespace Armin::UI::Tool
 			return This->Size();
 		case WM_COMMAND:
 			return This->Command(wp, lp);
+		case WM_DESTROY:
+			if (This->_Mondal)
+				PostQuitMessage(0);
+			return 0;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}
@@ -281,24 +291,48 @@ namespace Armin::UI::Tool
 		return NewImage;
 	}
 
-	Image* CreateImage::Execute(HINSTANCE ins)
+	Image* CreateImage::Execute(HINSTANCE ins, bool Mondal)
 	{
-		CreateImage* This = new CreateImage(ins);
+		CreateImage* This = new CreateImage();
+		This->_Mondal = true;
 
-		MSG msg;
+		bool* Running = new bool(true);
+		thread Thread = thread(RunMessageLoop, This, ins, Running);
+
+		if (Mondal)
+		{
+			while (*Running)
+				this_thread::sleep_for(chrono::milliseconds(100));
+
+			Thread.detach();
+			delete Running;
+			Image* Return = This->_Created;
+			delete This;
+
+			return Return;
+		}
+		else
+			return nullptr;
+	}
+	LRESULT CreateImage::RunMessageLoop(CreateImage* Object, HINSTANCE ins, bool* Running)
+	{
+		Object->Construct(ins);
+		*Running = true;
+
 		int Result;
-		while ((Result = GetMessageW(&msg, This->_Base, 0, 0)) != 0)
+		MSG msg;
+		while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
 		{
 			if (Result < 0)
 				break;
 
 			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			DispatchMessage(&msg);
 		}
 
-		Image* Return = This->_Created;
-		delete This;
-
-		return Return;
+		*Running = false;
+		if (Object->_Mondal)
+			delete Running; //The execute function will not clean up this memory, so this function will.
+		return msg.wParam;
 	}
 }

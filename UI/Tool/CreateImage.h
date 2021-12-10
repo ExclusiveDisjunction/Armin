@@ -16,12 +16,13 @@ namespace Armin
 		class CreateImage
 		{
 		private:
-			CreateImage() = delete;
+			CreateImage();
+			void Construct(HINSTANCE ins);
 
 			Files::Image* _Created;
 
 			HWND _Base;
-			bool _Loaded;
+			bool _Loaded, _Mondal;
 			
 			Label* Text,* TitleTxt;
 			TextBox* FilePath, *Title;
@@ -40,7 +41,6 @@ namespace Armin
 
 			Files::Image* GenerateImage();
 		public:
-			CreateImage(HINSTANCE ins);
 			CreateImage(const CreateImage& Obj) = delete;
 			CreateImage(const CreateImage&& Obj) = delete;
 			~CreateImage();
@@ -48,7 +48,8 @@ namespace Armin
 			CreateImage& operator=(const CreateImage& Obj) = delete;
 			CreateImage& operator=(const CreateImage&& Obj) = delete;
 
-			static Files::Image* Execute(HINSTANCE ins);
+			static Files::Image* Execute(HINSTANCE ins, bool Mondal);
+			static LRESULT RunMessageLoop(CreateImage* Obj, HINSTANCE ins, bool* Running);
 		};
 	}
 }

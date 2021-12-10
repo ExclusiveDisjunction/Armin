@@ -2,9 +2,16 @@
 
 #include "..\..\UICommon.h"
 
+#include <thread>
+#include <chrono>
+using namespace std;
+
 namespace Armin::UI::Tool
 {
-	PasswordInput::PasswordInput(HINSTANCE ins)
+	PasswordInput::PasswordInput()
+	{		
+	}
+	void PasswordInput::Construct(HINSTANCE ins)
 	{
 		if (!_ThisAtom)
 			InitBase(ins);
@@ -20,23 +27,37 @@ namespace Armin::UI::Tool
 
 	String PasswordInput::Execute(HINSTANCE ins)
 	{
-		PasswordInput* This = new PasswordInput(ins);
-		
-		MSG msg;
+		PasswordInput* Obj = new PasswordInput();
+
+		bool* Running = new bool(true);
+		thread Thread = thread(RunMessageLoop, Obj, ins, Running);
+		while (*Running)
+			this_thread::sleep_for(chrono::milliseconds(100));
+
+		Thread.detach();
+		delete Running;
+		String Return = Obj->Return;
+		delete Obj;
+
+		return Return;
+	}
+	LRESULT PasswordInput::RunMessageLoop(PasswordInput* Object, HINSTANCE ins, bool* Running)
+	{
+		Object->Construct(ins);
+		*Running = true;
+
 		int Result;
-		while ((Result = GetMessageW(&msg, This->_Base, 0, 0)) != 0)
+		MSG msg;
+		while ((Result = GetMessageW(&msg, nullptr, 0, 0)) != 0)
 		{
 			if (Result < 0)
 				break;
-
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
 
-		String Return = This->Return;
-		delete This;
-
-		return Return;
+		*Running = false;
+		return msg.wParam;
 	}
 
 	ATOM PasswordInput::_ThisAtom = ATOM();
@@ -70,6 +91,9 @@ namespace Armin::UI::Tool
 			return This->KeyDown(wp);
 		case WM_COMMAND:
 			return This->Command(wp, lp);
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}

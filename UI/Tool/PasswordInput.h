@@ -9,7 +9,8 @@ namespace Armin::UI::Tool
 	class PasswordInput
 	{
 	private:
-		PasswordInput(HINSTANCE ins);
+		PasswordInput();
+		void Construct(HINSTANCE ins);
 
 		HWND _Base;
 
@@ -30,6 +31,19 @@ namespace Armin::UI::Tool
 		static void InitBase(HINSTANCE ins);
 		static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 	public:
+		PasswordInput() = delete;
+		PasswordInput(const PasswordInput& Obj) = delete;
+		PasswordInput(const PasswordInput&& Obj) = delete;
+		~PasswordInput()
+		{
+			SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+			DestroyWindow(_Base);
+		}
+
+		PasswordInput& operator=(const PasswordInput& Obj) = delete;
+		PasswordInput& operator=(const PasswordInput&& Obj) = delete;
+
 		static String Execute(HINSTANCE ins);
+		static LRESULT RunMessageLoop(PasswordInput* Object, HINSTANCE ins, bool* Running);
 	};
 }

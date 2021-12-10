@@ -2,18 +2,24 @@
 
 #include "..\..\UICommon.h"
 
+#include <thread>
+#include <chrono>
+using namespace std;
+
 namespace Armin::UI::Tool
 {
-    DatePicker::DatePicker(const DateTime& Prev, HINSTANCE ins, bool HasDate) : _HasDate(HasDate)
+    DatePicker::DatePicker(const DateTime& Prev)
     {
         Return = Prev;
-
+    }
+    void DatePicker::Construct(HINSTANCE ins)
+    {
         if (!_ThisAtom)
             InitBase(ins);
 
         _Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), L"Date Picker", WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 470, 250, NULL, NULL, ins, NULL);
         SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-        
+
         ShowWindow(_Base, SW_NORMAL);
         UpdateWindow(_Base);
 
@@ -51,7 +57,8 @@ namespace Armin::UI::Tool
         case WM_COMMAND:
             return Item->Command(wp, lp);
         case WM_DESTROY:
-            return Item->Destroy();
+            PostQuitMessage(0);
+            return 0;
         case WM_KEYDOWN:
             return Item->KeyDown(wp);
         default:
@@ -234,19 +241,6 @@ namespace Armin::UI::Tool
 
         return true;
     }
-    void DatePicker::MessageLoop()
-    {
-        MSG Msg;
-        int Result;
-        while ((Result = GetMessageW(&Msg, _Base, NULL, NULL)) != 0)
-        {
-            if (Result < 0)
-                return;
-
-            TranslateMessage(&Msg);
-            DispatchMessageW(&Msg);
-        }
-    }
     LRESULT DatePicker::Paint()
     {
         PAINTSTRUCT ps;
@@ -260,10 +254,6 @@ namespace Armin::UI::Tool
 
         DeleteObject(Bk);
         EndPaint(_Base, &ps);
-        return 0;
-    }
-    LRESULT DatePicker::Destroy()
-    {
         return 0;
     }
     LRESULT DatePicker::Command(WPARAM wp, LPARAM lp)
@@ -313,13 +303,37 @@ namespace Armin::UI::Tool
         return 0;
     }
 
-    DateTime DatePicker::Execute(const DateTime& Prev, HINSTANCE ins, bool HasDate)
+    LRESULT DatePicker::RunMessageLoop(DatePicker* Obj, HINSTANCE ins, bool* Running)
     {
-        DatePicker* Item = new DatePicker(Prev, ins, HasDate);
-        Item->MessageLoop();
+        Obj->Construct(ins);
+        *Running = true;
 
-        DateTime Return = Item->Return;
-        delete Item;
+        int Result;
+        MSG msg;
+        while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
+        {
+            if (Result < 0)
+                break;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        *Running = false;
+        return msg.wParam;
+    }
+    DateTime DatePicker::Execute(const DateTime& Prev, HINSTANCE ins)
+    {
+        DatePicker* Obj = new DatePicker(Prev);
+
+        bool* Running = new bool(true);
+        thread Thread = thread(RunMessageLoop, Obj, ins, Running);
+        while (*Running)
+            this_thread::sleep_for(chrono::milliseconds(100));
+
+        Thread.detach();
+        delete Running;
+        DateTime Return = Obj->Return;
+        delete Obj;
 
         return Return;
     }

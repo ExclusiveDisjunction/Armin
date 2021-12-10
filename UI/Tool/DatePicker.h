@@ -10,14 +10,15 @@ namespace Armin::UI::Tool
 	class DatePicker
 	{
 	private:
-		DatePicker(const DateTime& Prev, HINSTANCE ins, bool HasDate = false);
+		DatePicker(const DateTime& Prev);
+		void Construct(HINSTANCE ins);
 
 		static ATOM _ThisAtom;
 		static void InitBase(HINSTANCE ins);
 		static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 
 		DateTime Return;
-		bool ProperReturn = false, _Loaded = false, _HasDate = false;
+		bool ProperReturn = false, _Loaded = false;
 
 		HWND _Base;
 		TextBox* MM, * DD, * YYYY, * HH, * MiMi;
@@ -27,14 +28,22 @@ namespace Armin::UI::Tool
 		Vector<ControlBase*> MiscControls;
 
 		bool Process();
-		void MessageLoop();
-
 		void LoadControls();
+
 		LRESULT Command(WPARAM wp, LPARAM lp);
 		LRESULT KeyDown(WPARAM key);
 		LRESULT Paint();
-		LRESULT Destroy();
 	public:
-		static DateTime Execute(const DateTime& Prev, HINSTANCE ins, bool HasDate = false);
+		DatePicker() = delete;
+		DatePicker(const DatePicker& Obj) = delete;
+		DatePicker(const DatePicker&& Obj) = delete;
+		~DatePicker()
+		{
+			SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+			DestroyWindow(_Base);
+		}
+
+		static DateTime Execute(const DateTime& Prev, HINSTANCE ins);
+		static LRESULT RunMessageLoop(DatePicker* Obj, HINSTANCE ins, bool* Running);
 	};
 }

@@ -22,7 +22,9 @@ namespace Armin
 			class SearchByName
 			{
 			private:
-				SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, Files::ProjectBase* Target);
+				SearchByName(Files::SearchCriteria& Criteria, Files::ProjectBase* Target);
+
+				void Construct(HINSTANCE ins);
 
 				HWND _Base;
 				bool _Loaded, _FirstRefresh = true;
@@ -53,6 +55,17 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp);
 
 			public:
+				SearchByName(const SearchByName& Obj) = delete;
+				SearchByName(const SearchByName&& Obj) = delete;
+				~SearchByName()
+				{
+					SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+					DestroyWindow(_Base);
+				}
+
+				SearchByName& operator=(const SearchByName& Obj) = delete;
+				SearchByName& operator=(const SearchByName&& Obj) = delete;
+
 				/// <summary>
 				/// Opens a window that allows searching and selection of components.
 				/// </summary>
@@ -62,12 +75,7 @@ namespace Armin
 				/// <returns>The list of selected components from the window, fitting the bounds of the Criteria.</returns>
 				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ProjectBase* SourceFile = nullptr);
 
-				SearchByName() = delete;
-				SearchByName(const SearchByName& Obj) = delete;
-				SearchByName(const SearchByName&& Obj) = delete;
-
-				SearchByName& operator=(const SearchByName& Obj) = delete;
-				SearchByName& operator=(const SearchByName&& Obj) = delete;
+				static LRESULT RunMessageLoop(SearchByName* Obj, HINSTANCE ins, bool* Running);
 			};
 		}
 	}

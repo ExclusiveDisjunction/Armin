@@ -22,7 +22,9 @@ namespace Armin
 		class GroupSelector
 		{
 		private:
-			GroupSelector(HINSTANCE ins, Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect = false);
+			GroupSelector(Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect = false);
+
+			void Construct(HINSTANCE ins);
 
 			static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			static ATOM _ThisAtom;
@@ -30,6 +32,7 @@ namespace Armin
 
 			HWND _Base;
 			Files::InventorySystem* _System;
+			GroupSelectorSource Source;
 			bool _Multi;
 
 			StringList Return;
@@ -43,14 +46,27 @@ namespace Armin
 			Vector<ControlBase*> MiscControls;
 			Vector<ToggleButton*> Groups;
 
-			void LoadControls(GroupSelectorSource Source, Files::InventorySystem* System, bool Multi);
+			void LoadControls();
 
 			LRESULT Paint();
 			LRESULT Command(WPARAM wp, LPARAM lp);
 			LRESULT Size();
 			LRESULT Destroy();
 		public:
+			GroupSelector() = delete;
+			GroupSelector(const GroupSelector& Obj) = delete;
+			GroupSelector(const GroupSelector&& Obj) = delete;
+			~GroupSelector()
+			{
+				SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+				DestroyWindow(_Base);
+			}
+
+			GroupSelector& operator=(const GroupSelector& Obj) = delete;
+			GroupSelector& operator=(const GroupSelector&& Obj) = delete;
+
 			static StringList Execute(HINSTANCE ins, Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect = false);
+			static LRESULT RunMessageLoop(GroupSelector* Object, HINSTANCE ins, bool* Running);
 		};
 	}
 }

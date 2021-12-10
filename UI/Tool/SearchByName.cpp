@@ -6,15 +6,21 @@
 #include "..\..\Files\Components.h"
 #include "..\..\UI\ArminControls.h"
 
+#include <thread>
+#include <chrono>
+using namespace std;
+
 namespace Armin::UI::Search
 {
 	using namespace Files;
 
-	SearchByName::SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, ProjectBase* File)
+	SearchByName::SearchByName(Files::SearchCriteria& Criteria, ProjectBase* File)
 	{
 		this->Criteria = Criteria;
 		this->File = !File ? LoadedProject : File;
-
+	}
+	void SearchByName::Construct(HINSTANCE ins)
+	{
 		if (!_ThisAtom)
 			InitBase(ins);
 
@@ -29,23 +35,37 @@ namespace Armin::UI::Search
 
 	Vector<Component*> SearchByName::Execute(Files::SearchCriteria& Criteria, HINSTANCE ins, ProjectBase* File)
 	{
-		SearchByName* Item = new SearchByName(Criteria, ins, File);
+		SearchByName* Item = new SearchByName(Criteria, File);
 
-		MSG msg;
-		int Result;
-		while ((Result = GetMessageW(&msg, Item->_Base, NULL, NULL)) != 0)
-		{
-			if (Result < 0)
-				break;
+		bool* Running = new bool(true);
+		thread Thread = thread(RunMessageLoop, Item, ins, Running);
+		while (*Running)
+			this_thread::sleep_for(chrono::milliseconds(100));
 
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
-		}
-
+		Thread.detach();
+		delete Running;
 		Vector<Component*> Return = Item->Return;
 		delete Item;
 
 		return Return;
+	}
+	LRESULT SearchByName::RunMessageLoop(SearchByName* Object, HINSTANCE ins, bool* Running)
+	{
+		Object->Construct(ins);
+		*Running = true;
+
+		int Result;
+		MSG msg;
+		while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
+		{
+			if (Result < 0)
+				break;
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		*Running = false;
+		return msg.wParam;
 	}
 
 	void SearchByName::LoadControls()
@@ -210,6 +230,9 @@ namespace Armin::UI::Search
 			return Item->Command(wp, lp);
 		case WM_KEYDOWN:
 			return Item->KeyDown(wp);
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}

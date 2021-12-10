@@ -361,12 +361,12 @@ namespace Armin::UI
 
 		int Result;
 		MSG msg;
-		while ((Result = GetMessageW(&msg, nullptr, 0, 0)) != 0)
+		while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
 		{
-			if (Result < 0 || *Running == false)
+			if (Result < 0)
 				break;
 			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			DispatchMessage(&msg);
 		}
 
 		*Running = false;

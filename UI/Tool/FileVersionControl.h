@@ -32,7 +32,8 @@ namespace Armin
 			FileVersionControl(HINSTANCE ins);
 
 			static bool Execute(HINSTANCE ins, Files::ProjectBase* ToRender);
-			static bool execute(HINSTANCE ins, Files::V2021::ArminSessionBase* ToConvert);
+			static bool Execute(HINSTANCE ins, Files::V2021::ArminSessionBase* ToConvert);
+			static LRESULT RunMessageLoop(FileVersionControl* Obj, HINSTANCE ins, bool* Running);
 		};
 	}
 }
