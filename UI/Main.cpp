@@ -26,7 +26,7 @@ namespace Armin::UI
 		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version) + (Ins::IsLoaded() ? L" - " + FileFullName(LoadedProjectPath) : L" - Unloaded")), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-		ShowWindow(_Base, InsInstance->LastWindowState);
+		ShowWindow(_Base, SW_MAXIMIZE);
 		UpdateWindow(_Base);
 
 		LoadControls();
@@ -204,10 +204,12 @@ namespace Armin::UI
 	}
 	LRESULT Main::Destroy()
 	{
+		/*
 		WINDOWPLACEMENT Place;
 		GetWindowPlacement(_Base, &Place);
 
 		InsInstance->LastWindowState = (WindowState)Place.showCmd;
+		*/
 
 		PostQuitMessage(0);
 		return 0;
