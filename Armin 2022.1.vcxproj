@@ -298,6 +298,7 @@
     <ClInclude Include="UI\Tool\CreateImage.h" />
     <ClInclude Include="UI\Tool\DatePicker.h" />
     <ClInclude Include="UI\Tool\FileProgress.h" />
+    <ClInclude Include="UI\Tool\FileVersionControl.h" />
     <ClInclude Include="UI\Tool\GroupSelector.h" />
     <ClInclude Include="UI\Tool\NewFile.h" />
     <ClInclude Include="UI\Tool\PasswordInput.h" />
