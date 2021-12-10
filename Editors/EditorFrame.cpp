@@ -99,7 +99,7 @@ namespace Armin::Editors
 		Style.Background = 0xFF313131;
 		Style.Radius = 20;
 
-		RECT Border = { 0, 0, 0, Style.BorderThickness };
+		RECT Border = { 0, 0, 0, 5 };
 
 		Close = new StyleButton(XCoord, YCoord, Width, Height, L"X", _Base, (HMENU)1, ins, Style, TextStyle, Border);
 		XCoord -= 10 + Width;
