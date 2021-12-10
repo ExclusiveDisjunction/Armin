@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733332 67.733335"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="NewFileIcon.svg"
+   inkscape:export-filename="C:\Programming\Programs\Armin\Armin 2022.1\Resource\NewFileIcon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="px"
+     inkscape:zoom="3.004382"
+     inkscape:cx="121.65563"
+     inkscape:cy="122.48775"
+     inkscape:window-width="2160"
+     inkscape:window-height="1346"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3018"
+       transform="matrix(1.324449,0,0,1.324449,-12.265341,-15.192068)">
+      <path
+         id="rect31"
+         style="fill:#22272c;fill-rule:evenodd;stroke:#958a56;stroke-width:3"
+         d="M 49.480338,24.389177 49.331263,57.538738 H 18.056452 v -43.19725 l 21.286753,0.02981 z"
+         sodipodi:nodetypes="cccccc" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:27.5278px;line-height:1.25;font-family:sans-serif;fill:#597387;fill-opacity:1;stroke:none;stroke-width:0.688197"
+         x="33.40078"
+         y="61.605259"
+         id="text1758"><tspan
+           sodipodi:role="line"
+           id="tspan1756"
+           style="fill:#597387;fill-opacity:1;stroke-width:0.688197"
+           x="33.40078"
+           y="61.605259">+</tspan></text>
+    </g>
+  </g>
+</svg>
