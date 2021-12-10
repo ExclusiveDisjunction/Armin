@@ -36,18 +36,19 @@ UI:
 		Add click locations.
 		Better overall experience.
 
-	Multithreaded approach to User Interface.
-		When Armin is launched, a base thread is created. This runs the core features.
-		Each instance of Main is it's own thread, and therefore when a new file is opened, it can open as it's own independant thread.
+	Multithreaded approach to User Interface. [DONE WITH CAUTION]
+		Each tool window can be mondal, concurent, or hybrid. Mondal & hybrid use their own thread to pause or work in concurency with the main thread.
+
+	Fix the editor stacking problem where buttons show through the screen.
 
 Server
 	Allow for Aaron Server?
 
 Files:
-	Improvements on how files will be created
-		Separate dialouge to create files
+	Improvements on how files will be created [DONE]
+		Separate dialouge to create files [DONE] (NewFile tool window)
 		https://docs.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbrowseforfoldera
-	Custom data storage
+	Custom data storage [DONE] (UniProject)
 	
 	References:
 		Project to Project references
@@ -72,9 +73,9 @@ Files:
 
 		Used for when a referenced file's data is loaded without actually loading the whole model.
 
-	Images:
-		Remove directories and sectors, direct write.
-		Make one singlular file for resources instead of doing directories.
+	Images: [PART]
+		Remove directories and sectors, direct write. [DONE]
+		Make one singlular file for resources instead of doing directories. [DONE]
 		Updated quality issues with image rendering.
 
 	Inventory:
