@@ -132,9 +132,9 @@ namespace Armin::Editors
         return Return;
     }
 
-    void EditorRegistry::MoveEditor(EditorFrame* Source, EditorHost* To, bool ToPopout)
+    void EditorRegistry::MoveEditor(EditorFrame* editor, EditorHost* toHost, bool ToPopout)
     {
-        To = ToPopout ? new EditorPopout(reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(*Source, GWLP_HINSTANCE))) : (!To ? BaseHost : To);
+        /*To = ToPopout ? new EditorPopout(reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(*Source, GWLP_HINSTANCE))) : (!To ? BaseHost : To);
         if (!To)
             return;
 
@@ -148,7 +148,12 @@ namespace Armin::Editors
 
         EditorButtonHost* ConvTo = dynamic_cast<EditorButtonHost*>(To);
         if (ConvTo)
+        {
+            if (ConvTo->LastEditor)
+                ShowWindow(*ConvTo->LastEditor, SW_HIDE);
             ConvTo->LastEditor = ConvTo->Current;
+            ConvTo->Current = Source;
+        }
 
         Source->_Placement = NewPlacement;
         Source->_Host = To;
@@ -160,12 +165,65 @@ namespace Armin::Editors
             ShowWindow(*To->Current, SW_HIDE);
         To->Current = Source;
         ShowWindow(*Source, SW_SHOW);
+        */    
 
-        OldHost->ProcessCloseCurrent();
+        HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(*editor, GWLP_HINSTANCE));
 
-        HWND Parent = *To;
+        if (ToPopout)
+            toHost = new EditorPopout(ins);
+        if (!toHost)
+            toHost = EditorRegistry::BaseHost;
+
+        EditorHost* fromHost = editor->Host;
+        if (fromHost == toHost)
+            return;
+        if (!fromHost || !toHost)
+            return;
+
+        EditorButtonHost* ConvHost = dynamic_cast<EditorButtonHost*>(toHost);
+        if (ConvHost)
+        {
+            if (ConvHost->Current)
+                ShowWindow(*ConvHost->Current, SW_HIDE);
+            ConvHost->LastEditor = ConvHost->Current;
+            ConvHost->Current = editor;
+            editor->_Host = ConvHost;
+        }
+        else
+        {
+            if (toHost->Current != nullptr)
+                return;
+            
+            toHost->Current = editor;
+            editor->_Host = toHost;
+        }
+
+        HWND ToParent = toHost->EditorParent();
+        RECT ToPlacement = toHost->EditorPlacement;
+
+        HWND FromParent = fromHost->EditorParent();
+        HWND ThisHWnd = *editor;
+
+        editor->_Placement = ToPlacement;
+        SetParent(ThisHWnd, ToParent);
+        editor->ReSize();
+
+        EditorButtonHost* ConvFrom = dynamic_cast<EditorButtonHost*>(fromHost);
+        if (ConvFrom)
+        {
+            ConvFrom->Current = nullptr;
+            ConvFrom->OpenLastEditor();
+        }
+        else
+        {
+            delete fromHost;
+            fromHost = nullptr;
+        }
+
+        HWND Parent = *toHost;
 
         SetWindowPos(Parent, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        ShowWindow(ThisHWnd, SW_SHOW);
 
         if (GetWindowLongPtrW(Parent, GWL_STYLE) & WS_MINIMIZE)
             ShowWindow(Parent, SW_RESTORE);

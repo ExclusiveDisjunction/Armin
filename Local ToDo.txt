@@ -1,3 +1,32 @@
-1. Finish testing/implementing NewFile window.
-2. Create File locking in Open, SaveAs, and NewFile. Close does the opposite of this action.
-3. DO NOT implement multi-project opening, as they are not supported yet by the component model.
+Recive editor, toHost.
+if isPopout
+	toHost = new popout;
+
+from editor, get fromHost.
+if fromHost == toHost,
+	return.
+if !fromHost || !toHost
+	return
+
+hide toHost current.
+toHost last = toHost current
+toHost current = editor.
+editor parent = toHost
+
+from toHost get HWND (ToParent)
+from toHost get RECT (ToPlacement)
+
+from fromHost get HWND (FromParent)
+from editor get HWND (ThisHWnd)
+
+set editor.placement to ToPlacement
+set parent ThisHWnd to FromParent
+
+if fromHost is SingleEditor
+	close host
+	set fromHost to nullptr.
+else
+	set fromHost current to nullptr.
+	fromHost.loadLast.
+
+show editor
