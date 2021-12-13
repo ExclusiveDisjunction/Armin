@@ -84,7 +84,7 @@ namespace Armin::Files
 		SetID(Parts[2].ToLong());
 
 		if ((Multiline ? Parts.Size : Parts.Size - 1) >= 4)
-			Config = Parts[3].ToLong();
+			Config = Parts[3].ToInt();
 		else
 			Config = UPC_All;
 		ConfigureMemory();
