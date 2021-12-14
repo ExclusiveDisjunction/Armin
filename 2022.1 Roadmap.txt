@@ -40,6 +40,7 @@ UI:
 		Each tool window can be mondal, concurent, or hybrid. Mondal & hybrid use their own thread to pause or work in concurency with the main thread.
 
 	Fix the editor stacking problem where buttons show through the screen.
+	Combine Edit & Add editors to one object.
 
 Server
 	Allow for Aaron Server?
