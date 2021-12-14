@@ -3,7 +3,7 @@
 #include "AString.h"
 #include "Files\Stream.h"
 #include "..\..\Common.h"
-#include "..\..\Config\Ins.h"
+#include "..\..\Ins.h"
 
 #include <iostream>
 #include <stdlib.h>

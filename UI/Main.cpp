@@ -2,8 +2,8 @@
 
 #include "Files\Stream.h"
 #include "SideHost.h"
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
-#include "..\Config\Ins.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
 #include "..\Files\ArminSessions.h"
@@ -11,7 +11,6 @@
 
 namespace Armin::UI
 {
-	using namespace Config;
 	using namespace Files;
 	using namespace Editors;
 

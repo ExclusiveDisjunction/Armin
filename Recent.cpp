@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-namespace Armin::Config
+namespace Armin
 {
 	namespace RecentData
 	{

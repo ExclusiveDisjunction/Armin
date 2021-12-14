@@ -7,8 +7,8 @@
 #include "Files\Stream.h"
 #include "Common.h"
 #include "UICommon.h"
-#include "Config\Ins.h"
-#include "Config\Recent.h"
+#include "Ins.h"
+#include "Recent.h"
 #include "Editors\EditorRegistry.h"
 #include "Files\SessionControl.h"
 #include "UI\Main.h"
@@ -20,7 +20,6 @@ using namespace std;
 using namespace Gdiplus;
 
 using namespace Armin;
-using namespace Armin::Config;
 using namespace Armin::Files;
 using namespace Armin::Editors;
 using namespace Armin::UI;

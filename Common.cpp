@@ -1,11 +1,9 @@
 #include "Common.h"
 #include "UICommon.h"
 
-#include "Config\Ins.h"
-#include "Config\Recent.h"
+#include "Ins.h"
+#include "Recent.h"
 #include "Files\ArminSessions.h"
-
-using namespace Armin::Config;
 
 namespace Armin
 {
@@ -50,8 +48,8 @@ namespace Armin
 	HICON ArminIcon = NULL;
 	HCURSOR ArminCursor = LoadCursorW(NULL, IDC_ARROW);
 
-	Config::Ins* InsInstance = nullptr;
-	Config::Recent* RecentInstance = nullptr;
+	Ins* InsInstance = nullptr;
+	Recent* RecentInstance = nullptr;
 
 	Files::ProjectBase* LoadedProject;
 	String LoadedProjectPath;

@@ -1,7 +1,7 @@
 #include "Startup.h"
 
+#include "..\Ins.h"
 #include "..\UICommon.h"
-#include "..\Config\Ins.h"
 #include "..\Files\SessionControl.h"
 #include "..\resource.h"
 
@@ -12,7 +12,6 @@
 #include "Color.h"
 
 using namespace Gdiplus;
-using namespace Armin::Config;
 
 namespace Armin::UI
 {	

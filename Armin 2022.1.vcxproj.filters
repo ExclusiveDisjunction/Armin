@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Config\Ins.cpp">
+    <ClCompile Include="Ins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Config\Recent.cpp">
+    <ClCompile Include="Recent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Inventory\AddInventoryItemEditor.cpp">
@@ -314,10 +314,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config\Ins.h">
+    <ClInclude Include="Ins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Config\Recent.h">
+    <ClInclude Include="Recent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Editors\EditorButtonHost.h">

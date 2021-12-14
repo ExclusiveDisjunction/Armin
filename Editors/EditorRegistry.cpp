@@ -2,7 +2,7 @@
 
 #include "EditorFrame.h"
 #include "EditorButtonHost.h"
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
 #include "..\Files\Components.h"
 #include "..\UI\EditorButton.h"
 #include "..\UI\EditorPopout.h"
@@ -10,7 +10,6 @@
 
 namespace Armin::Editors
 {
-    using namespace Config;
     using namespace Files;
     using namespace Editors::Inventory;
     using namespace Editors::Misc;

@@ -2,13 +2,12 @@
 
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
-#include "..\..\Config\Ins.h"
-#include "..\..\Config\Recent.h"
+#include "..\..\Ins.h"
+#include "..\..\Recent.h"
 #include "..\..\Files\ArminSessions.h"
 
 namespace Armin::Editors::Misc
 {
-	using namespace Config;
 	using namespace Files;
 
 	SettingsEditor::SettingsEditor()

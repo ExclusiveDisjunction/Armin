@@ -5,13 +5,11 @@
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
-#include "..\..\UI\User\CreateUser.h"
 
 namespace Armin::Editors::Users
 {
 	using namespace Files;
 	using namespace UI;
-	using namespace UI::Users;
 
 	UsersEditor::UsersEditor(UserSystem* System)
 	{

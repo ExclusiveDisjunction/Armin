@@ -1,15 +1,13 @@
 #include "RibbonHost.h"
 
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
-#include "..\Config\Ins.h"
 
 #include <thread>
 #include <chrono>
 
 namespace Armin::UI
 {
-	using namespace Config;
-
 	void FooterHost::SetFooterText(String Text, int Delay)
 	{
 		if (!FooterText)

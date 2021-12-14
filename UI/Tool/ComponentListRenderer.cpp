@@ -1,8 +1,8 @@
 #include "ComponentListRenderer.h"
 
+#include "..\..\Ins.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\UICommon.h"
-#include "..\..\Config\Ins.h"
 #include "..\..\Files\Components.h"
 #include "..\..\Editors\EditorRegistry.h"
 

@@ -8,11 +8,8 @@
 
 namespace Armin
 {
-	namespace Config
-	{
-		class Ins;
-		class Recent;
-	}
+	class Ins;
+	class Recent;
 	namespace Files
 	{
 		class ProjectBase;
@@ -26,8 +23,8 @@ namespace Armin
 	extern UI::FooterHost* FooterOutput; //Use to display text out.
 	extern UI::RibbonHost* MasterRibbon; //Use to set the state of the MasterRibbon
 
-	extern Config::Ins* InsInstance;
-	extern Config::Recent* RecentInstance;
+	extern Ins* InsInstance;
+	extern Recent* RecentInstance;
 
 	extern Files::ProjectBase* LoadedProject;
 	extern String LoadedProjectPath;

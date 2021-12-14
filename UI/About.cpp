@@ -2,12 +2,10 @@
 
 #include "..\UICommon.h"
 #include "..\resource.h"
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
 
 namespace Armin::UI
 {
-	using namespace Config;
-
 	About::About(HINSTANCE ins)
 	{
 		if (!_ThisAtom)

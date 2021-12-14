@@ -1,6 +1,6 @@
 #include "UserRegistry.h"
 
-#include "Config\Ins.h"
+#include "Ins.h"
 #include "Editors\EditorFrame.h"
 #include "Editors\EditorRegistry.h"
 #include "Files\ArminSessions.h"
@@ -10,7 +10,6 @@
 namespace Armin
 {
 	using namespace Files;
-	using namespace Config;
 	using namespace Editors;
 	using namespace UI;
 	using namespace UI::Users;

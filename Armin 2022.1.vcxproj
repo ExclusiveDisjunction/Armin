@@ -161,8 +161,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp" />
-    <ClCompile Include="Config\Ins.cpp" />
-    <ClCompile Include="Config\Recent.cpp" />
+    <ClCompile Include="Ins.cpp" />
+    <ClCompile Include="Recent.cpp" />
     <ClCompile Include="Editors\EditorButtonHost.cpp" />
     <ClCompile Include="Editors\EditorFrame.cpp" />
     <ClCompile Include="Editors\EditorHost.cpp" />
@@ -262,8 +262,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Config\Ins.h" />
-    <ClInclude Include="Config\Recent.h" />
+    <ClInclude Include="Ins.h" />
+    <ClInclude Include="Recent.h" />
     <ClInclude Include="Editors\EditorButtonHost.h" />
     <ClInclude Include="Editors\EditorFrame.h" />
     <ClInclude Include="Editors\EditorHost.h" />

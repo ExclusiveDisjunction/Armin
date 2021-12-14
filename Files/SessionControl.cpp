@@ -5,13 +5,12 @@
 #include "2021.2/ArminSessions.h"
 #include "2021.2/Components.h"
 #include "Files\Stream.h"
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
+#include "..\Recent.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
-#include "..\Config\Ins.h"
-#include "..\Config\Recent.h"
 #include "..\UI\Main.h"
-#include "..\UI\User\CreateUser.h"
 #include "..\UI\Tool\FileProgress.h"
 #include "..\UI\Tool\PasswordInput.h"
 #include "..\UI\Tool\NewFile.h"
@@ -21,11 +20,9 @@
 
 namespace Armin::Files
 {
-    using namespace Config;
     using namespace Editors;
     using namespace UI;
     using namespace UI::Tool;
-    using namespace UI::Users;
 
     bool SessionControl::Open(HINSTANCE ins)
     {

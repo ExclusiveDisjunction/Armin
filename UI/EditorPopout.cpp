@@ -1,13 +1,12 @@
 #include "EditorPopout.h"
 
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
 #include "..\Files\SessionControl.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
 
 namespace Armin::UI
 {
-	using namespace Config;
 	using namespace Files;
 	using namespace Editors;
 

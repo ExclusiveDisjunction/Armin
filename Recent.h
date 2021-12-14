@@ -1,8 +1,8 @@
 #pragma once
 
-#include "..\Common.h"
+#include "Common.h"
 
-namespace Armin::Config
+namespace Armin
 {
 	class Recent
 	{

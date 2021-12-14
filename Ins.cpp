@@ -1,13 +1,11 @@
 #include "Ins.h"
 
 #include "Files\Settings Parsing.h"
-#include "..\resource.h"
-#include "..\UICommon.h"
-#include "..\Editors\EditorRegistry.h"
-#include "..\Files\ArminSessions.h"
-#include "..\Files\SessionControl.h"
+#include "resource.h"
+#include "UICommon.h"
+#include "Files\ArminSessions.h"
 
-namespace Armin::Config
+namespace Armin
 {
 	namespace InsData
 	{

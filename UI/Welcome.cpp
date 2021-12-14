@@ -3,13 +3,12 @@
 #include "Files\Stream.h"
 #include "UI\Controls.h"
 #include "..\UICommon.h"
-#include "..\Config\Ins.h"
-#include "..\Config\Recent.h"
+#include "..\Ins.h"
+#include "..\Recent.h"
 #include "..\Files\SessionControl.h"
 
 namespace Armin::UI
 {
-	using namespace Config;
 	using namespace Files;
 
 	Welcome::Welcome(HINSTANCE ins)
