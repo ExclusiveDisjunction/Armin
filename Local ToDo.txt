@@ -1,6 +1,3 @@
-Add the New File icon to the resources
-Use the resource in New File.
-
 Add the UniProject to the reconised file types, and change all former types to be "Unsuported Project".
 
 Fix the UserRegistry to not be a static class anymore, and it's state are stored in AppStates.
