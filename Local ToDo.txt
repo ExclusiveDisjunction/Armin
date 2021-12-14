@@ -1,32 +1,6 @@
-Recive editor, toHost.
-if isPopout
-	toHost = new popout;
+Add the New File icon to the resources
+Use the resource in New File.
 
-from editor, get fromHost.
-if fromHost == toHost,
-	return.
-if !fromHost || !toHost
-	return
+Add the UniProject to the reconised file types, and change all former types to be "Unsuported Project".
 
-hide toHost current.
-toHost last = toHost current
-toHost current = editor.
-editor parent = toHost
-
-from toHost get HWND (ToParent)
-from toHost get RECT (ToPlacement)
-
-from fromHost get HWND (FromParent)
-from editor get HWND (ThisHWnd)
-
-set editor.placement to ToPlacement
-set parent ThisHWnd to FromParent
-
-if fromHost is SingleEditor
-	close host
-	set fromHost to nullptr.
-else
-	set fromHost current to nullptr.
-	fromHost.loadLast.
-
-show editor
+Fix the UserRegistry to not be a static class anymore, and it's state are stored in AppStates.
