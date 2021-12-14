@@ -32,7 +32,7 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Opening File...");
 
-        String Path = OpenFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = OpenFileEx(NULL, L"Uni-Projects\0*.arminuni\0Armin 2021.2 Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0", L"");
         if (Path == L"")
         {
             if (FooterOutput)
@@ -247,7 +247,6 @@ namespace Armin::Files
         String Username, Password;
         int Config = 0;
         String Path = NewFile::Execute(ins, Username, Password, Config);
-       //String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
         bool Return = false;
 
         if (Path == L"")
@@ -296,55 +295,6 @@ namespace Armin::Files
         }
         else
             Return = true;
-   
-
-        /*if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
-        {
-            OutFile.close();
-
-            LoadedProjectPath = Path;
-            if (FileExt == L"arminproj")
-                LoadedProject = new Project();
-            else if (FileExt == L"arminrcproj")
-                LoadedProject = new ProjectRc();
-            else if (FileExt == L"arminteamproj")
-                LoadedProject = new TeamProject();
-            else if (FileExt == L"arminrcteamproj")
-                LoadedProject = new TeamProjectRc();
-            LoadedProject->ChangePath(Path);
-
-            if (!CreateUser::Execute(true, ins))
-            {
-                delete LoadedProject;
-                LoadedProject = nullptr;
-                LoadedProjectPath = String();
-
-                MessageBoxW(NULL, L"The file cannot be created without an Admin User.", L"Assign File:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            Return = true;
-        }
-        else if (FileExt == L"armininvproj" || FileExt == L"arminrcinvproj")
-        {
-            std::ofstream OutFile(Path);
-            if (!OutFile)
-            {
-                MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            OutFile.close();
-
-            LoadedProjectPath = Path;
-            if (FileExt == L"armininvproj")
-                LoadedProject = new InventoryProject();
-            else if (FileExt == L"arminrcinvproj")
-                LoadedProject = new InventoryProjectRc();
-            LoadedProject->ChangePath(Path);
-            Return = true;
-        }
-        */
 
         if (Return)
         {
@@ -509,7 +459,7 @@ namespace Armin::Files
             }
         }
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = SaveFileEx(NULL, L"Armin Uni-Project\0*.arminuni\0", L".arminuni");
         if (Path == String())
             return false;
 
@@ -533,7 +483,7 @@ namespace Armin::Files
             return false;
         }
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = SaveFileEx(NULL, L"Armin Uni-Project\0*.arminuni", L".arminuni");
         if (Path == L"")
             return false;
 
