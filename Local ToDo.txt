@@ -1,3 +1,2 @@
 Fix the UserRegistry to not be a static class anymore, and it's state are stored in AppStates.
-Move Ins to global directory
 Combine add and edit editors to one thing.
