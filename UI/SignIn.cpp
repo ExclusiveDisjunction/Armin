@@ -1,8 +1,8 @@
 #include "SignIn.h"
 
-#include "..\..\UICommon.h"
-#include "..\..\Files\ArminSessions.h"
-#include "..\..\UI\Main.h"
+#include "Main.h"
+#include "..\UICommon.h"
+#include "..\Files\ArminSessions.h"
 
 namespace Armin::UI::Users
 {

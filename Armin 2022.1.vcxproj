@@ -256,8 +256,7 @@
     <ClCompile Include="UI\Tool\NewFile.cpp" />
     <ClCompile Include="UI\Tool\PasswordInput.cpp" />
     <ClCompile Include="UI\Tool\SearchByName.cpp" />
-    <ClCompile Include="UI\User\CreateUser.cpp" />
-    <ClCompile Include="UI\User\SignIn.cpp" />
+    <ClCompile Include="UI\SignIn.cpp" />
     <ClCompile Include="UI\Welcome.cpp" />
     <ClCompile Include="UserRegistry.cpp" />
   </ItemGroup>
@@ -303,8 +302,7 @@
     <ClInclude Include="UI\Tool\NewFile.h" />
     <ClInclude Include="UI\Tool\PasswordInput.h" />
     <ClInclude Include="UI\Tool\SearchByName.h" />
-    <ClInclude Include="UI\User\CreateUser.h" />
-    <ClInclude Include="UI\User\SignIn.h" />
+    <ClInclude Include="UI\SignIn.h" />
     <ClInclude Include="UI\Welcome.h" />
     <ClInclude Include="UserRegistry.h" />
   </ItemGroup>

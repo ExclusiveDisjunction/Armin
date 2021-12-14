@@ -5,7 +5,7 @@
 #include "Editors\EditorRegistry.h"
 #include "Files\ArminSessions.h"
 #include "UI\RibbonHost.h"
-#include "UI\User\SignIn.h"
+#include "UI\SignIn.h"
 
 namespace Armin
 {

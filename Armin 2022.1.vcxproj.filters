@@ -201,10 +201,7 @@
     <ClCompile Include="UI\Tool\SearchByName.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\User\CreateUser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\User\SignIn.cpp">
+    <ClCompile Include="UI\SignIn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\About.cpp">
@@ -380,10 +377,7 @@
     <ClInclude Include="UI\Tool\SearchByName.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI\User\CreateUser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\User\SignIn.h">
+    <ClInclude Include="UI\SignIn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\About.h">
