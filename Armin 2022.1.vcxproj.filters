@@ -462,6 +462,9 @@
     <Image Include="Resource\startup.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Resource\NewFile_Icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="2022.1 Roadmap.txt" />

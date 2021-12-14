@@ -33,6 +33,7 @@ namespace Armin::UI
 
 		static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 		static ATOM _ThisAtom;
+		static HICON _ThisIcon;
 		static void InitBase(HINSTANCE ins);
 	public:
 		NewFile();
@@ -42,6 +43,8 @@ namespace Armin::UI
 		{
 			SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
 			DestroyWindow(_Base);
+
+			DeleteObject(_ThisIcon);
 		}
 
 		NewFile& operator=(const NewFile& Obj) = delete;

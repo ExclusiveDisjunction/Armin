@@ -312,6 +312,7 @@
   <ItemGroup>
     <Image Include="Resource\Armin Logo.ico" />
     <Image Include="Resource\Armin Logo.png" />
+    <Image Include="Resource\NewFile_Icon.ico" />
     <Image Include="Resource\startup.png" />
   </ItemGroup>
   <ItemGroup>

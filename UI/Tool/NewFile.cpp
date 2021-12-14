@@ -1,6 +1,7 @@
 #include "NewFile.h"
 
 #include "UI\Label.h"
+#include "..\..\resource.h"
 #include "..\..\Files\ArminSessions.h"
 
 #include <iostream>
@@ -15,7 +16,6 @@ namespace Armin::UI
 
 	NewFile::NewFile() : _Base(nullptr), _Loaded(false)
 	{
-
 	}
 	void NewFile::CreateBase(HINSTANCE ins)
 	{
@@ -174,8 +174,11 @@ namespace Armin::UI
 		}
 	}
 	ATOM NewFile::_ThisAtom = ATOM();
+	HICON NewFile::_ThisIcon = HICON();
 	void NewFile::InitBase(HINSTANCE ins)
 	{
+		_ThisIcon = LoadIcon(ins, MAKEINTRESOURCE(IDI_NewFileIcon));
+
 		WNDCLASSW wn = { 0 };
 		wn.cbClsExtra = 0;
 		wn.cbWndExtra = sizeof(NewFile*);
@@ -184,7 +187,7 @@ namespace Armin::UI
 		wn.hCursor = ArminCursor;
 		wn.hInstance = ins;
 		wn.hbrBackground = nullptr;
-		wn.hIcon = ArminIcon;
+		wn.hIcon = _ThisIcon;
 		wn.style = CS_HREDRAW | CS_VREDRAW;
 
 		_ThisAtom = RegisterClassW(&wn);

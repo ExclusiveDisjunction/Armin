@@ -54,6 +54,8 @@ END
 // remains consistent on all systems.
 ID_ARMINICO             ICON                    "Resource\\Armin Logo.ico"
 
+IDI_NewFileIcon         ICON                    "Resource\\NewFile_Icon.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
