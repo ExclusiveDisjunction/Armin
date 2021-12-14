@@ -74,12 +74,12 @@ namespace Armin::Config
 	{
 		String Fileext = FileExt(Path);
 
-		if (Fileext == L"arminproj" || Fileext == L"arminrcproj")
-			return FileName(Path) + L" - Armin Project";
-		else if (Fileext == L"armininvproj" || Fileext == L"arminrcinvproj")
-			return FileName(Path) + L" - Armin Inventory Project";
-		else if (Fileext == L"arminteamproj" || Fileext == L"arminrcteamproj")
-			return FileName(Path) + L" - Armin Team Project";
+		if (Fileext == L"arminproj" || Fileext == L"arminrcproj" || Fileext == L"armininvproj" || Fileext == L"arminrcinvproj" || Fileext == L"arminteamproj" || Fileext == L"arminrcteamproj")
+			return FileName(Path) + L" - 2021.2 Armin Project";
+		else if (Fileext == L"armin")
+			return FileName(Path) + L" - 2021.1 Armin Project";
+		else if (Fileext == L"arminuni")
+			return FileName(Path) + L" - Armin Uni-Project";
 
 		return FileName(Path) + L" - Unknown File Type";
 	}
