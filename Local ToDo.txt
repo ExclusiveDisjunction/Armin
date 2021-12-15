@@ -1,2 +1,2 @@
-Fix the UserRegistry to not be a static class anymore, and it's state are stored in AppStates.
+Fix the UserRegistry to not be a static class anymore, and it's state are stored in AppStates. [IN PROGRESS, BRANCH "UserConfig"]
 Combine add and edit editors to one thing.
