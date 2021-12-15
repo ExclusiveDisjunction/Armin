@@ -22,7 +22,7 @@ namespace Armin::UI::Tool
 
 		HWND _Base;
 		TextBox* MM, * DD, * YYYY, * HH, * MiMi;
-		CheckableButton* HasDate, * IsAM, * IsPM;
+		CheckableButton * IsAM, * IsPM;
 		Button* Submit, * Cancel, * Now;
 		Label* Title;
 		Vector<ControlBase*> MiscControls;

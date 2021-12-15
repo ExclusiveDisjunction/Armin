@@ -177,67 +177,62 @@ namespace Armin::UI::Tool
 
     bool DatePicker::Process()
     {
-        if (HasDate->GetCheckState())
+        int Month, Day, Year, Hour, Minute;
+        bool AMPM = IsAM->GetCheckState();
+
+        Month = MM->GetText().ToInt();
+        Day = DD->GetText().ToInt();
+        Year = YYYY->GetText().ToInt();
+        Hour = HH->GetText().ToInt();
+        Minute = MiMi->GetText().ToInt();
+
+        if (Month < 1 || Month > 12)
         {
-            int Month, Day, Year, Hour, Minute;
-            bool AMPM = IsAM->GetCheckState();
-
-            Month = MM->GetText().ToInt();
-            Day = DD->GetText().ToInt();
-            Year = YYYY->GetText().ToInt();
-            Hour = HH->GetText().ToInt();
-            Minute = MiMi->GetText().ToInt();
-
-            if (Month < 1 || Month > 12)
-            {
-                MessageBoxW(_Base, L"The month must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            if (Day < 1)
-            {
-                MessageBoxW(_Base, L"The day must be greater than 1.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (Day > 30 && (Month == 4 || Month == 6 || Month == 9 || Month == 11))
-            {
-                MessageBoxW(_Base, L"In the months of April, June, September, and November, there are only 30 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 31 && (Month == 1 || Month == 3 || Month == 5 || Month == 7 || Month == 8 || Month == 10 || Month == 12))
-            {
-                MessageBoxW(_Base, L"In the months of January, March, May, July, August, October, and December, there are only 31 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 29 && Month == 2 && Year % 4 == 0)
-            {
-                MessageBoxW(_Base, L"In February, there are only 29 days in a leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 28 && Month == 2)
-            {
-                MessageBoxW(_Base, L"In February, there are only 28 days in a non-leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (Hour > 12 || Hour < 1)
-            {
-                MessageBoxW(_Base, L"The hour must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            if (Minute > 59 || Minute < 0)
-            {
-                MessageBoxW(_Base, L"The monute must be between 0 and 59.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (!AMPM)
-                Hour += 12;
-
-            Return = DateTime(Month, Day, Year, Hour, Minute, 0, 0);
+            MessageBoxW(_Base, L"The month must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
         }
-        else
-            Return = DateTime();
+        if (Day < 1)
+        {
+            MessageBoxW(_Base, L"The day must be greater than 1.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (Day > 30 && (Month == 4 || Month == 6 || Month == 9 || Month == 11))
+        {
+            MessageBoxW(_Base, L"In the months of April, June, September, and November, there are only 30 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 31 && (Month == 1 || Month == 3 || Month == 5 || Month == 7 || Month == 8 || Month == 10 || Month == 12))
+        {
+            MessageBoxW(_Base, L"In the months of January, March, May, July, August, October, and December, there are only 31 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 29 && Month == 2 && Year % 4 == 0)
+        {
+            MessageBoxW(_Base, L"In February, there are only 29 days in a leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 28 && Month == 2)
+        {
+            MessageBoxW(_Base, L"In February, there are only 28 days in a non-leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (Hour > 12 || Hour < 1)
+        {
+            MessageBoxW(_Base, L"The hour must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (Minute > 59 || Minute < 0)
+        {
+            MessageBoxW(_Base, L"The monute must be between 0 and 59.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (!AMPM)
+            Hour += 12;
+
+        Return = DateTime(Month, Day, Year, Hour, Minute, 0, 0);
 
         return true;
     }
