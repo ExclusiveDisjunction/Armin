@@ -156,5 +156,6 @@ namespace Armin::Files
 		AString ToAString() const;
 
 		operator Vector<Type>() const;
+		operator Vector<Component*>() const;
 	};
 }

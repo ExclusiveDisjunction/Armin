@@ -269,4 +269,17 @@ namespace Armin::Files
 
 		return Return;
 	}
+	ReferenceList::operator Vector<Component*>() const
+	{
+		Vector<Component*> Return;
+		const ReferenceList& This = *this;
+		for (ComponentReference*& Item : This)
+		{
+			Component* Eval = Item->Target();
+			if (Eval)
+				Return.Add(Eval);
+		}
+
+		return Return;
+	}
 }
