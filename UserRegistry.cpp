@@ -14,72 +14,71 @@ namespace Armin
 	using namespace UI;
 	using namespace UI::Users;
 
-	Files::User* UserRegistry::_Current = nullptr;
-	UserSystem* UserRegistry::_File = nullptr;
-	UserSet* UserRegistry::_Users = nullptr;
-	UserRegStatus UserRegistry::Status = URS_NotActive;
-	HINSTANCE UserRegistry::ThisInstance = nullptr;
-
-	void UserRegistry::Initalize()
+	namespace UserReg
 	{
-		_File = nullptr;
-		_Current = nullptr;
-		_Users = nullptr;
-
-		Status = URS_NotActive;
+		Files::User* _Current;
+		Files::UserSystem* _File;
+		Files::ComponentList<Files::User, Files::UserParent>* _Users;
+		HINSTANCE ThisInstance;
 	}
-	void UserRegistry::Initalize(UserSystem* Target, HINSTANCE ins)
+
+	void UserRegInit()
+	{
+		UserReg::_File = nullptr;
+		UserReg::_Current = nullptr;
+		UserReg::_Users = nullptr;
+
+		AppState &= ~APS_HasUser;
+		AppState &= ~APS_HasAdminUser;
+		AppState &= ~APS_HasAssuranceUser;
+		AppState &= ~APS_UserRegInit;
+	}
+	void UserRegInit(UserSystem* Target, HINSTANCE ins)
 	{
 		if (!Target || !Target->Users)
 		{
-			Initalize();
+			UserRegInit();
 			return;
 		}
 
-		_File = Target;
-		_Users = Target->Users;
+		UserReg::_File = Target;
+		UserReg::_Users = Target->Users;
 
-		Status = URS_NotSignedIn;
-		ThisInstance = ins;
+		AppState &= ~APS_HasUser;
+		AppState &= ~APS_HasAdminUser;
+		AppState &= ~APS_HasAssuranceUser;
+		AppState |= APS_UserRegInit;
 	}
 
-	bool UserRegistry::IsSignedIn()
-	{
-		return _Current != nullptr;
-	}
-	Files::User* UserRegistry::CurrentUser()
-	{
-		return _Current;
-	}
-	UserType UserRegistry::CurrentUserType()
-	{
-		if (!_Current)
-			return UT_Undefined;
+	Files::User*& CurrentUser = UserReg::_Current;
 
-		if (_Current->IsAdmin)
-			return UT_Admin;
-		else if (_Current->IsAssurance)
-			return UT_Assurance;
-		else
-			return UT_Standard;
-	}
-
-	void UserRegistry::SignIn()
+	void SignIn()
 	{
-		if (Status == URS_NotActive)
+		if (!(AppState & APS_UserRegInit))
 			return;
 
-		if (IsSignedIn())
-			SignOut();
+		if (AppState & APS_HasUser)
+			UserSignOut();
 
 		if (FooterOutput)
 			FooterOutput->SetFooterTextTillNext(L"Signing In...");
 
-		_Current = SignIn::Execute(nullptr, false, false, false, ThisInstance);
+		AppState &= ~APS_HasUser;
+		AppState &= ~APS_HasAdminUser;
+		AppState &= ~APS_HasAssuranceUser;
 
-		if (_Current)
+		UserReg::_Current = SignIn::Execute(nullptr, false, false, false, UserReg::ThisInstance);
+
+		if (UserReg::_Current)
 		{
-			Status = URS_SignedIn;
+			AppState |= APS_HasUser;
+			if (UserReg::_Current->IsAdmin)
+			{
+				AppState |= APS_HasAdminUser;
+				AppState |= APS_HasAssuranceUser;
+			}
+			else if (UserReg::_Current->IsAssurance)
+				AppState |= APS_HasAssuranceUser;
 
 			if (MasterRibbon)
 				MasterRibbon->SetRibbonStatusDef();
@@ -87,12 +86,10 @@ namespace Armin
 			if (FooterOutput)
 				FooterOutput->SetFooterText(L"Sign In Sucessful");
 
-			EditorRegistry::OpenEditor(new Editors::Users::UserHomepageEditor(_Current), nullptr);
+			EditorRegistry::OpenEditor(new Editors::Users::UserHomepageEditor(UserReg::_Current), nullptr);
 		}
 		else
 		{
-			Status = URS_NotSignedIn;
-
 			if (MasterRibbon)
 				MasterRibbon->SetRibbonStatusDef();
 
@@ -100,52 +97,56 @@ namespace Armin
 				FooterOutput->SetFooterText(L"Sign In Failed");
 		}
 	}
-	Files::User* UserRegistry::SignInForAssurance()
+	Files::User* SignInForAssurance()
 	{
-		if (Status == URS_NotActive)
+		if (!(AppState & APS_UserRegInit))
 			return nullptr;
 
 		MessageBoxW(nullptr, L"Please sign in as an Assurance or Admin user to complete this task.", L"Sign in for Admin:", MB_OK | MB_ICONINFORMATION);
-		return SignIn::Execute(nullptr, true, false, false, ThisInstance);
+		return SignIn::Execute(nullptr, true, false, false, UserReg::ThisInstance);
 	}
-	bool UserRegistry::SignInForConfirmation(Files::User* Target)
+	bool SignInForConfirmation(Files::User* Target)
 	{
 		if (!Target)
 			return false;
 
-		Files::User* Returned = SignIn::Execute(Target, false, false, false, ThisInstance);
+		Files::User* Returned = SignIn::Execute(Target, false, false, false, UserReg::ThisInstance);
 		return Returned != nullptr;
 	}
-	void UserRegistry::Lock()
+	void UserLock()
 	{
-		Files::User* Target = CurrentUser();
+		if (!(AppState & APS_UserRegInit) || !(AppState & APS_HasUser))
+			return;
+
+		Files::User* Target = UserReg::_Current;
 		if (!Target)
 			return;
 
-		Files::User* Returned = SignIn::Execute(Target, false, false, true, ThisInstance);
+		Files::User* Returned = SignIn::Execute(Target, false, false, true, UserReg::ThisInstance);
 		if (Returned == nullptr)
-			SignOut();
+			UserSignOut();
 	}
-	bool UserRegistry::SignInForAdmin()
+	bool SignInForAdmin()
 	{
 		MessageBoxW(nullptr, L"Please sign in as an Admin user to complete this task.", L"Sign in for Admin:", MB_OK | MB_ICONINFORMATION);
 
-		Files::User* Return = SignIn::Execute(nullptr, false, true, false, ThisInstance);
+		Files::User* Return = SignIn::Execute(nullptr, false, true, false, UserReg::ThisInstance);
 		return Return != nullptr;
 	}
-	void UserRegistry::SignOut()
+	void UserSignOut()
 	{
-		if (Status == URS_NotActive)
-			return;
-
-		if (!IsSignedIn())
+		if (!(AppState & APS_UserRegInit) || !(AppState & APS_HasUser))
 			return;
 
 		if (!EditorRegistry::CloseAllEditors())
 			return;
 
-		_Current = nullptr;
-		Status = URS_NotSignedIn;
+		UserReg::_Current = nullptr;
+	
+		AppState &= ~APS_HasUser;
+		AppState &= ~APS_HasAdminUser;
+		AppState &= ~APS_HasAssuranceUser;
+
 		if (MasterRibbon)
 			MasterRibbon->SetRibbonStatusDef();
 

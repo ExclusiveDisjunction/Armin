@@ -322,7 +322,7 @@ namespace Armin::Editors::Users
 		String First = this->FirstName->GetText();
 		String Last = this->LastName->GetText();
 		String Middle = this->MiddleName->GetText();
-		enum UserType Type = UserType->Current() == L"Admin" ? UT_Admin : UserType->Current() == L"Assurance" ? UT_Assurance : UT_Standard;
+		enum UserType { UT_Admin, UT_Assurance, UT_Standard } Type = this->UserType->Current() == L"Admin" ? UT_Admin : this->UserType->Current() == L"Assurance" ? UT_Assurance : UT_Standard;
 		Vector<JobPosition*> Positions;
 
 		for (uint i = 0; i < this->Positions.Size; i++)
@@ -342,7 +342,7 @@ namespace Armin::Editors::Users
 		if (!Current)
 			return false;
 
-		if (!UserRegistry::SignInForAdmin())
+		if (!SignInForAdmin())
 		{
 			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have access to modify this user.", L"Error:", MB_OK | MB_ICONERROR);
 			return false;

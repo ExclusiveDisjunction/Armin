@@ -88,19 +88,19 @@ namespace Armin::Editors::Inventory
 				Width = Height = ButtonSize;
 
 				Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)6, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)7, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)8, ins, Style, TextStyle);
-				EnableWindow(*View, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*View, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)9, ins, Style, TextStyle);
-				EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)10, ins, Style, TextStyle);
@@ -214,7 +214,7 @@ namespace Armin::Editors::Inventory
 			break;
 		case 'V':
 		case 'E':
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 			{
 				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user level to view or edit inventory items.", L"View/Edit:", MB_ICONERROR | MB_OK);
 				break;

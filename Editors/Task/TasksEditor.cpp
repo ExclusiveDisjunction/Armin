@@ -92,18 +92,18 @@ namespace Armin::Editors::Tasks
 				Width = Height = ButtonSize;
 
 				Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)5, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)6, ins, Style, TextStyle);
-				EnableWindow(*Remove, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Remove, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)7, ins, Style, TextStyle);
 				YCoord += 5 + ButtonSize;
 
 				Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)8, ins, Style, TextStyle);
-				EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)9, ins, Style, TextStyle);
@@ -237,7 +237,7 @@ namespace Armin::Editors::Tasks
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		case 'C':
 			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
@@ -256,12 +256,12 @@ namespace Armin::Editors::Tasks
 			EditorRegistry::OpenEditor(new Misc::QuickSearchEditor(CT_Task), nullptr);
 			break;
 		case 5: //Add
-			if (UserRegistry::CurrentUserType() == UT_Admin)
+			if ((AppState & APS_HasAdminUser))
 				EditorRegistry::OpenEditor(new AddTaskEditor(), nullptr);
 			break;
 		case 6: //Remove
 		{
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 			{
 				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user level to remove tasks.", L"Remove:", MB_OK | MB_ICONERROR);
 				break;
@@ -300,7 +300,7 @@ namespace Armin::Editors::Tasks
 		}
 		case 7: //View
 		case 8: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && UserRegistry::CurrentUserType() == UT_Admin);
+			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && (AppState & APS_HasAdminUser));
 			break;
 		case 9: //SelectAll
 		case 10: //DeSelectAll

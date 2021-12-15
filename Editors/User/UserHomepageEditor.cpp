@@ -97,7 +97,7 @@ namespace Armin::Editors::Users
 			YCoord += 5 + ButtonSize;
 
 			Edit = new Button(XCoord, YCoord, ButtonSize, ButtonSize, L"ED", _Base, (HMENU)10, ins, Style, TextStyle);
-			EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+			EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 			YCoord += 10 + ButtonSize;
 
 			SelectAll = new Button(XCoord, YCoord, ButtonSize, ButtonSize, L"SA", _Base, (HMENU)11, ins, Style, TextStyle);
@@ -221,7 +221,7 @@ namespace Armin::Editors::Users
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, wp, 0);
@@ -233,10 +233,10 @@ namespace Armin::Editors::Users
 		switch (wp)
 		{
 		case 4: //Sign Out
-			UserRegistry::SignOut();
+			UserSignOut();
 			break;
 		case 5: //Lock
-			UserRegistry::Lock();
+			UserLock();
 			break;
 		case 6: //Tasks
 			EditorRegistry::OpenEditor(new Tasks::TasksEditor(nullptr), nullptr);

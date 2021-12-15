@@ -3,6 +3,7 @@
 #include "ArminSessions.h"
 #include "Components.h"
 #include "Mapping.h"
+#include "..\Common.h"
 #include "..\UserRegistry.h"
 
 namespace Armin::Files
@@ -16,7 +17,7 @@ namespace Armin::Files
             JobPositions = AllowedTypes & CT_JobPosition,
             Tasks = AllowedTypes & CT_Task,
             CompletedTasks = AllowedTypes & CT_CompletedTask,
-            InventoryItems = (AllowedTypes & CT_InventoryItem) && UserRegistry::CurrentUserType() == UT_Admin,
+            InventoryItems = (AllowedTypes & CT_InventoryItem) && (AppState & APS_HasAdminUser),
             OperationInventoryItems = AllowedTypes & CT_OperationInventoryItem,
             RefrenceGroups = AllowedTypes & CT_RefrenceGroup,
             Images = AllowedTypes & CT_Image;

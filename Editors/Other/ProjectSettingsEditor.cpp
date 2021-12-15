@@ -65,7 +65,7 @@ namespace Armin::Editors::Misc
 			Width = WndRect.right - (10 + XCoord);
 			TextStyle.Bold = false;
 
-			bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : UserRegistry::CurrentUserType() == UT_Admin;
+			bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : (AppState & APS_HasAdminUser);
 
 			ControlBase* Temp;
 			MiscControls.Add(Temp = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, Target->RequiresPassword(), L"Requires Password", CBT_CheckBox, Style, TextStyle));
@@ -176,7 +176,7 @@ namespace Armin::Editors::Misc
 		dynamic_cast<CheckableButton*>(MiscControls[1])->SetCheckState(Target->RequiresPassword());
 		dynamic_cast<TextBox*>(MiscControls[3])->SetText(Target->Password());
 
-		bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : UserRegistry::CurrentUserType() == UT_Admin;
+		bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : (AppState & APS_HasAdminUser);
 		EnableWindow(*MiscControls[3], Target->RequiresPassword() && AdminCondition);
 		EnableWindow(*MiscControls[1], AdminCondition);
 	}

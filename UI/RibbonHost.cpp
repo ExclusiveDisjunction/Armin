@@ -28,6 +28,6 @@ namespace Armin::UI
 	}
 	void RibbonHost::SetRibbonStatusDef()
 	{
-		SetRibbonStatus((Ins::IsLoaded() ? 0 : RibbonStatus::MRS_NoFile) | (UserRegistry::CurrentUser() ? 0 : MRS_NoUser) | (!UserRegistry::CurrentUser() ? 0 : (UserRegistry::CurrentUserType() == UT_Admin ? 0 : MRS_StandardUser)));
+		SetRibbonStatus(0);
 	}
 }

@@ -136,10 +136,13 @@ namespace Armin::Files
         InsInstance->LastLoaded = Path;
         RecentInstance->AddRecent(Path);
 
+        AppState = 0;
+        AppState |= APS_FileLoaded;
+
         UserSystem* UserSys = dynamic_cast<UserSystem*>(LoadedProject);
-        UserRegistry::Initalize(UserSys, ins);
+        UserRegInit(UserSys, ins);
         if (UserSys && FooterOutput) //If the main window has already been loaded, then prompt a sign in.
-            UserRegistry::SignIn();
+            SignIn();
 
         ResourceSystem* Resources = dynamic_cast<ResourceSystem*>(LoadedProject);
         if (Resources)
@@ -211,6 +214,8 @@ namespace Armin::Files
         delete LoadedProject;
         LoadedProject = nullptr;
         LoadedProjectPath = L"";
+
+        AppState = 0;
 
         if (MasterRibbon)
             MasterRibbon->SetRibbonStatusDef();
@@ -303,7 +308,7 @@ namespace Armin::Files
             AppState |= APS_FileLoaded; //Loads a file up.
 
             UserSystem* ConvFile = dynamic_cast<UserSystem*>(LoadedProject);
-            UserRegistry::Initalize(ConvFile, ins);
+            UserRegInit(ConvFile, ins);
         }
 
         if (FooterOutput)
