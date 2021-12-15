@@ -93,9 +93,6 @@
     <ClCompile Include="Editors\User\CreateUserEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\User\EditUserEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

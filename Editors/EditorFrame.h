@@ -556,7 +556,7 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class EditUserEditor : public EditorFrame
+			/*class EditUserEditor : public EditorFrame
 			{
 			private:
 				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
@@ -592,11 +592,11 @@ namespace Armin
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
-			};
-			class CreateUserEditor : public EditorFrame
+			};*/
+			class CreateEditUserEditor : public EditorFrame
 			{
 			private:
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
+				Files::User* Target;
 
 				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
 				Button* ModifyPositions, * ViewPosition;
@@ -606,6 +606,7 @@ namespace Armin
 				Grid* PositionsView;
 				Vector<UI::ComponentViewer*> Positions;
 
+				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
 				void LoadControls() override;
 
@@ -614,7 +615,11 @@ namespace Armin
 				LRESULT Size() override;
 
 			public:
-				CreateUserEditor();
+				/// <summary>
+				/// Constructs the CreateEditUser editor.
+				/// </summary>
+				/// <param name="Target">If Target != nullptr, edit mode is enabled, add mode if not.</param>
+				CreateEditUserEditor(Files::User* Target);
 
 				EditorTypes EditorType() const override { return EDT_CreateUser; }
 				bool IsApplyable() const override { return true; }
@@ -623,7 +628,7 @@ namespace Armin
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return false; }
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Create User"; }
+				String GetName() const override { return Target ? L"Edit User" : L"Create User"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;

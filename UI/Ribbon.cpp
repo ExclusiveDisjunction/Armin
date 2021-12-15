@@ -613,7 +613,7 @@ namespace Armin::UI
 			if (UserRegistry::CurrentUserType() != UT_Admin)
 				MessageBoxW(_Base, L"You must be an admin to create users.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Users::CreateUserEditor(), nullptr);
+				EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(nullptr), nullptr);
 			break;
 		case 66: //UserSearch
 			EditorRegistry::OpenEditor(new Users::UserSearch(nullptr), nullptr);

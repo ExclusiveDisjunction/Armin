@@ -240,7 +240,7 @@ namespace Armin::UI
 					if (Type == CT_JobPosition || Type == CT_InventoryItem || Type == CT_OperationInventoryItem || Type == CT_Image)
 						EditorRegistry::OpenEditor(new Editors::Misc::BasicEditorEditor(Current), nullptr);
 					else if (Type == CT_User)
-						EditorRegistry::OpenEditor(new Users::EditUserEditor(dynamic_cast<User*>(Current)), nullptr);
+						EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(dynamic_cast<User*>(Current)), nullptr);
 					else if (Type == CT_Task)
 						EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(dynamic_cast<Task*>(Current)), nullptr);
 					else if (Type == CT_RefrenceGroup)
@@ -450,7 +450,7 @@ namespace Armin::UI
 				break;
 			case CT_User:
 				if (UserRegistry::CurrentUserType() == UT_Admin || UserRegistry::CurrentUser() == dynamic_cast<Files::User*>(_Source))
-					EditorRegistry::OpenEditor(new Users::EditUserEditor(dynamic_cast<User*>(_Source)), Parent);
+					EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(dynamic_cast<User*>(_Source)), Parent);
 				break;
 			}
 		}

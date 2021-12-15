@@ -165,7 +165,7 @@ namespace Armin::Editors::Users
 				break;
 			}
 
-			EditorRegistry::OpenEditor(new CreateUserEditor(), nullptr);
+			EditorRegistry::OpenEditor(new CreateEditUserEditor(nullptr), nullptr);
 			break;
 		case 7://Remove
 		{
