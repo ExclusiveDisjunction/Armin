@@ -1,5 +1,6 @@
 #include "..\EditorFrame.h"
 
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -14,21 +15,24 @@ namespace Armin::Editors::Tasks
 	using namespace UI::Search;
 	using namespace UI::Tool;
 
-	AddTaskEditor::AddTaskEditor()
+	AddEditTaskEditor::AddEditTaskEditor(Task* ToEdit)
 	{
-
+		if (ToEdit)
+			Target = ToEdit;
+		else
+			Target = nullptr;
 	}
 
-	LRESULT __stdcall AddTaskEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	LRESULT __stdcall AddEditTaskEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
-		AddTaskEditor* This = reinterpret_cast<AddTaskEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		AddEditTaskEditor* This = reinterpret_cast<AddEditTaskEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!This)
 			return DefWindowProcW(Window, Message, wp, lp);
 
 		return EditorFrame::EditorProc(This, Window, Message, wp, lp);
 	}
 
-	void AddTaskEditor::LoadControls()
+	void AddEditTaskEditor::LoadControls()
 	{
 		if (_Loaded)
 			return;
@@ -72,18 +76,21 @@ namespace Armin::Editors::Tasks
 			YCoord += 10 + Height; //Space for requires assurance
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Assigned To:", BaseBk, TextStyle, false));
+			YCoord += 10 + Height;
+
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Instructions:", BaseBk, TextStyle, false));
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;
-			Width = (WndRect.right / 2) - (10 + XCoord);
+			Width = WndRect.right - (10 + XCoord);
 			TextStyle.Alignment = TA_LeftAlignment;
 
-			Title = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, false, false);
+			Title = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Title() : String(), Style, TextStyle, false, false);
 			YCoord += 10 + Height;
 
 			Width -= 5 + Height;
 
-			DueBy = new Label(XCoord, YCoord, Width, Height, _Base, ins, DateTime().ToString(DateStringFormat::ShortDate), BaseBk, TextStyle, false);
+			DueBy = new Label(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->DueBy.ToString(DateStringFormat::ShortDate) : DateTime().ToString(DateStringFormat::ShortDate), BaseBk, TextStyle, false);
 			XCoord += 5 + Width;
 			DueBySelect = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
 
@@ -91,48 +98,30 @@ namespace Armin::Editors::Tasks
 			Width += 5 + Height;
 			YCoord += 10 + Height;
 
-			RequiresAssurance = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, true, L"Requires Assurance", CBT_CheckBox, Style, TextStyle);
+			RequiresAssurance = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, Target ? Target->RequiresAssurance : true, L"Requires Assurance", CBT_CheckBox, Style, TextStyle);
 			YCoord += 10 + Height;
 
-			ModifyAssigned = new Button(XCoord, YCoord, Width, Height, L"Assign Users", _Base, (HMENU)5, ins, Style, TextStyle);
-			YCoord += 10 + Height;
+			Width -= 5 + Height;
 
-			Height = WndRect.bottom - 10 - YCoord;
-			AssignedScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
-			AssignedView = new Grid(0, 0, Width, Height, AssignedScroll, ins, Style);
-			AssignedScroll->SetViewer(AssignedView);
-		}
+			AssignedLabel = new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Collection {Count = " + String(Target ? Target->AssignedTo.Size : 0) + L"}", BaseBk, TextStyle, false);
+			XCoord += 5 + Width;
+			ModifyAssigned = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)5, ins, Style, TextStyle);
 
-		{
-			int XCoord = (WndRect.right / 2) + 10;
-			int YCoord = BaseYCoord;
-			int Width = 120;
-			int Height = 27;
+			if (Target)
+				AssignedTo = ComponentReference::Convert<User>(Target->AssignedTo);
 
-			TextStyleSheet TextStyle;
-			TextStyle.FontFamily = StandardFontName;
-			TextStyle.FontSize = 13;
-			TextStyle.Foreground = FontColor;
-			TextStyle.Alignment = TA_LeftAlignment;
-
-			StyleSheet Style;
-			Style.Background = Grey3;
-			Style.BaseBackground = BaseBk;
-			Style.BorderBrush = Accent4;
-			Style.BorderThickness = 3;
-			Style.Radius = 20;
-
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Instructions:", BaseBk, TextStyle, false));
+			XCoord -= 5 + Width;
+			Width += 5 + Height;
 			YCoord += 10 + Height;
 
 			Height = WndRect.bottom - (YCoord + 10);
 			Width = WndRect.right - (XCoord + 10);
 
-			Instructions = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, true);
+			Instructions = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Instructions : String(), Style, TextStyle, true);
 		}
 	}
 
-	LRESULT AddTaskEditor::Size()
+	LRESULT AddEditTaskEditor::Size()
 	{
 		if (!_Loaded)
 			return 0;
@@ -159,10 +148,13 @@ namespace Armin::Editors::Tasks
 			YCoord += 10 + Height; //Space for requires assurance
 
 			MiscControls[2]->Move(XCoord, YCoord, Width, Height);
+			YCoord += 10 + Height;
+
+			MiscControls[3]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;
-			Width = (WndRect.right / 2) - (10 + XCoord);
+			Width = WndRect.right - (10 + XCoord);
 
 			Title->Move(XCoord, YCoord, Width, Height);
 			YCoord += 10 + Height;
@@ -180,21 +172,15 @@ namespace Armin::Editors::Tasks
 			RequiresAssurance->Move(XCoord, YCoord, Width, Height);
 			YCoord += 10 + Height;
 
-			ModifyAssigned->Move(XCoord, YCoord, Width, Height);
+			Width -= 5 + Height;
+
+			AssignedLabel->Move(XCoord, YCoord, Width, Height);
+			XCoord += 5 + Width;
+			ModifyAssigned->Move(XCoord, YCoord, Height, Height);
+
+			XCoord -= 5 + Width;
+			Width += 5 + Height;
 			YCoord += 10 + Height;
-
-			Height = WndRect.bottom - 10 - YCoord;
-			AssignedScroll->Move(XCoord, YCoord, Width, Height);
-		}
-
-		{
-			int XCoord = (WndRect.right / 2) + 10;
-			int YCoord = BaseYCoord;
-			int Width = 120;
-			int Height = 27;
-
-			MiscControls[3]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 5 + Height;
 
 			Height = WndRect.bottom - (YCoord + 10);
 			Width = WndRect.right - (XCoord + 10);
@@ -202,32 +188,13 @@ namespace Armin::Editors::Tasks
 			Instructions->Move(XCoord, YCoord, Width, Height);
 		}
 
-		{
-			int XCoord = 5;
-			int YCoord = 5;
-			int Width = 900;
-			int Height = 27;
-
-			RECT Client;
-			GetClientRect(AssignedView, &Client);
-
-			AssignedView->Move(0, 0, Width + 10, static_cast<int>((Height + 5) * (AssignedTo.Size + 1)));
-			AssignedScroll->Reset();
-
-			for (uint i = 0; i < AssignedTo.Size; i++)
-			{
-				AssignedTo[i]->Move(XCoord, YCoord, Width, Height);
-				YCoord += 5 + Height;
-			}
-		}
-
 		return 0;
 	}
-	LRESULT AddTaskEditor::KeyDown(WPARAM wp)
+	LRESULT AddEditTaskEditor::KeyDown(WPARAM wp)
 	{
 		return 0;
 	}
-	LRESULT AddTaskEditor::Command(WPARAM wp, LPARAM lp)
+	LRESULT AddEditTaskEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		switch (wp)
 		{
@@ -239,7 +206,9 @@ namespace Armin::Editors::Tasks
 		}
 		case 5:
 		{
-			Vector<Component*> OldItems = ComponentViewer::GetAllComponents(AssignedTo);
+			Vector<Component*> OldItems;
+			for (User* Obj : AssignedTo)
+				OldItems.Add(Obj);
 
 			SearchCriteria Criteria;
 			Criteria.AllowedTypes = CT_User;
@@ -248,24 +217,34 @@ namespace Armin::Editors::Tasks
 
 			Vector<Component*> New = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
 
-			CloseControls(AssignedTo);
-			AssignedTo = ComponentViewer::GenerateList(New, AssignedView, NULL, _IsMultiselect, true, AssignedScroll);
+			AssignedTo.Clear();
+			for (Component* Obj : New)
+			{
+				User* Conv = dynamic_cast<User*>(Obj);
+				if (Conv)
+					AssignedTo.Add(Conv);
+			}
+
+			AssignedLabel->SetText(L"Collection {Count = " + String(AssignedTo.Size) + L"}");
 			break;
 		}
 		}
 		return 0;
 	}
 
-	void AddTaskEditor::Reset()
+	void AddEditTaskEditor::Reset()
 	{
-		Title->SetText(String());
-		Instructions->SetText(String());
-		CloseControls(AssignedTo);
-		RequiresAssurance->SetCheckState(true);
+		Title->SetText(Target ? Target->Title() : String());
+		Instructions->SetText(Target ? Target->Instructions : String());
+		RequiresAssurance->SetCheckState(Target ? Target->RequiresAssurance : true);
 		DueBy->SetText(DateTime().ToString(DateStringFormat::ShortDate));
-		_IsMultiselect = false;
+		
+		AssignedTo.Clear();
+		if (Target)
+			AssignedTo = ComponentReference::Convert<User>(Target->AssignedTo);
+		AssignedLabel->SetText(L"Collection {Count = " + String(AssignedTo.Size) + L"}");
 	}
-	bool AddTaskEditor::Apply(ProjectBase* File, bool PromptErrors)
+	bool AddEditTaskEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		TaskSystem* TaskFile = dynamic_cast<class TaskSystem*>(LoadedProject);
 		TaskList* Tasks = !TaskFile ? nullptr : TaskFile->Tasks;
@@ -280,15 +259,7 @@ namespace Armin::Editors::Tasks
 		String Instructions = this->Instructions->GetText();
 		DateTime DueBy = DueByD;
 		bool RequiresAssurance = this->RequiresAssurance->GetCheckState();
-
-		Vector<Component*> RawAssignedTo = ComponentViewer::RetriveFromList(AssignedTo);
-		Vector<Files::User*> AssignedTo;
-		for (uint i = 0; i < RawAssignedTo.Size; i++)
-		{
-			Files::User* Conv = dynamic_cast<Files::User*>(RawAssignedTo[i]);
-			if (Conv)
-				AssignedTo.Add(Conv);
-		}
+		Vector<Files::User*> AssignedTo = this->AssignedTo;
 
 		if (Title.Contains(L'~') || Instructions.Contains(L'~'))
 		{
@@ -297,7 +268,7 @@ namespace Armin::Editors::Tasks
 			return false;
 		}
 
-		Files::Task* New = new Task(File, Tasks);
+		Files::Task* New = Target ? Target : new Task(File, Tasks);
 		New->Title(Title);
 		New->AssignedTo = ComponentReference::Generate(AssignedTo);
 		New->DueBy = DueBy;
@@ -305,13 +276,17 @@ namespace Armin::Editors::Tasks
 		New->RequiresAssurance = RequiresAssurance;
 
 		AppState |= APS_HasEdit;
-		EditorRegistry::ResetEditorOfType(EDT_Tasks);
+		if (!Target)
+			EditorRegistry::ResetEditorOfType(EDT_Tasks);
 		EditorRegistry::ResetEditorOfType(EDT_UserHomepage);
 
 		return true;
 	}
-	bool AddTaskEditor::TestOnCondition(Vector<void*> Args) const
+	bool AddEditTaskEditor::TestOnCondition(Vector<void*> Args) const
 	{
-		return true;
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target;
+		else
+			return true;
 	}
 }

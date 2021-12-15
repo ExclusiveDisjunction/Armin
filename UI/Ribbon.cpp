@@ -552,7 +552,7 @@ namespace Armin::UI
 			if (UserRegistry::CurrentUserType() != UT_Admin)
 				MessageBoxW(_Base, L"You must be an admin to add tasks.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Tasks::AddTaskEditor(), nullptr);
+				EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(nullptr), nullptr);
 			break;
 		case 42: //Completed Tasks
 			EditorRegistry::OpenEditor(new Tasks::CompletedTasksEditor(nullptr), nullptr);

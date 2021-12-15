@@ -217,7 +217,7 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class EditTaskEditor : public EditorFrame
+			/*class EditTaskEditor : public EditorFrame
 			{
 			private:
 				Files::Task* Target;
@@ -255,14 +255,15 @@ namespace Armin
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
-			};
-			class AddTaskEditor : public EditorFrame
+			};*/
+			class AddEditTaskEditor : public EditorFrame
 			{
 			private:
+				Files::Task* Target;
+
 				TextBox* Title, * Instructions;
-				ScrollViewer* AssignedScroll;
-				Grid* AssignedView;
-				Vector<UI::ComponentViewer*> AssignedTo;
+				Label* AssignedLabel;
+				Vector<Files::User*> AssignedTo;
 				CheckableButton* RequiresAssurance;
 				Label* DueBy;
 				Button* DueBySelect; //ID: 4
@@ -280,7 +281,11 @@ namespace Armin
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
 			public:
-				AddTaskEditor();
+				/// <summary>
+				/// Constructs the AddEditTaskEditor.
+				/// </summary>
+				/// <param name="ToEdit">If ToEdit != nullptr, then the editor is in edit mode, if not then it is in add mode.</param>
+				AddEditTaskEditor(Files::Task* ToEdit);
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
@@ -289,7 +294,7 @@ namespace Armin
 				Vector<void*> CondenseArgs() const override { return {}; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Task"; }
+				String GetName() const override { return Target ? L"Edit Task" : L"Add Task"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;

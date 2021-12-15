@@ -163,7 +163,7 @@ namespace Armin::Editors::Tasks
                 break;
             }
 
-            EditorRegistry::OpenEditor(new EditTaskEditor(Source), nullptr);
+            EditorRegistry::OpenEditor(new AddEditTaskEditor(Source), nullptr);
             EditorRegistry::CloseEditor(this, false);
         }
         }

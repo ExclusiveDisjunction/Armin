@@ -2,3 +2,4 @@ Fix the UserRegistry to not be a static class anymore, and it's state are stored
 Combine add and edit editors to one thing. [IN PROGRESS, BRANCH "EditorImprove"]
 
 Implement Mutexes for Multithreaded windows.
+Fix the issue with Tasks not showing up on homepage.

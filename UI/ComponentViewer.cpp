@@ -242,7 +242,7 @@ namespace Armin::UI
 					else if (Type == CT_User)
 						EditorRegistry::OpenEditor(new Users::EditUserEditor(dynamic_cast<User*>(Current)), nullptr);
 					else if (Type == CT_Task)
-						EditorRegistry::OpenEditor(new Tasks::EditTaskEditor(dynamic_cast<Task*>(Current)), nullptr);
+						EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(dynamic_cast<Task*>(Current)), nullptr);
 					else if (Type == CT_RefrenceGroup)
 						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<RefrenceGroup*>(Current), true), nullptr);
 				}
@@ -439,7 +439,7 @@ namespace Armin::UI
 			{
 			case CT_Task:
 				if (UserRegistry::CurrentUserType() == UT_Admin)
-					EditorRegistry::OpenEditor(new Tasks::EditTaskEditor(dynamic_cast<Task*>(_Source)), Parent);
+					EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(dynamic_cast<Task*>(_Source)), Parent);
 				break;
 			case CT_InventoryItem:
 			case CT_OperationInventoryItem:
