@@ -12,7 +12,7 @@ namespace Armin::Editors::Users
 
 	ViewUserEditor::ViewUserEditor(User* Target)
 	{	
-		Current = !Target ? UserRegistry::CurrentUser() : Target;
+		Current = !Target ? CurrentUser : Target;
 	}
 	ViewUserEditor::~ViewUserEditor()
 	{
@@ -65,7 +65,7 @@ namespace Armin::Editors::Users
 			int TWidth = (WndRect.right - 20 - XCoord - 10) / 2;
 
 			Change = new Button(XCoord, YCoord, TWidth, Height, L"Change Information", _Base, (HMENU)4, ins, Style, TextStyle);
-			EnableWindow(*Change, UserRegistry::CurrentUserType() == UT_Admin);
+			EnableWindow(*Change, (AppState & APS_HasAdminUser));
 			XCoord += 10 + TWidth;
 
 			//Timecards = new Button(XCoord, YCoord, TWidth, Height, L"Timecards", _Base, (HMENU)5, ins, Style, TextStyle);

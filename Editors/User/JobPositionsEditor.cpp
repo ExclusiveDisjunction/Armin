@@ -98,18 +98,18 @@ namespace Armin::Editors::Users
                 Width = Height = ButtonSize;
 
                 Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)5, ins, Style, TextStyle);
-                EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Add, (AppState & APS_HasAdminUser));
                 YCoord += 5 + ButtonSize;
 
                 Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)6, ins, Style, TextStyle);
-                EnableWindow(*Remove, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Remove, (AppState & APS_HasAdminUser));
                 YCoord += 10 + ButtonSize;
 
                 View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)7, ins, Style, TextStyle);
                 YCoord += 5 + ButtonSize;
 
                 Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)8, ins, Style, TextStyle);
-                EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Edit, (AppState & APS_HasAdminUser));
                 YCoord += 10 + ButtonSize;
 
                 SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)9, ins, Style, TextStyle);
@@ -159,12 +159,12 @@ namespace Armin::Editors::Users
             EditorRegistry::OpenEditor(new Misc::QuickSearchEditor(CT_JobPosition), nullptr);
             break;
         case 5: //Add
-            if (UserRegistry::CurrentUserType() == UT_Admin)
+            if ((AppState & APS_HasAdminUser))
                 EditorRegistry::OpenEditor(new AddJobPositionEditor(), nullptr);
             break;
         case 6: //Remove
         {
-            if (UserRegistry::CurrentUserType() != UT_Admin)
+            if ((AppState & APS_HasAdminUser))
             {
                 MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user level to remove inventory items.", L"Remove:", MB_OK | MB_ICONERROR);
                 break;
@@ -201,7 +201,7 @@ namespace Armin::Editors::Users
         }
         case 7: //View        
         case 8: //Edit
-            ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && UserRegistry::CurrentUserType() == UT_Admin);
+            ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && (AppState & APS_HasAdminUser));
         case 9: //Select All
             for (ComponentViewer* Obj : Objects)
                 Obj->CheckState(true);
@@ -230,7 +230,7 @@ namespace Armin::Editors::Users
         case 'V':
         case 'E':
             if (GetKeyState(VK_CONTROL) & 0x8000)
-                ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+                ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E' && (AppState & APS_HasAdminUser));
             break;
         default:
             return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);

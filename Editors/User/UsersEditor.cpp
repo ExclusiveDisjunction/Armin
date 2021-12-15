@@ -78,7 +78,7 @@ namespace Armin::Editors::Users
 				
 				TextStyle.Bold = false;
 				TextStyle.Alignment = TA_LeftAlignment;
-				CurrentUser = new ComponentViewer(XCoord + 5 + Width, YCoord, (WndRect.right) - (10 + (XCoord + 5 + Width)), Height, _Base, ins, nullptr, UserRegistry::CurrentUser(), false, true);
+				CurrentUser = new ComponentViewer(XCoord + 5 + Width, YCoord, (WndRect.right) - (10 + (XCoord + 5 + Width)), Height, _Base, ins, nullptr, Armin::CurrentUser, false, true);
 
 				YCoord += 10 + Height;
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;				
@@ -100,18 +100,18 @@ namespace Armin::Editors::Users
 				Width = Height = ButtonSize;
 
 				Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)6, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)7, ins, Style, TextStyle);
-				EnableWindow(*Remove, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Remove, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)8, ins, Style, TextStyle);
 				YCoord += 5 + ButtonSize;
 
 				Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)9, ins, Style, TextStyle);
-				EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)10, ins, Style, TextStyle);
@@ -156,10 +156,10 @@ namespace Armin::Editors::Users
 			EditorRegistry::OpenEditor(new UserSearch(_System), nullptr);
 			break;
 		case 5: //SignOut
-			UserRegistry::SignOut();
+			UserSignOut();
 			break;
 		case 6: //Add
-			if (!UserRegistry::CurrentUser() || !UserRegistry::CurrentUser()->IsAdmin)
+			if (!Armin::CurrentUser || !(AppState & APS_HasAdminUser))
 			{
 				MessageBoxW(_Base, L"You do not have the proper User Level Access to add a user.", L"Add User:", MB_OK | MB_ICONERROR);
 				break;
@@ -169,7 +169,7 @@ namespace Armin::Editors::Users
 			break;
 		case 7://Remove
 		{
-			if (!UserRegistry::CurrentUser() || !UserRegistry::CurrentUser()->IsAdmin)
+			if (!Armin::CurrentUser || !(AppState & APS_HasAdminUser))
 			{
 				MessageBoxW(_Base, L"You do not have the proper User Level Access to remove a user.", L"Remove User:", MB_OK | MB_ICONERROR);
 				break;
@@ -230,17 +230,17 @@ namespace Armin::Editors::Users
 			FillObjects();
 			return 0;
 		case VK_DELETE:
-			if (UserRegistry::CurrentUserType() == UT_Admin)
+			if ((AppState & APS_HasAdminUser))
 				Command(7, 0);
 			break;
 		case 'N':
-			if ((GetKeyState(VK_SHIFT) & 0x8000) && (GetKeyState(VK_CONTROL) & 0x8000) && UserRegistry::CurrentUserType() == UT_Admin)
+			if ((GetKeyState(VK_SHIFT) & 0x8000) && (GetKeyState(VK_CONTROL) & 0x8000) && (AppState & APS_HasAdminUser))
 				Command(6, 0);
 			break;
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-			ComponentViewer::OpenSelectedForEditView(Objects, key == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+			ComponentViewer::OpenSelectedForEditView(Objects, key == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, key, 0);

@@ -28,12 +28,12 @@ namespace Armin::UI
 			TaskFile = RTskFile != nullptr,
 			ResourceFile = RRcFile != nullptr;
 
-		bool File = !(New & MRS_NoFile);
-		bool User = !UserFile ? true : !(New & MRS_NoUser);
-		bool AdminUser = UserRegistry::CurrentUserType() == UT_Admin;
+		bool File = AppState & APS_FileLoaded;
+		bool User = !UserFile ? true : (AppState & APS_HasUser);
+		bool AdminUser = !UserFile ? true : (AppState & APS_HasAdminUser);
 
 		bool SignedIn = (!UserFile && File) ? true : File && User;
-		bool AdminSignedIn = (!UserFile && File) ? true  : File && AdminUser;
+		bool AdminSignedIn = (!UserFile && File) ? true : File && AdminUser;
 
 		int AllowedForView = !File ? 0 :
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
@@ -549,7 +549,7 @@ namespace Armin::UI
 			EditorRegistry::OpenEditor(new Tasks::TasksEditor(nullptr), nullptr);
 			break;
 		case 41: //AddTask
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 				MessageBoxW(_Base, L"You must be an admin to add tasks.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
 				EditorRegistry::OpenEditor(new Tasks::AddTaskEditor(), nullptr);
@@ -591,26 +591,26 @@ namespace Armin::UI
 
 			//User
 		case 60: //Sign In
-			UserRegistry::SignIn();
+			SignIn();
 			break;
 		case 61: //Sign Out
-			UserRegistry::SignOut();
+			UserSignOut();
 			break;
 			//case 42:
 		case 62: //Lock
-			UserRegistry::Lock();
+			UserLock();
 			break;
 		case 63: //CurrentUser
-			if (!UserRegistry::CurrentUser())
+			if (!CurrentUser)
 				MessageBoxW(_Base, L"There is no user currently signed in.\n\nPlease sign in and then try again.", L"Current User:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Users::UserHomepageEditor(UserRegistry::CurrentUser()), nullptr);
+				EditorRegistry::OpenEditor(new Users::UserHomepageEditor(CurrentUser), nullptr);
 			break;
 		case 64: //Users
 			EditorRegistry::OpenEditor(new Users::UsersEditor(nullptr), nullptr);
 			break;
 		case 65: //Add User
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 				MessageBoxW(_Base, L"You must be an admin to create users.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
 				EditorRegistry::OpenEditor(new Users::CreateUserEditor(), nullptr);
@@ -622,7 +622,7 @@ namespace Armin::UI
 			EditorRegistry::OpenEditor(new Users::JobPositionsEditor(nullptr), nullptr);
 			break;
 		case 68: //Timecard
-			EditorRegistry::OpenEditor(new Users::TimecardsEditor(UserRegistry::CurrentUser()), nullptr);
+			EditorRegistry::OpenEditor(new Users::TimecardsEditor(CurrentUser), nullptr);
 			break;
 		case 69: //Timeclock
 			//EditorRegistry::OpenEditor(new Timecards::TimeclockEditor(), nullptr);

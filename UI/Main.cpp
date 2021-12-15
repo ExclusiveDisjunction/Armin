@@ -166,7 +166,7 @@ namespace Armin::UI
 				if (Conv)
 				{
 					KillTimer(Param, ID);
-					UserRegistry::SignIn();
+					SignIn();
 				}
 				else if (InvConv && InvConv->Config == UPC_Inventory)
 					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);

@@ -156,7 +156,7 @@ namespace Armin::Editors::Tasks
             break;
         case 6:
         {
-            if (!UserRegistry::CurrentUserType() == UT_Admin)
+            if (!(AppState & APS_HasAdminUser))
             {
                 MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user privileges to preform this task.", L"Edit Task:", MB_OK | MB_ICONERROR);
                 EnableWindow(*EditThis, false);

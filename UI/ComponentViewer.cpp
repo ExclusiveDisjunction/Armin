@@ -218,14 +218,14 @@ namespace Armin::UI
 				case CT_User:
 				case CT_InventoryItem:
 				case CT_Task:
-					if (UserRegistry::CurrentUserType() == UT_Admin)
+					if ((AppState & APS_HasAdminUser))
 						Open = true;
 					break;
 				case CT_JobPosition:
 				case CT_OperationInventoryItem:
 				case CT_RefrenceGroup:
 				case CT_Image:
-					Open = UserRegistry::IsSignedIn();
+					Open = (AppState & APS_HasUser);
 					break;
 				case CT_CompletedTask:
 				case CT_ConfigItem:
@@ -258,7 +258,7 @@ namespace Armin::UI
 				switch (Current->ObjectType())
 				{
 				case CT_InventoryItem:
-					if (UserRegistry::CurrentUserType() == UT_Admin)
+					if ((AppState & APS_HasAdminUser))
 						Open = true;
 					break;
 				case CT_User:
@@ -268,7 +268,7 @@ namespace Armin::UI
 				case CT_RefrenceGroup:
 				case CT_CompletedTask:
 				case CT_Image:
-					Open = UserRegistry::IsSignedIn();
+					Open = (AppState & APS_HasUser);
 					break;
 				case CT_ConfigItem:
 				default:
@@ -438,18 +438,18 @@ namespace Armin::UI
 			switch (_Source->ObjectType())
 			{
 			case CT_Task:
-				if (UserRegistry::CurrentUserType() == UT_Admin)
+				if ((AppState & APS_HasAdminUser))
 					EditorRegistry::OpenEditor(new Tasks::EditTaskEditor(dynamic_cast<Task*>(_Source)), Parent);
 				break;
 			case CT_InventoryItem:
 			case CT_OperationInventoryItem:
 			case CT_JobPosition:
 			case CT_Image:
-				if (UserRegistry::IsSignedIn())
+				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Misc::BasicEditorEditor(_Source), Parent);
 				break;
 			case CT_User:
-				if (UserRegistry::CurrentUserType() == UT_Admin || UserRegistry::CurrentUser() == dynamic_cast<Files::User*>(_Source))
+				if ((AppState & APS_HasAdminUser) || CurrentUser == dynamic_cast<Files::User*>(_Source))
 					EditorRegistry::OpenEditor(new Users::EditUserEditor(dynamic_cast<User*>(_Source)), Parent);
 				break;
 			}
@@ -470,15 +470,15 @@ namespace Armin::UI
 			case CT_InventoryItem:
 			case CT_OperationInventoryItem:
 			case CT_JobPosition:
-				if (UserRegistry::IsSignedIn())
+				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Misc::BasicViewerEditor(_Source), Parent);
 				break;
 			case CT_User:
-				if (UserRegistry::IsSignedIn())
+				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Users::ViewUserEditor(dynamic_cast<User*>(_Source)), Parent);
 				break;
 			case CT_Image:
-				if (UserRegistry::IsSignedIn())
+				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Resources::ViewImageEditor(dynamic_cast<Image*>(_Source)), Parent);
 			}
 		}

@@ -202,7 +202,7 @@ namespace Armin::Editors::Tasks
 		switch (wp)
 		{
 		case 4: //Assured By
-			AssuredBy->Target(UserRegistry::SignInForAssurance());
+			AssuredBy->Target(SignInForAssurance());
 			break;
 		case 5: //Select Date
 			DateCompletedD = DatePicker::Execute(DateCompletedD, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));

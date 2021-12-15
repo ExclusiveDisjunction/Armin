@@ -22,7 +22,7 @@ namespace Armin
 		HINSTANCE ThisInstance;
 	}
 
-	void Initalize()
+	void UserRegInit()
 	{
 		UserReg::_File = nullptr;
 		UserReg::_Current = nullptr;
@@ -33,11 +33,11 @@ namespace Armin
 		AppState &= ~APS_HasAssuranceUser;
 		AppState &= ~APS_UserRegInit;
 	}
-	void Initalize(UserSystem* Target, HINSTANCE ins)
+	void UserRegInit(UserSystem* Target, HINSTANCE ins)
 	{
 		if (!Target || !Target->Users)
 		{
-			Initalize();
+			UserRegInit();
 			return;
 		}
 
