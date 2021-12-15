@@ -14,22 +14,19 @@ namespace Armin
 		class ComponentList;
 	}
 
-	enum UserRegStatus
-	{
-		URS_SignedIn,
-		URS_NotSignedIn,
-		URS_NotActive
-	};
+	void UserRegInit();
+	void UserRegInit(Files::UserSystem* File, HINSTANCE ins);
 
-	enum UserType
-	{
-		UT_Admin,
-		UT_Assurance,
-		UT_Standard,
-		UT_Undefined
-	};
+	extern Files::User*& CurrentUser;
 
-	class UserRegistry
+	void SignIn();
+	Files::User* SignInForAssurance();
+	bool SignInForConfirmation(Files::User* Target);
+	void UserLock();
+	bool SignInForAdmin();
+	void UserSignOut();
+
+	/*class UserRegistry
 	{
 	private:
 		UserRegistry() {}
@@ -37,7 +34,6 @@ namespace Armin
 		static Files::User* _Current;
 		static Files::UserSystem* _File;
 		static Files::ComponentList<Files::User, Files::UserParent>* _Users;
-		static UserRegStatus Status;
 		static HINSTANCE ThisInstance;
 	public:
 		static void Initalize();
@@ -45,7 +41,6 @@ namespace Armin
 
 		static bool IsSignedIn();
 		static Files::User* CurrentUser();
-		static UserType CurrentUserType();
 
 		static void SignIn();
 		static Files::User* SignInForAssurance();
@@ -53,5 +48,5 @@ namespace Armin
 		static void Lock();
 		static bool SignInForAdmin();
 		static void SignOut();
-	};
+	};*/
 }
