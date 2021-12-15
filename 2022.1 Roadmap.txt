@@ -1,6 +1,6 @@
 
 AppStates
-	Centralized numerical value that represents the whole scope of the program, instead of multiple headers.
+	Centralized numerical value that represents the whole scope of the program, instead of multiple headers. [IN PROGRESS]
 
 File Locking
 	Partitions locked?
@@ -39,8 +39,8 @@ UI:
 	Multithreaded approach to User Interface. [DONE WITH CAUTION]
 		Each tool window can be mondal, concurent, or hybrid. Mondal & hybrid use their own thread to pause or work in concurency with the main thread.
 
-	Fix the editor stacking problem where buttons show through the screen.
-	Combine Edit & Add editors to one object.
+	Fix the editor stacking problem where buttons show through the screen. [DONE]
+	Combine Edit & Add editors to one object. [IN PROGRESS]
 
 Server
 	Allow for Aaron Server?
@@ -52,12 +52,12 @@ Files:
 	Custom data storage [DONE] (UniProject)
 	
 	References:
-		Project to Project references
+		Project to Project references [DEP]
 			For each project to reference, create an object called ProjectReference that accepts a file path and has an ID.
-		ComponentReference has ToString && operator<< functions:
-			Used to give id's the format of [FILE]:[ID].
-			[FILE] = 0 when it is part of the current document.
-			[FILE] != 0 when it is not part of the current project, and it is the Id of the ProjectReference object.
+		ComponentReference has ToString && operator<< functions: [DONE] 
+			Used to give id's the format of [FILE]:[ID]. [DEP]
+			[FILE] = 0 when it is part of the current document. [DEP]
+			[FILE] != 0 when it is not part of the current project, and it is the Id of the ProjectReference object. [DEP]
 			[ID] is the ID of the target.
 	ID Compression:
 		Keep Root Admin as 1, and make each object remove each blank id.
@@ -68,7 +68,7 @@ Files:
 	Linked projects
 		Make each project loaded together and linked with dynamic daisy-chain lists.
 		For comparing projects together.
-	ComponentShell class
+	ComponentShell class [DEP]
 		A mirror of the Component Model class tree, but each child ONLY contains the data of the object, including ID.
 		A clone PURE clone of a Component, and each Component class will be able to convert to, and a Component can accept a Shell as an input to copy (unique ID).
 
