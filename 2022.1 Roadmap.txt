@@ -87,11 +87,11 @@ Files:
 	Tasks:
 		Tasks assigned to no-one are assigned to everyone.
 
-	Requsts:
+	Requsts: [IN PROGRESS]
 		A new component that is like a task, but created by a standard/assurance user, and does not have any requirement of assurance.
 		Anyone can edit this component.
 		Visible only to those in the receptient list.
 
-	Lists
+	Lists [IN PROGRESS]
 		A list of things to do for someone.
 		Child of User, and can only be seen by a user.
