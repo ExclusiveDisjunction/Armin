@@ -90,7 +90,7 @@
     <ClCompile Include="Editors\User\AddJobPositionEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\User\CreateUserEditor.cpp">
+    <ClCompile Include="Editors\User\CreateEditUserEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp">

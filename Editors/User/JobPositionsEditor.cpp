@@ -160,7 +160,7 @@ namespace Armin::Editors::Users
             break;
         case 5: //Add
             if (UserRegistry::CurrentUserType() == UT_Admin)
-                EditorRegistry::OpenEditor(new AddJobPositionEditor(), nullptr);
+                EditorRegistry::OpenEditor(new AddEditJobPositionEditor(nullptr), nullptr);
             break;
         case 6: //Remove
         {

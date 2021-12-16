@@ -190,7 +190,7 @@
     <ClCompile Include="Editors\Task\ViewTaskEditor.cpp" />
     <ClCompile Include="Editors\Timecards\Timeclock.cpp" />
     <ClCompile Include="Editors\User\AddJobPositionEditor.cpp" />
-    <ClCompile Include="Editors\User\CreateUserEditor.cpp" />
+    <ClCompile Include="Editors\User\CreateEditUserEditor.cpp" />
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp" />
     <ClCompile Include="Editors\User\TimecardsEditor.cpp" />
     <ClCompile Include="Editors\User\UserHomepageEditor.cpp" />

@@ -19,6 +19,7 @@ namespace Armin
 		class CompletedTask;
 		class Component;
 		class Image;
+		class JobPosition;
 		class InventorySystem;
 		class User;
 		class UserSystem;
@@ -453,9 +454,10 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class AddJobPositionEditor : public EditorFrame
+			class AddEditJobPositionEditor : public EditorFrame
 			{
 			private:
+				Files::JobPosition* Target;
 				TextBox* Title, * Description;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
@@ -468,7 +470,7 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddJobPositionEditor();
+				AddEditJobPositionEditor(Files::JobPosition* Target);
 
 				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
 				bool IsApplyable() const override { return true; }
@@ -477,7 +479,7 @@ namespace Armin
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Job Position"; }
+				String GetName() const override { return Target ? L"Edit Job Position" : L"Add Job Position"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
