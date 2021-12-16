@@ -27,7 +27,7 @@ namespace Armin
 		void LoadData();
 		void Save();
 
-		WindowState LastWindowState;
+		WindowStates LastWindowState;
 		bool LoadLast;
 		String LastLoaded;
 		bool DevMode;

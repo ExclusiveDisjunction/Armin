@@ -11,6 +11,11 @@ namespace Armin
 		class Image;
 	}
 
+	namespace UI
+	{
+		class WindowState;
+	}
+
 	namespace UI::Tool
 	{
 		class CreateImage
@@ -23,9 +28,9 @@ namespace Armin
 
 			HWND _Base;
 			bool _Loaded, _Mondal;
-			
-			Label* Text,* TitleTxt;
-			TextBox* FilePath, *Title;
+
+			Label* Text, * TitleTxt;
+			TextBox* FilePath, * Title;
 			Button* SelectPath;
 			Button* BeginImport, * Cancel;
 
@@ -49,7 +54,7 @@ namespace Armin
 			CreateImage& operator=(const CreateImage&& Obj) = delete;
 
 			static Files::Image* Execute(HINSTANCE ins, bool Mondal);
-			static LRESULT RunMessageLoop(CreateImage* Obj, HINSTANCE ins, bool* Running);
+			static LRESULT RunMessageLoop(CreateImage* Obj, HINSTANCE ins, WindowState* Running);
 		};
 	}
 }

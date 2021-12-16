@@ -2,7 +2,7 @@
 
 #include "Container.h"
 #include "UI\Controls.h"
-#include "..\..\Common.h"
+#include "..\..\UICommon.h"
 
 namespace Armin::UI::Tool
 {
@@ -43,6 +43,6 @@ namespace Armin::UI::Tool
 		PasswordInput& operator=(const PasswordInput&& Obj) = delete;
 
 		static String Execute(HINSTANCE ins);
-		static LRESULT RunMessageLoop(PasswordInput* Object, HINSTANCE ins, bool* Running);
+		static LRESULT RunMessageLoop(PasswordInput* Object, HINSTANCE ins, WindowState* Running);
 	};
 }

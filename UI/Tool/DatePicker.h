@@ -3,7 +3,7 @@
 #include "Container.h"
 #include "DateTime.h"
 #include "UI\Controls.h"
-#include "..\..\Common.h"
+#include "..\..\UICommon.h"
 
 namespace Armin::UI::Tool
 {
@@ -44,6 +44,6 @@ namespace Armin::UI::Tool
 		}
 
 		static DateTime Execute(const DateTime& Prev, HINSTANCE ins);
-		static LRESULT RunMessageLoop(DatePicker* Obj, HINSTANCE ins, bool* Running);
+		static LRESULT RunMessageLoop(DatePicker* Obj, HINSTANCE ins, WindowState* Running);
 	};
 }

@@ -33,10 +33,11 @@ namespace Armin::UI::Tool
 		LoadControls();
 	}
 
-	LRESULT GroupSelector::RunMessageLoop(GroupSelector* Object, HINSTANCE ins, bool* Running)
+	LRESULT GroupSelector::RunMessageLoop(GroupSelector* Object, HINSTANCE ins, WindowState* _Running)
 	{
 		Object->Construct(ins);
-		*Running = true;
+		WindowState& Running = *_Running;
+		Running = true;
 
 		int Result;
 		MSG msg;
@@ -49,20 +50,21 @@ namespace Armin::UI::Tool
 			DispatchMessageW(&msg);
 		}
 
-		*Running = false;
+		Running = false;
 		return msg.wParam;
 	}
 	StringList GroupSelector::Execute(HINSTANCE ins, InventorySystem* System, GroupSelectorSource Source, bool Multiselect)
 	{
 		GroupSelector* Selector = new GroupSelector(System, Source, Multiselect);
 
-		bool* Running = new bool(true);
-		thread Thread = thread(RunMessageLoop, Selector, ins, Running);
-		while (*Running)
+		WindowState* _Running = new WindowState(true);
+		WindowState& Running = *_Running;
+		thread Thread = thread(RunMessageLoop, Selector, ins, _Running);
+		while (Running)
 			this_thread::sleep_for(chrono::milliseconds(100));
 
 		Thread.detach();
-		delete Running;
+		delete _Running;
 		StringList Return = Selector->Return;
 		delete Selector;
 

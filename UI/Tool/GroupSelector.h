@@ -2,7 +2,7 @@
 
 #include "Container.h"
 #include "UI\Controls.h"
-#include "..\..\Common.h"
+#include "..\..\UICommon.h"
 
 namespace Armin
 {
@@ -66,7 +66,7 @@ namespace Armin
 			GroupSelector& operator=(const GroupSelector&& Obj) = delete;
 
 			static StringList Execute(HINSTANCE ins, Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect = false);
-			static LRESULT RunMessageLoop(GroupSelector* Object, HINSTANCE ins, bool* Running);
+			static LRESULT RunMessageLoop(GroupSelector* Object, HINSTANCE ins, WindowState* Running);
 		};
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace Armin
 {
-	enum WindowState
+	enum WindowStates
 	{
 		WS_Maximized = 3,
 		WS_Normal = 1,

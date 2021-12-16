@@ -207,7 +207,7 @@ namespace Armin::UI
 		WINDOWPLACEMENT Place;
 		GetWindowPlacement(_Base, &Place);
 
-		InsInstance->LastWindowState = (WindowState)Place.showCmd;
+		InsInstance->LastWindowState = (WindowStates)Place.showCmd;
 		*/
 
 		PostQuitMessage(0);

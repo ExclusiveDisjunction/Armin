@@ -37,9 +37,9 @@ namespace Armin::UI::Search
 	{
 		SearchByName* Item = new SearchByName(Criteria, File);
 
-		bool* Running = new bool(true);
+		WindowState* Running = new WindowState(true);
 		thread Thread = thread(RunMessageLoop, Item, ins, Running);
-		while (*Running)
+		while ((*Running))
 			this_thread::sleep_for(chrono::milliseconds(100));
 
 		Thread.detach();
@@ -49,10 +49,11 @@ namespace Armin::UI::Search
 
 		return Return;
 	}
-	LRESULT SearchByName::RunMessageLoop(SearchByName* Object, HINSTANCE ins, bool* Running)
+	LRESULT SearchByName::RunMessageLoop(SearchByName* Object, HINSTANCE ins, WindowState* _Running)
 	{
 		Object->Construct(ins);
-		*Running = true;
+		WindowState& Running = *_Running;
+		Running = true;
 
 		int Result;
 		MSG msg;
@@ -64,7 +65,7 @@ namespace Armin::UI::Search
 			DispatchMessage(&msg);
 		}
 
-		*Running = false;
+		Running = false;
 		return msg.wParam;
 	}
 

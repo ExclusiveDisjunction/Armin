@@ -82,7 +82,7 @@ namespace Armin
 			SettingsItem* Current = Items->Item(i);
 			String Name = Current->Name;
 			if (Name == L"LastWindowState")
-				LastWindowState = (WindowState)Current->Value.ToInt();
+				LastWindowState = (WindowStates)Current->Value.ToInt();
 			else if (Name == L"LoadLast")
 				LoadLast = Current->Value == L"True";
 			else if (Name == L"LastLoaded")

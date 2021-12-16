@@ -50,7 +50,7 @@ namespace Armin::UI
 		NewFile& operator=(const NewFile& Obj) = delete;
 		NewFile& operator=(const NewFile&& Obj) = delete;
 
-		static LRESULT RunMessageLoop(NewFile* Object, HINSTANCE ins, bool* Running);
+		static LRESULT RunMessageLoop(NewFile* Object, HINSTANCE ins, WindowState* Running);
 	
 		String const& Return = _Return;
 		static String Execute(HINSTANCE ins, String& Username, String& Password, int& Config);
