@@ -357,10 +357,11 @@ namespace Armin::UI
 		return 0;
 	}
 
-	LRESULT NewFile::RunMessageLoop(NewFile* Object, HINSTANCE ins, bool* Running)
+	LRESULT NewFile::RunMessageLoop(NewFile* Object, HINSTANCE ins, WindowState* _Running)
 	{
 		Object->CreateBase(ins);
-		*Running = true;
+		WindowState& Running = *_Running;
+		Running = true;
 
 		int Result;
 		MSG msg;
@@ -372,16 +373,16 @@ namespace Armin::UI
 			DispatchMessage(&msg);
 		}
 
-		*Running = false;
+		Running = false;
 		return msg.wParam;
 	}
 	String NewFile::Execute(HINSTANCE ins, String& Username, String& Password, int& Config)
 	{
 		NewFile* Obj = new NewFile();
 
-		bool* Running = new bool(true);
+		WindowState* Running = new WindowState(true);
 		thread Thread = thread(RunMessageLoop, Obj, ins, Running);
-		while (*Running)
+		while ((*Running))
 			this_thread::sleep_for(chrono::milliseconds(100));
 
 		Thread.detach();

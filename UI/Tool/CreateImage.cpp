@@ -296,12 +296,12 @@ namespace Armin::UI::Tool
 		CreateImage* This = new CreateImage();
 		This->_Mondal = true;
 
-		bool* Running = new bool(true);
+		WindowState* Running = new WindowState(true);
 		thread Thread = thread(RunMessageLoop, This, ins, Running);
 
 		if (Mondal)
 		{
-			while (*Running)
+			while ((*Running))
 				this_thread::sleep_for(chrono::milliseconds(100));
 
 			Thread.detach();
@@ -312,12 +312,16 @@ namespace Armin::UI::Tool
 			return Return;
 		}
 		else
+		{
+			Thread.detach();
 			return nullptr;
+		}
 	}
-	LRESULT CreateImage::RunMessageLoop(CreateImage* Object, HINSTANCE ins, bool* Running)
+	LRESULT CreateImage::RunMessageLoop(CreateImage* Object, HINSTANCE ins, WindowState* _Running)
 	{
 		Object->Construct(ins);
-		*Running = true;
+		WindowState& Running = *_Running;
+		Running = true;
 
 		int Result;
 		MSG msg;
@@ -330,9 +334,9 @@ namespace Armin::UI::Tool
 			DispatchMessage(&msg);
 		}
 
-		*Running = false;
+		Running = false;
 		if (Object->_Mondal)
-			delete Running; //The execute function will not clean up this memory, so this function will.
+			delete _Running;
 		return msg.wParam;
 	}
 }

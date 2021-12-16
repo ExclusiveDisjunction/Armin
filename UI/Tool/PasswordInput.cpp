@@ -29,9 +29,9 @@ namespace Armin::UI::Tool
 	{
 		PasswordInput* Obj = new PasswordInput();
 
-		bool* Running = new bool(true);
+		WindowState* Running = new WindowState(true);
 		thread Thread = thread(RunMessageLoop, Obj, ins, Running);
-		while (*Running)
+		while ((*Running))
 			this_thread::sleep_for(chrono::milliseconds(100));
 
 		Thread.detach();
@@ -41,10 +41,11 @@ namespace Armin::UI::Tool
 
 		return Return;
 	}
-	LRESULT PasswordInput::RunMessageLoop(PasswordInput* Object, HINSTANCE ins, bool* Running)
+	LRESULT PasswordInput::RunMessageLoop(PasswordInput* Object, HINSTANCE ins, WindowState* _Running)
 	{
 		Object->Construct(ins);
-		*Running = true;
+		WindowState& Running = *_Running;
+		Running = true;
 
 		int Result;
 		MSG msg;
@@ -56,7 +57,7 @@ namespace Armin::UI::Tool
 			DispatchMessageW(&msg);
 		}
 
-		*Running = false;
+		Running = false;
 		return msg.wParam;
 	}
 

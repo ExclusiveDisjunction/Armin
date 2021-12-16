@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "Common.h"
+#include "UI\WindowState.h"
 #include <Windows.h>
 
 namespace Armin

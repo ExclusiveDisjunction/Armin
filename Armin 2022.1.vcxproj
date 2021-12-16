@@ -303,6 +303,7 @@
     <ClInclude Include="UI\Tool\PasswordInput.h" />
     <ClInclude Include="UI\Tool\SearchByName.h" />
     <ClInclude Include="UI\SignIn.h" />
+    <ClInclude Include="UI\WindowState.h" />
     <ClInclude Include="UI\Welcome.h" />
     <ClInclude Include="UserRegistry.h" />
   </ItemGroup>

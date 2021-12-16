@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "Container.h"
 #include "UI\ControlDef.h"
+#include "..\..\UICommon.h"
 #include "..\..\Files\SearchCriteria.h"
 
 namespace Armin
@@ -75,7 +76,7 @@ namespace Armin
 				/// <returns>The list of selected components from the window, fitting the bounds of the Criteria.</returns>
 				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ProjectBase* SourceFile = nullptr);
 
-				static LRESULT RunMessageLoop(SearchByName* Obj, HINSTANCE ins, bool* Running);
+				static LRESULT RunMessageLoop(SearchByName* Obj, HINSTANCE ins, WindowState* Running);
 			};
 		}
 	}

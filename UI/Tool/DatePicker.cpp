@@ -298,10 +298,11 @@ namespace Armin::UI::Tool
         return 0;
     }
 
-    LRESULT DatePicker::RunMessageLoop(DatePicker* Obj, HINSTANCE ins, bool* Running)
+    LRESULT DatePicker::RunMessageLoop(DatePicker* Obj, HINSTANCE ins, WindowState* _Running)
     {
         Obj->Construct(ins);
-        *Running = true;
+        WindowState& Running = *_Running;
+        Running = true;
 
         int Result;
         MSG msg;
@@ -313,16 +314,16 @@ namespace Armin::UI::Tool
             DispatchMessage(&msg);
         }
 
-        *Running = false;
+        Running = false;
         return msg.wParam;
     }
     DateTime DatePicker::Execute(const DateTime& Prev, HINSTANCE ins)
     {
         DatePicker* Obj = new DatePicker(Prev);
 
-        bool* Running = new bool(true);
+        WindowState* Running = new WindowState(true);
         thread Thread = thread(RunMessageLoop, Obj, ins, Running);
-        while (*Running)
+        while ((*Running))
             this_thread::sleep_for(chrono::milliseconds(100));
 
         Thread.detach();
