@@ -1,3 +1,1 @@
 Combine add and edit editors to one thing. [IN PROGRESS, BRANCH "EditorImprove"]
-
-Implement Mutexes for Multithreaded windows.
