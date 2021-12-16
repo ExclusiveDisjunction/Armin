@@ -168,7 +168,7 @@ namespace Armin::Files
         }
 
         if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
+            MasterRibbon->SetRibbonStatus();
 
         if (FooterOutput)
            FooterOutput->SetFooterText(L"Sucessfully Opened File");
@@ -218,7 +218,7 @@ namespace Armin::Files
         AppState = 0;
 
         if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
+            MasterRibbon->SetRibbonStatus();
 
         if (FooterOutput)
             FooterOutput->SetFooterText(L"Sucessfully Closed File");
@@ -315,7 +315,7 @@ namespace Armin::Files
             FooterOutput->SetFooterText(L"Sucessfully Created New File");
 
         if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
+            MasterRibbon->SetRibbonStatus();
 
         return Return;
     }

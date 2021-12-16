@@ -30,7 +30,7 @@ namespace Armin::UI
 
 		LoadControls();
 
-		SetRibbonStatusDef();
+		SetRibbonStatus();
 	}
 
 	ATOM Main::_ThisAtom = ATOM();

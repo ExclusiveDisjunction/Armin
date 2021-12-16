@@ -81,7 +81,7 @@ namespace Armin
 				AppState |= APS_HasAssuranceUser;
 
 			if (MasterRibbon)
-				MasterRibbon->SetRibbonStatusDef();
+				MasterRibbon->SetRibbonStatus();
 
 			if (FooterOutput)
 				FooterOutput->SetFooterText(L"Sign In Sucessful");
@@ -91,7 +91,7 @@ namespace Armin
 		else
 		{
 			if (MasterRibbon)
-				MasterRibbon->SetRibbonStatusDef();
+				MasterRibbon->SetRibbonStatus();
 
 			if (FooterOutput)
 				FooterOutput->SetFooterText(L"Sign In Failed");
@@ -148,7 +148,7 @@ namespace Armin
 		AppState &= ~APS_HasAssuranceUser;
 
 		if (MasterRibbon)
-			MasterRibbon->SetRibbonStatusDef();
+			MasterRibbon->SetRibbonStatus();
 
 		if (FooterOutput)
 			FooterOutput->SetFooterText(L"Signed Out.");

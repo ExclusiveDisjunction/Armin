@@ -69,7 +69,7 @@ namespace Armin
 			HWND EditorParent() const override { return _Base; }
 			HWND FooterParent() const override { return _Base; }
 
-			void SetRibbonStatus(int State) override;
+			void SetRibbonStatus() override;
 
 			operator HWND() const
 			{

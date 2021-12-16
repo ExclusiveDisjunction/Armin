@@ -28,7 +28,6 @@ namespace Armin::UI
 	class RibbonHost
 	{
 	public:
-		virtual void SetRibbonStatus(int NewState) = 0;
-		void SetRibbonStatusDef();
+		virtual void SetRibbonStatus() = 0;
 	};
 }

@@ -26,8 +26,4 @@ namespace Armin::UI
 		if (FooterText)
 			FooterText->SetText(L"Ready");
 	}
-	void RibbonHost::SetRibbonStatusDef()
-	{
-		SetRibbonStatus(0);
-	}
 }

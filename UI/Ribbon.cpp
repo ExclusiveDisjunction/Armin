@@ -15,7 +15,7 @@ namespace Armin::UI
 	using namespace Files;
 	using namespace Editors;
 
-	void Main::SetRibbonStatus(int New)
+	void Main::SetRibbonStatus()
 	{
 		ProjectBase* Current = LoadedProject;
 		InventorySystem* RInvFile = dynamic_cast<InventorySystem*>(Current);
