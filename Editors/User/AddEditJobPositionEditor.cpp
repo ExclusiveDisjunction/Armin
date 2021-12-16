@@ -169,4 +169,10 @@ namespace Armin::Editors::Users
 			return Args.Size != 0 && Args[0] == Target;
 		return true;
 	}
+	bool AddEditJobPositionEditor::EquatableTo(EditorFrame* Obj) const
+	{
+		if (Target)
+			return dynamic_cast<AddEditJobPositionEditor*>(Obj) != nullptr && Obj->TestOnCondition(CondenseArgs());
+		return false;
+	}
 }

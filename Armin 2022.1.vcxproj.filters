@@ -87,7 +87,7 @@
     <ClCompile Include="Editors\Timecards\Timeclock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\User\AddJobPositionEditor.cpp">
+    <ClCompile Include="Editors\User\AddEditJobPositionEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\User\CreateEditUserEditor.cpp">

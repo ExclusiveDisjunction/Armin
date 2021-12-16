@@ -474,11 +474,11 @@ namespace Armin
 
 				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
+				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return Target ? L"Edit Job Position" : L"Add Job Position"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
@@ -625,11 +625,11 @@ namespace Armin
 
 				EditorTypes EditorType() const override { return EDT_CreateUser; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
-				bool TestOnCondition(Vector<void*> Args) const override { return false; }
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
+				bool TestOnCondition(Vector<void*> Args) const override;
+				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return Target ? L"Edit User" : L"Create User"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 

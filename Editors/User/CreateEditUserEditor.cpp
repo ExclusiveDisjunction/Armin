@@ -333,4 +333,16 @@ namespace Armin::Editors::Users
 		EditorRegistry::ResetEditorOfType(EDT_Users);
 		return true;
 	}
+	bool CreateEditUserEditor::TestOnCondition(Vector<void*> Args) const
+	{
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target;
+		return true;
+	}
+	bool CreateEditUserEditor::EquatableTo(EditorFrame* Other) const
+	{
+		if (Target)
+			return dynamic_cast<CreateEditUserEditor*>(Other) != nullptr && Other->TestOnCondition(CondenseArgs());
+		return false;
+	}
 }
