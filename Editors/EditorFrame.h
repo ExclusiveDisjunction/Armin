@@ -19,6 +19,7 @@ namespace Armin
 		class CompletedTask;
 		class Component;
 		class Image;
+		class JobPosition;
 		class InventorySystem;
 		class User;
 		class UserSystem;
@@ -217,7 +218,7 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class EditTaskEditor : public EditorFrame
+			/*class EditTaskEditor : public EditorFrame
 			{
 			private:
 				Files::Task* Target;
@@ -255,14 +256,15 @@ namespace Armin
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
-			};
-			class AddTaskEditor : public EditorFrame
+			};*/
+			class AddEditTaskEditor : public EditorFrame
 			{
 			private:
+				Files::Task* Target;
+
 				TextBox* Title, * Instructions;
-				ScrollViewer* AssignedScroll;
-				Grid* AssignedView;
-				Vector<UI::ComponentViewer*> AssignedTo;
+				Label* AssignedLabel;
+				Vector<Files::User*> AssignedTo;
 				CheckableButton* RequiresAssurance;
 				Label* DueBy;
 				Button* DueBySelect; //ID: 4
@@ -280,7 +282,11 @@ namespace Armin
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
 			public:
-				AddTaskEditor();
+				/// <summary>
+				/// Constructs the AddEditTaskEditor.
+				/// </summary>
+				/// <param name="ToEdit">If ToEdit != nullptr, then the editor is in edit mode, if not then it is in add mode.</param>
+				AddEditTaskEditor(Files::Task* ToEdit);
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
@@ -289,7 +295,7 @@ namespace Armin
 				Vector<void*> CondenseArgs() const override { return {}; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Task"; }
+				String GetName() const override { return Target ? L"Edit Task" : L"Add Task"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -448,9 +454,10 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class AddJobPositionEditor : public EditorFrame
+			class AddEditJobPositionEditor : public EditorFrame
 			{
 			private:
+				Files::JobPosition* Target;
 				TextBox* Title, * Description;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
@@ -463,16 +470,16 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddJobPositionEditor();
+				AddEditJobPositionEditor(Files::JobPosition* Target);
 
 				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Job Position"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Job Position" : L"Add Job Position"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -551,7 +558,7 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class EditUserEditor : public EditorFrame
+			/*class EditUserEditor : public EditorFrame
 			{
 			private:
 				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
@@ -587,11 +594,11 @@ namespace Armin
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
-			};
-			class CreateUserEditor : public EditorFrame
+			};*/
+			class CreateEditUserEditor : public EditorFrame
 			{
 			private:
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
+				Files::User* Target;
 
 				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
 				Button* ModifyPositions, * ViewPosition;
@@ -601,6 +608,7 @@ namespace Armin
 				Grid* PositionsView;
 				Vector<UI::ComponentViewer*> Positions;
 
+				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
 				void LoadControls() override;
 
@@ -609,16 +617,20 @@ namespace Armin
 				LRESULT Size() override;
 
 			public:
-				CreateUserEditor();
+				/// <summary>
+				/// Constructs the CreateEditUser editor.
+				/// </summary>
+				/// <param name="Target">If Target != nullptr, edit mode is enabled, add mode if not.</param>
+				CreateEditUserEditor(Files::User* Target);
 
 				EditorTypes EditorType() const override { return EDT_CreateUser; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
-				bool TestOnCondition(Vector<void*> Args) const override { return false; }
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Create User"; }
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
+				bool TestOnCondition(Vector<void*> Args) const override;
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit User" : L"Create User"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;

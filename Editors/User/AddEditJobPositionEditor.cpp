@@ -7,21 +7,24 @@ namespace Armin::Editors::Users
 {
 	using namespace Files;
 
-	AddJobPositionEditor::AddJobPositionEditor()
+	AddEditJobPositionEditor::AddEditJobPositionEditor(Files::JobPosition* Target)
 	{
-
+		if (Target)
+			this->Target = Target;
+		else
+			this->Target = nullptr;
 	}
 
-	LRESULT __stdcall AddJobPositionEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	LRESULT __stdcall AddEditJobPositionEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
-		AddJobPositionEditor* This = reinterpret_cast<AddJobPositionEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		AddEditJobPositionEditor* This = reinterpret_cast<AddEditJobPositionEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!This)
 			return DefWindowProcW(Window, Message, wp, lp);
 
 		return EditorProc(This, Window, Message, wp, lp);
 	}
 
-	void AddJobPositionEditor::LoadControls()
+	void AddEditJobPositionEditor::LoadControls()
 	{
 		if (_Loaded)
 			return;
@@ -66,24 +69,24 @@ namespace Armin::Editors::Users
 			Width = WndRect.right - (10 + XCoord);
 			TextStyle.Alignment = TA_LeftAlignment;
 
-			Title = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			Title = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Title() : String(), Style, TextStyle);
 
 			YCoord += 10 + Height;
 			Height = WndRect.bottom - 10 - YCoord;
 
-			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, true);
+			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Description : String(), Style, TextStyle, true);
 		}
 	}
 
-	LRESULT AddJobPositionEditor::Command(WPARAM wp, LPARAM lp)
+	LRESULT AddEditJobPositionEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		return 0;
 	}
-	LRESULT AddJobPositionEditor::KeyDown(WPARAM wp)
+	LRESULT AddEditJobPositionEditor::KeyDown(WPARAM wp)
 	{
 		return 0;
 	}
-	LRESULT AddJobPositionEditor::Size()
+	LRESULT AddEditJobPositionEditor::Size()
 	{
 		if (!_Loaded)
 			return 0;
@@ -120,17 +123,17 @@ namespace Armin::Editors::Users
 
 		return 0;
 	}
-	LRESULT AddJobPositionEditor::Destroy()
+	LRESULT AddEditJobPositionEditor::Destroy()
 	{
 		return 0;
 	}
 
-	void AddJobPositionEditor::Reset()
+	void AddEditJobPositionEditor::Reset()
 	{
 		Title->SetText(String());
 		Description->SetText(String());
 	}
-	bool AddJobPositionEditor::Apply(ProjectBase* File, bool PromptErrors)
+	bool AddEditJobPositionEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		UserSystem* ConvFile = dynamic_cast<UserSystem*>(File);
 		JobPositionList* Positions = ConvFile ? ConvFile->Positions : nullptr;
@@ -152,7 +155,7 @@ namespace Armin::Editors::Users
 			return false;
 		}
 
-		JobPosition* New = new JobPosition(File, Positions);
+		JobPosition* New = Target ? Target : new JobPosition(File, Positions);
 		New->Title(Title);
 		New->Description = Description;
 
@@ -160,8 +163,16 @@ namespace Armin::Editors::Users
 		EditorRegistry::ResetEditorOfType(EDT_JobPositions);
 		return true;
 	}
-	bool AddJobPositionEditor::TestOnCondition(Vector<void*> Args) const
+	bool AddEditJobPositionEditor::TestOnCondition(Vector<void*> Args) const
 	{
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target;
 		return true;
+	}
+	bool AddEditJobPositionEditor::EquatableTo(EditorFrame* Obj) const
+	{
+		if (Target)
+			return dynamic_cast<AddEditJobPositionEditor*>(Obj) != nullptr && Obj->TestOnCondition(CondenseArgs());
+		return false;
 	}
 }

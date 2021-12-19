@@ -140,7 +140,7 @@ namespace Armin::Editors::Users
 		switch (wp)
 		{
 		case 4: //Change Info
-			EditorRegistry::OpenEditor(new EditUserEditor(Current), nullptr);
+			EditorRegistry::OpenEditor(new CreateEditUserEditor(Current), nullptr);
 			break;
 		case 5:
 			//EditorRegistry::OpenEditor(new TimecardsEditor(Current), nullptr);

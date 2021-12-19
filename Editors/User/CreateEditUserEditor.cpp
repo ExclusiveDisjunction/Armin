@@ -10,21 +10,24 @@ namespace Armin::Editors::Users
 	using namespace UI;
 	using namespace UI::Search;
 
-	CreateUserEditor::CreateUserEditor()
+	CreateEditUserEditor::CreateEditUserEditor(Files::User* Target)
 	{
-		
+		if (Target)
+			this->Target = Target;
+		else
+			this->Target = nullptr;
 	}
 
-	LRESULT __stdcall CreateUserEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	LRESULT __stdcall CreateEditUserEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
-		CreateUserEditor* This = reinterpret_cast<CreateUserEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		CreateEditUserEditor* This = reinterpret_cast<CreateEditUserEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!This)
 			return DefWindowProcW(Window, Message, wp, lp);
 
 		return EditorFrame::EditorProc(This, Window, Message, wp, lp);
 	}
 
-	void CreateUserEditor::LoadControls()
+	void CreateEditUserEditor::LoadControls()
 	{
 		if (_Loaded)
 			return;
@@ -80,22 +83,24 @@ namespace Armin::Editors::Users
 			YCoord = BaseYCoord;
 			Width = (WndRect.right / 2) - (10 + XCoord);
 
-			Username = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			Username = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Username : String(), Style, TextStyle);
 			YCoord += 10 + Height;
 
-			Password = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, false, true);
+			Password = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Password : String(), Style, TextStyle, false, true);
 			YCoord += 10 + Height;
 
-			FirstName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			FirstName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->FirstName : String(), Style, TextStyle);
 			YCoord += 10 + Height;
 
-			MiddleName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			MiddleName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->MiddleName : String(), Style, TextStyle);
 			YCoord += 10 + Height;
 
-			LastName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			LastName = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->LastName : String(), Style, TextStyle);
 			YCoord += 10 + Height;
 
 			UserType = new ComboBox(XCoord, YCoord, Width, Height, _Base, NULL, ins, { L"Standard", L"Assurance", L"Admin" }, Style, TextStyle);
+			if (Target)
+				UserType->Seek(Target->IsAdmin ? L"Admin" : Target->IsAssurance ? L"Assurance" : L"Standard");
 		}
 
 		{
@@ -136,10 +141,13 @@ namespace Armin::Editors::Users
 			PositionsScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			PositionsView = new Grid(0, 0, 910, 37, PositionsScroll, ins, Style);
 			PositionsScroll->SetViewer(PositionsView);
+
+			if (Target)
+				Positions = ComponentViewer::GenerateListRef(Target->Positions, PositionsView, nullptr, true, true, PositionsScroll);
 		}
 	}
 
-	LRESULT CreateUserEditor::Size()
+	LRESULT CreateEditUserEditor::Size()
 	{
 		if (!_Loaded)
 			return 0;
@@ -223,11 +231,11 @@ namespace Armin::Editors::Users
 
 		return 0;
 	}
-	LRESULT CreateUserEditor::KeyDown(WPARAM wp)
+	LRESULT CreateEditUserEditor::KeyDown(WPARAM wp)
 	{
 		return 0;
 	}
-	LRESULT CreateUserEditor::Command(WPARAM wp, LPARAM lp)
+	LRESULT CreateEditUserEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		switch (wp)
 		{
@@ -253,20 +261,20 @@ namespace Armin::Editors::Users
 		return 0;
 	}
 
-	void CreateUserEditor::Reset()
+	void CreateEditUserEditor::Reset()
 	{
-		Username->SetText(String());
-		Password->SetText(String());
-		FirstName->SetText(String());
-		MiddleName->SetText(String());
-		LastName->SetText(String());
-		UserType->Seek(L"Standard");
+		Username->SetText(Target ? Target->Username : String());
+		Password->SetText(Target ? Target->Password : String());
+		FirstName->SetText(Target ? Target->FirstName : String());
+		MiddleName->SetText(Target ? Target->MiddleName : String());
+		LastName->SetText(Target ? Target->LastName : String());
+		UserType->Seek(Target ? (Target->IsAdmin ? L"Admin" : Target->IsAssurance ? L"Assurance" : L"Standard") : L"Standard");
 		
 		CloseControls(Positions);
 		PositionsView->Move(0, 0, 910, 32);
 		PositionsScroll->Reset();
 	}
-	bool CreateUserEditor::Apply(ProjectBase* File, bool PromptErrors)
+	bool CreateEditUserEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!File)
 			return false;
@@ -311,7 +319,7 @@ namespace Armin::Editors::Users
 			return false;
 		}
 
-		Files::User* New = new User(File, Users);
+		Files::User* New = Target ? Target : new User(File, Users);
 		New->Username = Username;
 		New->Password = Password;
 		New->FirstName = FirstName;
@@ -324,5 +332,17 @@ namespace Armin::Editors::Users
 		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_Users);
 		return true;
+	}
+	bool CreateEditUserEditor::TestOnCondition(Vector<void*> Args) const
+	{
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target;
+		return true;
+	}
+	bool CreateEditUserEditor::EquatableTo(EditorFrame* Other) const
+	{
+		if (Target)
+			return dynamic_cast<CreateEditUserEditor*>(Other) != nullptr && Other->TestOnCondition(CondenseArgs());
+		return false;
 	}
 }

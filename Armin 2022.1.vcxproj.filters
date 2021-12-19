@@ -66,16 +66,13 @@
     <ClCompile Include="Editors\Resources\ViewImageEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Task\AddTaskEditor.cpp">
+    <ClCompile Include="Editors\Task\AddEditTaskEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Task\CompletedTasksEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Task\CompleteTaskEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editors\Task\EditTaskEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Task\TasksEditor.cpp">
@@ -90,13 +87,10 @@
     <ClCompile Include="Editors\Timecards\Timeclock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\User\AddJobPositionEditor.cpp">
+    <ClCompile Include="Editors\User\AddEditJobPositionEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\User\CreateUserEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editors\User\EditUserEditor.cpp">
+    <ClCompile Include="Editors\User\CreateEditUserEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp">

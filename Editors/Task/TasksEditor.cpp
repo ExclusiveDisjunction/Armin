@@ -257,7 +257,7 @@ namespace Armin::Editors::Tasks
 			break;
 		case 5: //Add
 			if ((AppState & APS_HasAdminUser))
-				EditorRegistry::OpenEditor(new AddTaskEditor(), nullptr);
+				EditorRegistry::OpenEditor(new AddEditTaskEditor(nullptr), nullptr);
 			break;
 		case 6: //Remove
 		{

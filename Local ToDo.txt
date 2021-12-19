@@ -1,3 +1,0 @@
-Combine add and edit editors to one thing. [IN PROGRESS, BRANCH "EditorImprove"]
-
-Add new Components to component model [IN PROGRESS, BRANCH "FileTypes"]
