@@ -15,6 +15,8 @@ namespace Armin::Files
 		CT_RefrenceGroup = 512,
 		CT_TimecardEntry = 1024,
 		CT_Image = 2048,
-		CT_All = CT_User | CT_Task | CT_CompletedTask | CT_InventoryItem | CT_JobPosition | CT_ConfigItem | CT_OperationInventoryItem | CT_RefrenceGroup | CT_TimecardEntry | CT_Image
+		CT_Checklist = 4096,
+		CT_Request = 8192,
+		CT_All = CT_User | CT_Task | CT_CompletedTask | CT_InventoryItem | CT_JobPosition | CT_ConfigItem | CT_OperationInventoryItem | CT_RefrenceGroup | CT_TimecardEntry | CT_Image | CT_Request | CT_Checklist
 	};
 }
