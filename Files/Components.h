@@ -278,8 +278,8 @@ namespace Armin::Files
 	class Checklist : public Component
 	{
 	private:
-		ChecklistGroup* _ParentList;
-		ChecklistParent* _Parent;
+		ChecklistGroup* _ParentList = nullptr;
+		ChecklistParent* _Parent = nullptr;
 	public:
 		Checklist() = delete;
 		Checklist(ProjectBase* File, ChecklistGroup* ParentList);
@@ -296,7 +296,7 @@ namespace Armin::Files
 		ChecklistParent* const& Parent = _Parent;
 		inline static const String ThisName = L"Checklist";
 
-		ComponentReference* Creator;
+		ComponentReference* Creator = nullptr;
 		Mapping<String, bool> Items;
 
 		ComponentTypes ObjectType() const override { return CT_Checklist; }

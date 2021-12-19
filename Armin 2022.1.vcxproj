@@ -160,6 +160,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Files\Checklist.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Ins.cpp" />
     <ClCompile Include="Recent.cpp" />
