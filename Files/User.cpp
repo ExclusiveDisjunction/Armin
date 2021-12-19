@@ -6,7 +6,7 @@ using namespace std;
 
 namespace Armin::Files
 {
-	User::User(ProjectBase* File, UserSet* ParentList) : Component(File, true), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList) : Component(File, true), TimecardEntryParent(File), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -15,7 +15,7 @@ namespace Armin::Files
 		IsAdmin = IsAssurance = false;
 		Username = FirstName = MiddleName = LastName = Password = String();
 	}
-	User::User(ProjectBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), TimecardEntryParent(File), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -35,9 +35,12 @@ namespace Armin::Files
 
 			for (uint i = 0; i < ToClone->TimecardEntries->Count; i++)
 				new TimecardEntry(File, TimecardEntries, ToClone->TimecardEntries->Item(i));
+
+			for (uint i = 0; i < ToClone->Checklists->Count; i++)
+				new Checklist(File, Checklists, ToClone->Checklists->Item(i));
 		}
 	}
-	User::User(ProjectBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), TimecardEntryParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), TimecardEntryParent(File), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -87,6 +90,8 @@ namespace Armin::Files
 					streampos Pos = InFile.tellg();
 					if (ThisParts[1] == TimecardEntries->Name)
 						TimecardEntries->Fill(InFile);
+					else if (ThisParts[1] == Checklists->Name)
+						Checklists->Fill(InFile);
 					else
 						InFile.seekg(Pos);
 				}
@@ -131,10 +136,13 @@ namespace Armin::Files
 		OutFile << Header;
 		OutFile << "~Username:" << Username << "~FirstName:" << FirstName << "~MiddleName:" << MiddleName << "~LastName:" << LastName << "~IsAdmin:" << (IsAdmin ? "True" : "False") << "~IsAssurance:" << (IsAssurance ? "True" : "False") << "~Password:" << Password.ShiftEachChar(-15) << "~TargetImage:" << (!TargetImage || !TargetImage->Target() ? 0 : TargetImage->Target()->ID) << "~ID:" << ID << "~Positions:" << Positions.ToString();
 
-		if (TimecardEntries->Count != 0)
+		if (TimecardEntries->Count != 0 || Checklists->Count != 0)
 		{
 			OutFile << endl;
-			TimecardEntries->Push(OutFile, PreIndex + 1);
+			if (TimecardEntries->Count != 0)
+				TimecardEntries->Push(OutFile, PreIndex + 1);
+			if (Checklists->Count != 0)
+				Checklists->Push(OutFile, PreIndex + 1);
 			OutFile << TabIndexValue << "end~User" << endl;
 		}
 		else

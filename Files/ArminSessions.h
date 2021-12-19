@@ -18,10 +18,10 @@ namespace Armin::Files
 	/// <summary>
 	/// Represents a collection system of User tools.
 	/// </summary>
-	class UserSystem : virtual public ProjectBase, public UserParent, public JobPositionParent
+	class UserSystem : virtual public ProjectBase, public UserParent, public JobPositionParent, public ChecklistParent
 	{
 	public:
-		UserSystem() : ProjectBase(), UserParent(this), JobPositionParent(this) { }
+		UserSystem() : ProjectBase(), UserParent(this), JobPositionParent(this), ChecklistParent(this) { }
 	};
 	/// <summary>
 	/// Represents a collection system of Taslk tools.

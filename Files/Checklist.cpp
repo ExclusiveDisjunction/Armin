@@ -13,7 +13,7 @@ namespace Armin::Files
 		_ParentList->Append(this);
 		_Parent = ParentList->Parent;
 	}
-	Checklist::Checklist(ProjectBase* File, ChecklistGroup* ParentList, const Checklist*& Obj) : Component(File, true)
+	Checklist::Checklist(ProjectBase* File, ChecklistGroup* ParentList, Checklist* Obj) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -37,6 +37,9 @@ namespace Armin::Files
 	Checklist::~Checklist()
 	{
 		_ParentList->Pop(this);
+
+		if (Creator)
+			delete Creator;
 	}
 
 	void Checklist::Fill(std::ifstream& InFile)

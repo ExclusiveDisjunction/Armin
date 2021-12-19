@@ -283,7 +283,7 @@ namespace Armin::Files
 	public:
 		Checklist() = delete;
 		Checklist(ProjectBase* File, ChecklistGroup* ParentList);
-		Checklist(ProjectBase* File, ChecklistGroup* ParentList, const Checklist*& ToClone);
+		Checklist(ProjectBase* File, ChecklistGroup* ParentList, Checklist* ToClone);
 		Checklist(ProjectBase* File, ChecklistGroup* ParentList, std::ifstream& InFile);
 		Checklist(const Checklist& Obj) = delete;
 		Checklist(const Checklist&& Obj) = delete;
@@ -320,7 +320,7 @@ namespace Armin::Files
 		ChecklistGroup*& Checklists = _Checklists;
 	};
 
-	class User : public Component, public TimecardEntryParent
+	class User : public Component, public TimecardEntryParent, public ChecklistParent
 	{
 	private:
 		UserSet* _ParentList;
