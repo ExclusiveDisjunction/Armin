@@ -610,13 +610,13 @@ namespace Armin::Files
 	class Request : public Component
 	{
 	private:
-		RequestList* _ParentList;
-		RequestParent* _Parent;
+		RequestList* _ParentList = nullptr;
+		RequestParent* _Parent = nullptr;
 	public:
 		Request() = delete;
-		Request(RequestList* ParentList);
-		Request(RequestList* ParentList, const Request*& ToClone);
-		Request(RequestList* ParentList, std::ifstream& InFile);
+		Request(ProjectBase* File, RequestList* ParentList);
+		Request(ProjectBase* File, RequestList* ParentList, Request* ToClone);
+		Request(ProjectBase* File, RequestList* ParentList, std::ifstream& InFile);
 		Request(const Request& Obj) = delete;
 		Request(const Request&& Obj) = delete;
 		~Request();
@@ -629,7 +629,7 @@ namespace Armin::Files
 		inline static const String ThisName = L"Request";
 
 		//Has Title.
-		ComponentReference* Creator;
+		ComponentReference* Creator = nullptr;
 		ReferenceList ForUsers;
 		String RequestMsg;
 		bool Completed;
