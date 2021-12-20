@@ -75,7 +75,7 @@ namespace Armin::Files
 
 		operator Component* () const;
 
-		AString ToString() const { !Active ? "0" : (Ref ? AString(Ref->ID) : "0"); }
+		AString ToString() const;
 	};
 
 	class ReferenceIterator
