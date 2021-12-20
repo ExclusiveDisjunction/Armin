@@ -102,6 +102,10 @@ namespace Armin::Editors
 
 	void EditorButtonHost::OpenLastEditor()
 	{
+		Vector<EditorFrame*> AllEditors = EditorRegistry::GetEditors(EDT_All, this);
+		for (EditorFrame*& Obj : AllEditors)
+			ShowWindow(*Obj, SW_HIDE);
+
 		if (LastEditor && LastEditor->Host == this)
 		{
 			ShowWindow(*LastEditor, SW_SHOW);
