@@ -160,6 +160,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Files\Checklist.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Ins.cpp" />
     <ClCompile Include="Recent.cpp" />
@@ -236,6 +237,7 @@
     <ClCompile Include="Files\TimecardEntry.cpp" />
     <ClCompile Include="Files\UniProject.cpp" />
     <ClCompile Include="Files\User.cpp" />
+    <ClCompile Include="Files\Request.cpp" />
     <ClCompile Include="UI\About.cpp" />
     <ClCompile Include="UI\ComponentViewer.cpp" />
     <ClCompile Include="UI\EditorButton.cpp" />

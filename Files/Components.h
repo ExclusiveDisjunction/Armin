@@ -6,6 +6,7 @@
 #include "BaseTypes.h"
 #include "ComponentTypes.h"
 #include "DateTime.h"
+#include "Mapping.h"
 #include "Str.h"
 
 /*
@@ -37,6 +38,10 @@ namespace Armin::Files
 	class TimecardEntryParent;
 	using TimecardEntryList = ComponentList<TimecardEntry, TimecardEntryParent>;
 
+	class Checklist;
+	class ChecklistParent;
+	using ChecklistGroup = ComponentList<Checklist, ChecklistParent>;
+
 	class User;
 	class UserParent;
 	using UserSet = ComponentList<User, UserParent>;
@@ -50,6 +55,10 @@ namespace Armin::Files
 	class CompletedTask;
 	class CompletedTaskParent;
 	using CompletedTaskList = ComponentList<CompletedTask, CompletedTaskParent>;
+
+	class Request;
+	class RequestParent;
+	using RequestList = ComponentList<Request, RequestParent>;
 
 	//InventorySystem
 	class InventoryBase;
@@ -266,7 +275,52 @@ namespace Armin::Files
 		TimecardEntryList*& TimecardEntries = _TimecardEntries;
 	};
 
-	class User : public Component, public TimecardEntryParent
+	class Checklist : public Component
+	{
+	private:
+		ChecklistGroup* _ParentList = nullptr;
+		ChecklistParent* _Parent = nullptr;
+	public:
+		Checklist() = delete;
+		Checklist(ProjectBase* File, ChecklistGroup* ParentList);
+		Checklist(ProjectBase* File, ChecklistGroup* ParentList, Checklist* ToClone);
+		Checklist(ProjectBase* File, ChecklistGroup* ParentList, std::ifstream& InFile);
+		Checklist(const Checklist& Obj) = delete;
+		Checklist(const Checklist&& Obj) = delete;
+		~Checklist();
+
+		Checklist& operator=(const Checklist& Obj) = delete;
+		Checklist& operator=(const Checklist&& Obj) = delete;
+
+		Checklist* Next = nullptr, * Last = nullptr;
+		ChecklistParent* const& Parent = _Parent;
+		inline static const String ThisName = L"Checklist";
+
+		ComponentReference* Creator = nullptr;
+		Mapping<String, bool> Items;
+
+		ComponentTypes ObjectType() const override { return CT_Checklist; }
+		void Fill(std::ifstream& InFile) override;
+		void Push(std::ofstream& OutFile, uint TabIndex) const override;
+	};
+	class ChecklistParent : public ComponentParent
+	{
+	private:
+		ChecklistGroup* _Checklists;
+	protected:
+		ChecklistParent() : _Checklists(nullptr) {}
+		ChecklistParent(ProjectBase* File) : _Checklists(new ChecklistGroup(File, this)) {}
+	public:
+		~ChecklistParent()
+		{
+			delete _Checklists;
+			_Checklists = nullptr;
+		}
+
+		ChecklistGroup*& Checklists = _Checklists;
+	};
+
+	class User : public Component, public TimecardEntryParent, public ChecklistParent
 	{
 	private:
 		UserSet* _ParentList;
@@ -551,6 +605,55 @@ namespace Armin::Files
 		}
 
 		CompletedTaskList*& CompletedTasks = _CompletedTasks;
+	};
+
+	class Request : public Component
+	{
+	private:
+		RequestList* _ParentList = nullptr;
+		RequestParent* _Parent = nullptr;
+	public:
+		Request() = delete;
+		Request(ProjectBase* File, RequestList* ParentList);
+		Request(ProjectBase* File, RequestList* ParentList, Request* ToClone);
+		Request(ProjectBase* File, RequestList* ParentList, std::ifstream& InFile);
+		Request(const Request& Obj) = delete;
+		Request(const Request&& Obj) = delete;
+		~Request();
+
+		Request& operator=(const Request& Obj) = delete;
+		Request& operator=(const Request&& Obj) = delete;
+
+		Request* Next = nullptr, * Last = nullptr;
+		RequestParent* const& Parent = _Parent;
+		inline static const String ThisName = L"Request";
+
+		//Has Title.
+		ComponentReference* Creator = nullptr;
+		ReferenceList ForUsers;
+		String RequestMsg;
+		bool Completed;
+		String CompleteMsg;
+
+		ComponentTypes ObjectType() const override { return CT_Request; }
+		void Fill(std::ifstream& InFile) override;
+		void Push(std::ofstream& OutFile, uint TabIndex) const override;
+	};
+	class RequestParent : public ComponentParent
+	{
+	private:
+		RequestList* _Requests;
+	protected:
+		RequestParent() : _Requests(nullptr) {}
+		RequestParent(ProjectBase* File) : _Requests(new RequestList(File, this)) {}
+	public:
+		~RequestParent()
+		{
+			delete _Requests;
+			_Requests = nullptr;
+		}
+
+		RequestList*& Requests = _Requests;
 	};
 
 #pragma endregion

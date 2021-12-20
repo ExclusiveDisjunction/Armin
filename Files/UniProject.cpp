@@ -29,6 +29,7 @@ namespace Armin::Files
 		{
 			Positions = new JobPositionList(this, this);
 			Users = new UserSet(this, this);
+			Checklists = new ChecklistGroup(this, this);
 		}
 		if (Config & UPC_Tasks)
 		{
@@ -58,6 +59,8 @@ namespace Armin::Files
 			Positions->Push(OutFile, 1);
 		if (Users)
 			Users->Push(OutFile, 1);
+		if (Checklists)
+			Checklists->Push(OutFile, 1);
 		if (Tasks)
 			Tasks->Push(OutFile, 1);
 		if (CompletedTasks)
@@ -117,6 +120,8 @@ namespace Armin::Files
 						Positions->Fill(InFile);
 					else if (ThisParts[1] == Users->Name && (Config & UPC_Users))
 						Users->Fill(InFile);
+					else if (ThisParts[1] == Checklists->Name && (Config & UPC_Users))
+						Checklists->Fill(InFile);
 					else if (ThisParts[1] == InventoryItems->Name && (Config & UPC_Inventory))
 						InventoryItems->Fill(InFile);
 					else if (ThisParts[1] == OperationInventoryItems->Name && (Config & UPC_Inventory))
@@ -154,10 +159,11 @@ namespace Armin::Files
 			}
 		}
 
-		if (Users && ((Filter & CT_User) || (Filter & CT_TimecardEntry)))
+		if (Users && ((Filter & CT_User) || (Filter & CT_TimecardEntry) || (Filter & CT_Checklist)))
 		{
 			bool User = Filter & CT_User;
 			bool Timecard = Filter & CT_TimecardEntry;
+			bool Checklists = Filter & CT_Checklist;
 
 			for (uint i = 0; i < Users->Count; i++)
 			{
@@ -174,6 +180,26 @@ namespace Armin::Files
 							Return = Current;
 					}
 				}
+
+				if (Checklists)
+				{
+					for (uint i = 0; i < Current->Checklists->Count; i++)
+					{
+						Checklist* Chck = Current->Checklists->Item(i);
+						if (Chck->ID == ID)
+							Return = Current;
+					}
+				}
+			}
+		}
+
+		if (Checklists && (Filter & CT_Checklist))
+		{
+			for (uint i = 0; i < Checklists->Count; i++)
+			{
+				Checklist* Current = Checklists->Item(i);
+				if (Current->ID == ID)
+					Return = Current;
 			}
 		}
 
