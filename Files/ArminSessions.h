@@ -26,10 +26,10 @@ namespace Armin::Files
 	/// <summary>
 	/// Represents a collection system of Taslk tools.
 	/// </summary>
-	class TaskSystem : virtual public ProjectBase, public TaskParent, public CompletedTaskParent
+	class TaskSystem : virtual public ProjectBase, public TaskParent, public CompletedTaskParent, public RequestParent
 	{
 	public:
-		TaskSystem() : ProjectBase(), TaskParent(this), CompletedTaskParent(this) { }
+		TaskSystem() : ProjectBase(), TaskParent(this), CompletedTaskParent(this), RequestParent(this) { }
 	};
 	/// <summary>
 	/// Represents a collection system of Resource tools.

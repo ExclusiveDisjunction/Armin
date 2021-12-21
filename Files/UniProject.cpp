@@ -24,6 +24,8 @@ namespace Armin::Files
 		delete Tasks;
 		delete CompletedTasks;
 		delete Images;
+		delete Checklists;
+		delete Requests;
 
 		if (Config & UPC_Users)
 		{
@@ -35,6 +37,7 @@ namespace Armin::Files
 		{
 			Tasks = new TaskList(this, this);
 			CompletedTasks = new CompletedTaskList(this, this);
+			Requests = new RequestList(this, this);
 		}
 		if (Config & UPC_Inventory)
 		{
@@ -65,6 +68,8 @@ namespace Armin::Files
 			Tasks->Push(OutFile, 1);
 		if (CompletedTasks)
 			CompletedTasks->Push(OutFile, 1);
+		if (Requests)
+			Requests->Push(OutFile, 1);
 		if (InventoryItems)
 			InventoryItems->Push(OutFile, 1);
 		if (OperationInventoryItems)
@@ -130,6 +135,8 @@ namespace Armin::Files
 						Tasks->Fill(InFile);
 					else if (ThisParts[1] == CompletedTasks->Name && (Config & UPC_Tasks))
 						CompletedTasks->Fill(InFile);
+					else if (ThisParts[1] == Requests->Name && (Config & UPC_Tasks))
+						Requests->Fill(InFile);
 					else if (ThisParts[1] == RefrenceGroups->Name)
 						RefrenceGroups->Fill(InFile);
 					else if (ThisParts[1] == ConfigItems->Name)
@@ -240,6 +247,16 @@ namespace Armin::Files
 			for (uint i = 0; i < Tasks->Count; i++)
 			{
 				Task* Current = Tasks->Item(i);
+				if (Current->ID == ID)
+					Return = Current;
+			}
+		}
+
+		if (Requests && (Filter & CT_Request))
+		{
+			for (uint i = 0; i < Requests->Count; i++)
+			{
+				Request* Current = Requests->Item(i);
 				if (Current->ID == ID)
 					Return = Current;
 			}
