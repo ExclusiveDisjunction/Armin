@@ -287,6 +287,6 @@ namespace Armin::Editors::Tasks
 		if (Target)
 			return Args.Size != 0 && Args[0] == Target;
 		else
-			return true;
+			return false;
 	}
 }

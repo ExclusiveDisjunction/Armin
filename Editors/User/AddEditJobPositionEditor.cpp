@@ -167,7 +167,7 @@ namespace Armin::Editors::Users
 	{
 		if (Target)
 			return Args.Size != 0 && Args[0] == Target;
-		return true;
+		return false;
 	}
 	bool AddEditJobPositionEditor::EquatableTo(EditorFrame* Obj) const
 	{
