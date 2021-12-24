@@ -107,7 +107,7 @@ namespace Armin::Editors
         return Vector<EditorFrame*>(Info);
     }
 
-    EditorFrame* EditorRegistry::GetEditor(int EditorType, EditorHost* Parent)
+    EditorFrame* EditorRegistry::GetEditor(uint EditorType, EditorHost* Parent)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -118,7 +118,7 @@ namespace Armin::Editors
 
         return nullptr;
     }
-    Vector<EditorFrame*> EditorRegistry::GetEditors(int EditorType, EditorHost* Parent)
+    Vector<EditorFrame*> EditorRegistry::GetEditors(uint EditorType, EditorHost* Parent)
     {
         Vector<EditorFrame*> Return;
         for (uint i = 0; i < Info.Size; i++)
@@ -231,7 +231,7 @@ namespace Armin::Editors
             RedrawWindow(*Hosts, NULL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
     }
 
-    void EditorRegistry::ResetEditorOfType(int Types)
+    void EditorRegistry::ResetEditorOfType(uint Types)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -240,7 +240,7 @@ namespace Armin::Editors
                 Current->Reset();
         }
     }
-    void EditorRegistry::ResetEditorOfType(int Types, Vector<void*> Condition)
+    void EditorRegistry::ResetEditorOfType(uint Types, Vector<void*> Condition)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -250,7 +250,7 @@ namespace Armin::Editors
         }
     }
 
-    bool EditorRegistry::IsOpen(int Types, EditorHost* Host)
+    bool EditorRegistry::IsOpen(uint Types, EditorHost* Host)
     {
         for (EditorFrame* Frame : Info)
         {
@@ -260,7 +260,7 @@ namespace Armin::Editors
 
         return false;
     }
-    bool EditorRegistry::IsOpen(int Types, Vector<void*> Args, EditorHost* Host)
+    bool EditorRegistry::IsOpen(uint Types, Vector<void*> Args, EditorHost* Host)
     {
         for (EditorFrame* Frame : Info)
         {

@@ -42,8 +42,8 @@ namespace Armin
 			static Vector<EditorFrame*> CurrentApplyableEditors();
 			static Vector<EditorFrame*> CurrentOpenEditors();
 
-			static EditorFrame* GetEditor(int EditorType, EditorHost* Parent = nullptr);
-			static Vector<EditorFrame*> GetEditors(int EditorType, EditorHost* Parent = nullptr);
+			static EditorFrame* GetEditor(uint EditorType, EditorHost* Parent = nullptr);
+			static Vector<EditorFrame*> GetEditors(uint EditorType, EditorHost* Parent = nullptr);
 
 			/// <summary>
 			/// Moves an editor from one editor host to another.
@@ -57,13 +57,13 @@ namespace Armin
 			/// Resets an editor that matches a specified type.
 			/// </summary>
 			/// <param name="Types">The editor types to reset. Can use more than one type of editor.</param>
-			static void ResetEditorOfType(int Types);
+			static void ResetEditorOfType(uint Types);
 			/// <summary>
 			/// Resets an editor that matches a specified type and condition.
 			/// </summary>
 			/// <param name="Types">The editor types to reset. Can use more than one type of editor.</param>
 			/// <param name="Condition">The condition the editor must match to be reset.</param>
-			static void ResetEditorOfType(int Types, Vector<void*> Condition);
+			static void ResetEditorOfType(uint Types, Vector<void*> Condition);
 
 			/// <summary>
 			/// Evaluates if an editor is open.
@@ -71,7 +71,7 @@ namespace Armin
 			/// <param name="Types">The allowed types of editor to test for.</param>
 			/// <param name="Host">The Host to search under. If nullptr, all hosts are allowed.</param>
 			/// <returns>If the editor matching the specified criteria is open.</returns>
-			static bool IsOpen(int Types, EditorHost* Host = nullptr);
+			static bool IsOpen(uint Types, EditorHost* Host = nullptr);
 			/// <summary>
 			/// Evaluates if an editor is open.
 			/// </summary>
@@ -79,7 +79,7 @@ namespace Armin
 			/// <param name="Args">The condition that the editor must match.</param>
 			/// <param name="Host">The Host to search under. If nullptr, all hosts are allowed.</param>
 			/// <returns>If the editor matching the specified criteria is open.</returns>
-			static bool IsOpen(int Types, Vector<void*> Args, EditorHost* Host = nullptr);
+			static bool IsOpen(uint Types, Vector<void*> Args, EditorHost* Host = nullptr);
 
 			/// <summary>
 			/// Opens an editor, and specifies it's parent.

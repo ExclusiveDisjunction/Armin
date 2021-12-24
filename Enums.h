@@ -66,7 +66,9 @@ namespace Armin
 		EDT_ViewImage = 536'870'912,
 		EDT_Images = 1'073'741'824,
 
+		EDT_Welcome = 2'147'483'648,
+
 		EDT_None = 0,
-		EDT_All = EDT_Tasks | EDT_AddTask | EDT_ViewTask | EDT_EditTask | EDT_CompleteTask | EDT_CompletedTasks | EDT_ViewCompletedTask | EDT_JobPositions | EDT_AddJobPosition | EDT_Users | EDT_ViewUser | EDT_EditUser | EDT_CreateUser | EDT_UserSearch | EDT_Inventory | EDT_OperationInventory | EDT_AddInventoryItem | EDT_AddOperationInventoryItem | EDT_InventorySearch |EDT_AddReferenceGroup | EDT_ViewEditReferenceGroup | EDT_ReferenceGroups | EDT_BasicEditor | EDT_BasicViewer | EDT_QuickSearch | EDT_ProjectSettings | EDT_Settings |				EDT_UserHomepage | EDT_Timecards | EDT_ViewImage | EDT_Images
+		EDT_All = EDT_Tasks | EDT_AddTask | EDT_ViewTask | EDT_EditTask | EDT_CompleteTask | EDT_CompletedTasks | EDT_ViewCompletedTask | EDT_JobPositions | EDT_AddJobPosition | EDT_Users | EDT_ViewUser | EDT_EditUser | EDT_CreateUser | EDT_UserSearch | EDT_Inventory | EDT_OperationInventory | EDT_AddInventoryItem | EDT_AddOperationInventoryItem | EDT_InventorySearch |EDT_AddReferenceGroup | EDT_ViewEditReferenceGroup | EDT_ReferenceGroups | EDT_BasicEditor | EDT_BasicViewer | EDT_QuickSearch | EDT_ProjectSettings | EDT_Settings |				EDT_UserHomepage | EDT_Timecards | EDT_ViewImage | EDT_Images | EDT_Welcome
 	};
 }
