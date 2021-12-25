@@ -1302,6 +1302,42 @@ namespace Armin
 
 				void Reset() override;
 			};
+			class WelcomeEditor : public EditorFrame
+			{
+			private:
+				Grid* RecentsViewer;
+				ScrollViewer* RecentsScroll;
+				Vector<Button*> Recents;
+				Button* Open, * New, * OpenLast, * Settings, * Quit, * RemoveRecent;
+				ControlList MiscControls;
+
+				StringList Paths;
+
+				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
+
+				void RefreshList();
+			protected:
+				void LoadControls() override;
+
+				LRESULT Size() override;
+				LRESULT KeyDown(WPARAM wp) override;
+				LRESULT Command(WPARAM wp, LPARAM lp) override;
+
+			public:
+				WelcomeEditor();
+
+				EditorTypes EditorType() const override { return EDT_Welcome; }
+				bool IsApplyable() const override { return false; }
+				bool ConditionSpecific() const override { return false; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
+				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				bool TestOnCondition(Vector<void*> Args) const override { return true; }
+				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<WelcomeEditor*>(Other) != nullptr; }
+				String GetName() const override { return L"Welcome"; }
+				WNDPROC ThisProc() const override { return WndProc; }
+
+				void Reset() override;
+			};
 		}
 	}
 }

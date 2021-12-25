@@ -484,7 +484,8 @@ namespace Armin::UI
 		case 12: //Close
 			if (SessionControl::Close(ins))
 			{
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - Unloaded"));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version)));
+				EditorRegistry::OpenEditor(new Misc::WelcomeEditor(), nullptr);
 				CurrentEdtBttnY = 5;
 			}
 			break;

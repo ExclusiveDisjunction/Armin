@@ -14,7 +14,6 @@
 #include "UI\Main.h"
 #include "UI\SideHost.h"
 #include "UI\Startup.h"
-#include "UI\Welcome.h"
 
 using namespace std;
 using namespace Gdiplus;
@@ -59,20 +58,6 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCm
 			SessionControl::Open(CommandPath, hInstance);
 		else if (FileExists(InsInstance->LastLoaded) && InsInstance->LoadLast)
 			SessionControl::Open(InsInstance->LastLoaded, hInstance);
-	}
-
-	if (!Ins::IsLoaded())
-	{
-		Welcome* Wel = new Welcome(hInstance);
-		Wel->Open();
-
-		if (Welcome::DoQuit)
-		{
-			delete Wel;
-			return 0;
-		}
-
-		delete Wel;
 	}
 
 	Main* main = new Main(hInstance);

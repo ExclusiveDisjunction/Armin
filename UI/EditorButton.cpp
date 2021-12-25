@@ -58,6 +58,9 @@ namespace Armin::UI
 
 	LRESULT EditorButton::Paint()
 	{
+		if (!Source || !this)
+			return 0;
+
 		PAINTSTRUCT ps;
 		HDC Dc = BeginPaint(_Base, &ps);
 		SetBkMode(Dc, TRANSPARENT);

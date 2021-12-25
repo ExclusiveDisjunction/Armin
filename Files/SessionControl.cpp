@@ -230,7 +230,7 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Creating New File...");
 
-        if (AppState & APS_HasEdit)
+        if ((AppState & APS_HasEdit) || (AppState & APS_AppendableEditorOpen))
         {
             int Result = MessageBoxW(nullptr, L"Would you like to save first?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
             if (Result == IDYES)
@@ -274,9 +274,6 @@ namespace Armin::Files
         Proj->ConfigureMemory();
         Proj->ChangePath(Path);
 
-        LoadedProject = Proj;
-        LoadedProjectPath = Path;
-
         if (Config & UPC_Users)
         {
             UserSet* Users = Proj->Users;
@@ -292,32 +289,12 @@ namespace Armin::Files
             New->IsAssurance = false;
             New->Username = Username;
             New->Password = Password;
-
-            Return = true;
-        }
-        else
-            Return = true;
-
-        if (Return)
-        {
-            RecentInstance->AddRecent(Path);
-            InsInstance->LastLoaded = Path;
-
-            LoadedProject->Save();
-            AppState = 0; //Resets app state
-            AppState |= APS_FileLoaded; //Loads a file up.
-
-            UserSystem* ConvFile = dynamic_cast<UserSystem*>(LoadedProject);
-            UserRegInit(ConvFile, ins);
         }
 
-        if (FooterOutput)
-            FooterOutput->SetFooterText(L"Sucessfully Created New File");
+        Proj->Save();
+        delete Proj;
 
-        if (MasterRibbon)
-            MasterRibbon->SetRibbonStatus();
-
-        return Return;
+        return Open(Path, ins);
     }
 
     bool SessionControl::Apply(EditorFrame* Host, bool ShowCompleted)

@@ -22,7 +22,7 @@ namespace Armin::UI
 		EditorRegistry::SetHost(this);
 		EditorRegistry::Track(static_cast<FooterHost*>(this));
 
-		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version) + (Ins::IsLoaded() ? L" - " + FileFullName(LoadedProjectPath) : L" - Unloaded")), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
+		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version)), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 		ShowWindow(_Base, SW_MAXIMIZE);
@@ -169,8 +169,10 @@ namespace Armin::UI
 					SignIn();
 				}
 				else if (InvConv && InvConv->Config == UPC_Inventory)
-					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
+					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);			
 			}
+			else
+				EditorRegistry::OpenEditor(new Misc::WelcomeEditor(), nullptr);
 
 			KillTimer(Param, ID);
 		};

@@ -160,6 +160,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Editors\Other\WelcomeEditor.cpp" />
     <ClCompile Include="Files\Checklist.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Ins.cpp" />
@@ -257,7 +258,6 @@
     <ClCompile Include="UI\Tool\PasswordInput.cpp" />
     <ClCompile Include="UI\Tool\SearchByName.cpp" />
     <ClCompile Include="UI\SignIn.cpp" />
-    <ClCompile Include="UI\Welcome.cpp" />
     <ClCompile Include="UserRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -304,7 +304,6 @@
     <ClInclude Include="UI\Tool\SearchByName.h" />
     <ClInclude Include="UI\SignIn.h" />
     <ClInclude Include="UI\WindowState.h" />
-    <ClInclude Include="UI\Welcome.h" />
     <ClInclude Include="UserRegistry.h" />
   </ItemGroup>
   <ItemGroup>
