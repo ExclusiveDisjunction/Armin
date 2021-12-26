@@ -291,7 +291,7 @@ namespace Armin
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
-				EditorTypes EditorType() const override { return EDT_AddTask; }
+				EditorTypes EditorType() const override { return EDT_AddEditTask; }
 				Vector<void*> CondenseArgs() const override { return {}; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
@@ -472,7 +472,7 @@ namespace Armin
 			public:
 				AddEditJobPositionEditor(Files::JobPosition* Target);
 
-				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
+				EditorTypes EditorType() const override { return EDT_AddJobEditPosition; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
@@ -623,7 +623,7 @@ namespace Armin
 				/// <param name="Target">If Target != nullptr, edit mode is enabled, add mode if not.</param>
 				CreateEditUserEditor(Files::User* Target);
 
-				EditorTypes EditorType() const override { return EDT_CreateUser; }
+				EditorTypes EditorType() const override { return EDT_CreateEditUser; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
@@ -836,7 +836,7 @@ namespace Armin
 			public:
 				AddInventoryItemEditor();
 
-				EditorTypes EditorType() const override { return EDT_AddInventoryItem; }
+				EditorTypes EditorType() const override { return EDT_AddEditInventoryItem; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
 				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
@@ -867,7 +867,7 @@ namespace Armin
 			public:
 				AddOperationInventoryItemEditor();
 
-				EditorTypes EditorType() const override { return EDT_AddOperationInventoryItem; }
+				EditorTypes EditorType() const override { return EDT_AddEditOperationInventoryItem; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
 				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
