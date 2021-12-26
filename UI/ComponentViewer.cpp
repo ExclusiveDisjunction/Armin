@@ -152,7 +152,7 @@ namespace Armin::UI
 		{
 			RECT WndRect;
 			GetClientRect(Scroll, &WndRect);
-			Width = max(Width, WndRect.right);
+			Width = max(Width, WndRect.right - 10);
 
 			ParentGrid->Move(0, 0, Width + 10, static_cast<int>((Height + Spacing) * (Objects.Size + 1)));
 			Scroll->Reset();
@@ -194,7 +194,7 @@ namespace Armin::UI
 		{
 			RECT WndRect;
 			GetClientRect(Scroll, &WndRect);
-			Width = max(Width, WndRect.right);
+			Width = max(Width, WndRect.right - 10);
 
 			Grid->Move(0, 0, Width + 10, static_cast<int>((Height + Spacing) * (Objects.Size + 1)));
 			Scroll->Reset();
