@@ -37,7 +37,7 @@ namespace Armin::Editors::Tasks
 
         _Loaded = true;
 
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
         AaColor BaseBk = EditorGrey;
 
         {
@@ -184,7 +184,7 @@ namespace Armin::Editors::Tasks
 
         _Loaded = true;
 
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
 
         {
             int XCoord = 10;

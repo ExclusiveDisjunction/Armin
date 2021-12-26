@@ -31,7 +31,7 @@ namespace Armin::Editors
 		SetTextColor(Dc, Fore);
 		SelectObject(Dc, GetStockObject(NULL_PEN));
 
-		HFONT Font = CreateFontW(-MulDiv(34, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, 0, false, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(FontName));
+		HFONT Font = CreateFont(-MulDiv(34, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, 0, false, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(FontName));
 		SelectObject(Dc, Font);
 		SetBkMode(Dc, TRANSPARENT);
 
@@ -48,7 +48,7 @@ namespace Armin::Editors
 		Rectangle(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom);
 
 		RECT TextArea = { 0, 0, WndRect.right, TextSize.cy };
-		DrawTextW(Dc, Text, TextLen, &TextArea, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		DrawText(Dc, Text, TextLen, &TextArea, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 		HPEN BorderPen = CreatePen(PS_SOLID, 4, Accent4);
 		SelectObject(Dc, BorderPen);
@@ -56,6 +56,14 @@ namespace Armin::Editors
 		POINT Begin = { (WndRect.right / 2) - (TextSize.cx / 2) - 10, TextArea.top + TextArea.bottom }, End = { (WndRect.right / 2) + (TextSize.cx / 2) + 10, TextArea.top + TextArea.bottom };
 		MoveToEx(Dc, Begin.x, Begin.y, NULL);
 		LineTo(Dc, End.x, End.y);
+		
+		DeleteObject(Font);
+		Font = CreateFont(-MulDiv(11, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, 0, true, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(StandardFontName));
+		SelectObject(Dc, Font);
+
+		RECT Area = { 10, Begin.y + 10, WndRect.right - 20, Begin.y + 50 };
+		String Notes = GetNotes();
+		DrawText(Dc, static_cast<LPCWSTR>(Notes), Notes.Length(), &Area, DT_CENTER | DT_WORDBREAK);
 
 		DeleteObject(Bk);
 		DeleteObject(Font);

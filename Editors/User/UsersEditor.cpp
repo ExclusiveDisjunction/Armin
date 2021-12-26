@@ -31,7 +31,7 @@ namespace Armin::Editors::Users
 	void UsersEditor::LoadControls()
 	{
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		RECT WndRect;
@@ -251,7 +251,7 @@ namespace Armin::Editors::Users
 	LRESULT UsersEditor::Size()
 	{
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);

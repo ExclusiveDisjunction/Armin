@@ -26,7 +26,7 @@ namespace Armin::Editors::Inventory
 	void AddOperationInventoryItemEditor::LoadControls()
 	{
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		_Loaded = true;
 
@@ -179,7 +179,7 @@ namespace Armin::Editors::Inventory
 			return 0;
 
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		MoveUpperButtons(WndRect);
 

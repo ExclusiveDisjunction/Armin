@@ -36,7 +36,7 @@ namespace Armin::Editors::Users
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
@@ -166,7 +166,7 @@ namespace Armin::Editors::Users
 		MoveUpperButtons(WndRect);
 
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = BaseXCoord;

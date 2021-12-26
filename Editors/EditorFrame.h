@@ -59,6 +59,7 @@ namespace Armin
 			Button* Close = nullptr, * Move = nullptr, * _Apply = nullptr;
 
 			bool _Loaded = false;
+			const int BaseYCoord = 120;
 
 			virtual void LoadControls() = 0;
 
@@ -119,6 +120,7 @@ namespace Armin
 			virtual bool TestOnCondition(Vector<void*> Args) const = 0;
 			virtual bool EquatableTo(EditorFrame* Other) const = 0;
 			virtual String GetName() const = 0;
+			virtual String GetNotes() const = 0;
 			virtual void Reset() = 0;
 			virtual WNDPROC ThisProc() const = 0;
 
@@ -177,6 +179,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<TasksEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Tasks"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -214,49 +217,11 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View Task"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			/*class EditTaskEditor : public EditorFrame
-			{
-			private:
-				Files::Task* Target;
-				DateTime DueByD;
-
-				TextBox* Title, * Instructions;
-				Label* DueBy;
-				CheckableButton* RequiresAssurance;
-				Button* DueBySelect, * ModifyAssigned, * ViewAssigned;
-				ScrollViewer* AssignedUsersScroll;
-				Grid* AssignedUsersView;
-				Vector<UI::ComponentViewer*> AssignedUsers;
-
-				bool _Multiselect = false;
-			protected:
-				void LoadControls() override;
-				void FillAssigned();
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			public:
-				EditTaskEditor(Files::Task* Target);
-
-				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override;
-				EditorTypes EditorType() const override { return EDT_EditTask; }
-				Vector<void*> CondenseArgs() const override { return { Target }; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Edit Task"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};*/
 			class AddEditTaskEditor : public EditorFrame
 			{
 			private:
@@ -296,6 +261,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return Target ? L"Edit Task" : L"Add Task"; }
+				String GetNotes() const override { return L"The Title feild is required. By default, the Date is set to 1/1/1970.\nA Tilde ('~') is not allowed in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -334,6 +300,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<CompletedTasksEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Completed Tasks"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -376,6 +343,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Complete Task"; }
+				String GetNotes() const override { return L"By default, the Date Completed is 1/1/1970.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -410,6 +378,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View Completed Task"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -450,6 +419,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<JobPositionsEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Job Positions"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -480,6 +450,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return Target ? L"Edit Job Position" : L"Add Job Position"; }
+				String GetNotes() const override { return L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -518,6 +489,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UsersEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Users"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -554,47 +526,11 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View User"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			/*class EditUserEditor : public EditorFrame
-			{
-			private:
-				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
-				ComboBox* UserType;
-				ScrollViewer* PositionScroll;
-				Grid* PositionView;
-				Button* ModifyPositions, * ViewPosition;
-				Vector<UI::ComponentViewer*> Positions;
-
-				bool _Multiselect;
-				Files::User* Current;
-
-				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
-
-			protected:
-				void LoadControls() override;
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-
-			public:
-				EditUserEditor(Files::User* Target);
-
-				EditorTypes EditorType() const override { return EDT_EditUser; }
-				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ProjectBase* File, bool PrmoptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return { Current }; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Edit User"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};*/
 			class CreateEditUserEditor : public EditorFrame
 			{
 			private:
@@ -631,6 +567,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return Target ? L"Edit User" : L"Create User"; }
+				String GetNotes() const override { return L"The Username and Password feilds are required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -667,6 +604,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Homepage"; }
+				String GetNotes() const override { return L"Welcome Back!"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -702,6 +640,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Timecards"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -740,6 +679,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearch*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"User Search"; }
+				String GetNotes() const override { return L"Use commas (',') to separate Usernames and Names.\nA blank record in any feild will result in allowing all data to pass through that filter."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -778,6 +718,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Inventory"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -813,6 +754,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<OperationInventoryEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Operation Inventory"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -844,6 +786,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Add Inventory Item"; }
+				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -875,6 +818,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Add Operation Inventory Item"; }
+				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -920,6 +864,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<InventorySearchEditor*>(Other) != nullptr; }
 				String GetName() const override { return L"Inventory Search"; }
+				String GetNotes() const override { return L"Use Commas (',') to separate seperate data in each feild.\nA blank feild will allow all data to pass through that filter."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -958,6 +903,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return false; }
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Add Refrence Group"; }
+				String GetNotes() const override { return L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -995,6 +941,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 2 && Args[0] == static_cast<void*>(_Target) && Args[1] == (void*)_EditMode; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return _EditMode ? L"Edit Refrence Group" : L"View Refrence Group"; }
+				String GetNotes() const override { return _EditMode ? L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild." : L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1031,6 +978,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<ReferenceGroupsEditor*>(Other) == this; }
 				String GetName() const override { return L"Refrence Groups"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1064,6 +1012,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View Image"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1099,6 +1048,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Other) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Images"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1156,6 +1106,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override;
+				String GetNotes() const override { return L"A Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1193,6 +1144,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override;
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1231,6 +1183,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<QuickSearchEditor*>(Other) != nullptr; }
 				String GetName() const override { return L"Quick Search"; }
+				String GetNotes() const override { return L"Type the Title or ID of an object into the search box, or specifiy the criteria you want to search.\nBy clicking on one of the data types, you can filter out data types."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void RunSearch();
@@ -1262,6 +1215,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == (void*)Target; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Project Settings"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1298,6 +1252,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return true; }
 				String GetName() const override { return L"Settings"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1334,6 +1289,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<WelcomeEditor*>(Other) != nullptr; }
 				String GetName() const override { return L"Welcome"; }
+				String GetNotes() const override { return L"Please open a previous project, or create a new one to begin."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;

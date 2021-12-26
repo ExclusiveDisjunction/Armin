@@ -202,12 +202,7 @@ namespace Armin::Files
             }
         }
 
-        if (!Ins::IsLoaded())
-        {
-            if (FooterOutput)
-                FooterOutput->SetFooterText(L"Sucessfully Closed File");
-            return true;
-        }
+        bool WasLoaded = Ins::IsLoaded();
 
         EditorRegistry::ForceCloseAllEditors();
 
@@ -221,7 +216,7 @@ namespace Armin::Files
             MasterRibbon->SetRibbonStatus();
 
         if (FooterOutput)
-            FooterOutput->SetFooterText(L"Sucessfully Closed File");
+            FooterOutput->SetFooterText(WasLoaded ? L"Closed all editors, but there was no file loaded prior." : L"Sucessfully Closed File");
 
         return true;
     }

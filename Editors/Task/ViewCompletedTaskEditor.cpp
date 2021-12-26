@@ -36,7 +36,7 @@ namespace Armin::Editors::Tasks
 		HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
 		LoadUpperButtons(WndRect, ins);
-		const int BaseYCoord = 110;
+		const int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		TextStyleSheet LabelStyle;
@@ -156,7 +156,7 @@ namespace Armin::Editors::Tasks
 		GetClientRect(_Base, &WndRect);
 
 		MoveUpperButtons(WndRect);
-		const int BaseYCoord = 110;
+		const int BaseYCoord = this->BaseYCoord;
 		
 		{
 			int XCoord = 10;

@@ -37,7 +37,7 @@ namespace Armin::Editors::Misc
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		{
@@ -135,7 +135,7 @@ namespace Armin::Editors::Misc
 
 		MoveUpperButtons(WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		int i = 0;
 
 		{

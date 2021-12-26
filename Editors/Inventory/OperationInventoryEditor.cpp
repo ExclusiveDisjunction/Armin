@@ -36,7 +36,7 @@ namespace Armin::Editors::Inventory
 		HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
 		AaColor BaseBk = EditorGrey;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		LoadUpperButtons(WndRect, ins);
 
@@ -221,7 +221,7 @@ namespace Armin::Editors::Inventory
 		GetClientRect(_Base, &WndRect);
 
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		if (!_Loaded)
 			return 0;
