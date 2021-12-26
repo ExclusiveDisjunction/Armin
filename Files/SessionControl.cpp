@@ -182,7 +182,7 @@ namespace Armin::Files
 
         bool HasEdit = AppState & APS_HasEdit;
 
-        if (HasEdit || EditorRegistry::ApplyableEditorRunning())
+        if (HasEdit || (AppState & APS_AppendableEditorRunning))
         {
             int Result = MessageBoxW(NULL, L"Do you want to save before closing the current project?", L"Armin:", MB_YESNOCANCEL | MB_ICONWARNING);
             if (Result == IDYES)
@@ -230,7 +230,7 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Creating New File...");
 
-        if ((AppState & APS_HasEdit) || (AppState & APS_AppendableEditorOpen))
+        if ((AppState & APS_HasEdit) || (AppState & APS_AppendableEditorRunning))
         {
             int Result = MessageBoxW(nullptr, L"Would you like to save first?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
             if (Result == IDYES)

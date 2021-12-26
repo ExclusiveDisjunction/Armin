@@ -74,22 +74,10 @@ namespace Armin::Editors
         ButtonHosts.Clear();
         FooterHosts.Clear();
         BaseHost = nullptr;
+       
+        AppState &= ~APS_EditorOpen;
     }
 
-    bool EditorRegistry::EditorRunning()
-    {
-        return Info.Size > 0u;
-    }
-    bool EditorRegistry::ApplyableEditorRunning()
-    {
-        for (uint i = 0; i < Info.Size; i++)
-        {
-            if (Info[i]->IsApplyable())
-                return true;
-        }
-
-        return false;
-    }
     Vector<EditorFrame*> EditorRegistry::CurrentApplyableEditors()
     {
         Vector<EditorFrame*> Return;
@@ -380,6 +368,9 @@ namespace Armin::Editors
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Opened Editor \"" + Frame->GetName() + L"\".");
 
+        AppState |= APS_EditorOpen;
+        if (Frame->IsApplyable())
+            AppState |= APS_AppendableEditorRunning;
         return Frame;
     }
 
@@ -421,6 +412,19 @@ namespace Armin::Editors
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Closed Editor \"" + EditorName + L"\".");
 
+        if (Info.Size == 0 && (AppState & APS_EditorOpen))
+            AppState &= ~APS_EditorOpen;
+        if (Info.Size != 0)
+        {
+            bool Apply = false;
+            for (EditorFrame* Item : Info)
+                Apply |= Item->IsApplyable();
+
+            if (Apply)
+                AppState |= APS_AppendableEditorRunning;
+            else
+                AppState &= ~APS_AppendableEditorRunning;
+        }
         return true;
     }
     bool EditorRegistry::CloseAllEditors() 
@@ -495,6 +499,20 @@ namespace Armin::Editors
 
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Closed " + String(ToRemove.Size) + L" editors.");
+
+        if ((AppState & APS_EditorOpen) && Info.Size == 0)
+            AppState &= ~APS_EditorOpen;
+        if (Info.Size != 0)
+        {
+            bool Apply = false;
+            for (EditorFrame* Item : Info)
+                Apply |= Item->IsApplyable();
+
+            if (Apply)
+                AppState |= APS_AppendableEditorRunning;
+            else
+                AppState &= ~APS_AppendableEditorRunning;
+        }
         return Return;
     }
     bool EditorRegistry::ForceCloseAllEditors()
@@ -515,6 +533,8 @@ namespace Armin::Editors
         }
 
         Info.Clear();
+        if (AppState & APS_EditorOpen)
+            AppState &= ~APS_EditorOpen;
         return true;
     }
 }

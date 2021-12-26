@@ -18,11 +18,9 @@ namespace Armin
 		APS_HasAdminUser = 8,
 		APS_HasAssuranceUser = 16,
 		APS_ReadOnly = 32,
-		APS_Saving = 64,
-		APS_Appending = 128,
-		APS_AppendableEditorOpen = 256,
-		APS_EditorOpen = 512,
-		APS_UserRegInit = 1024
+		APS_EditorOpen = 64,
+		APS_AppendableEditorRunning = 128,
+		APS_UserRegInit = 256
 	};
 
 	enum EditorTypes

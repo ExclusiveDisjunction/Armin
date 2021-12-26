@@ -37,8 +37,6 @@ namespace Armin
 			static void RemoveTracking(UI::FooterHost* Footer);
 			static void ExitRegistry();
 
-			static bool EditorRunning();
-			static bool ApplyableEditorRunning();
 			static Vector<EditorFrame*> CurrentApplyableEditors();
 			static Vector<EditorFrame*> CurrentOpenEditors();
 
