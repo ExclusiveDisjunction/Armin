@@ -55,7 +55,7 @@ namespace Armin
 	String LoadedProjectPath;
 	int AppState = 0;
 
-	const String Version = L"2022.2";
+	const String Version = L"2022.1";
 	const String TitleFontName = L"Baskerville Old Face";
 	const String StandardFontName = L"Candara";
 }

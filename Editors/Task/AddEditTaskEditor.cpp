@@ -59,6 +59,7 @@ namespace Armin::Editors::Tasks
 			TextStyle.FontSize = 13;
 			TextStyle.Foreground = FontColor;
 			TextStyle.Alignment = TA_RightAlignment;
+			TextStyle.Bold = true;
 
 			StyleSheet Style;
 			Style.Background = Grey3;
@@ -84,6 +85,7 @@ namespace Armin::Editors::Tasks
 			XCoord += 5 + Width;
 			Width = WndRect.right - (10 + XCoord);
 			TextStyle.Alignment = TA_LeftAlignment;
+			TextStyle.Bold = false;
 
 			Title = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, Target ? Target->Title() : String(), Style, TextStyle, false, false);
 			YCoord += 10 + Height;
@@ -277,6 +279,7 @@ namespace Armin::Editors::Tasks
 		{
 			if (PromptErrors)
 				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("Please assign this task to at least one user."), TEXT("Add Task:"), MB_OK | MB_ICONERROR);
+
 			return false;
 		}
 		if (DueBy == DateTime() || DueBy < DateTime::Now())

@@ -261,7 +261,7 @@ namespace Armin
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return Target ? L"Edit Task" : L"Add Task"; }
-				String GetNotes() const override { return L"The Title feild is required. By default, the Date is set to 1/1/1970.\nA Tilde ('~') is not allowed in any feild."; }
+				String GetNotes() const override { return L"The Title, Due By, and Assigned To feilds as required. By default, the Due By feild is set to No Date.\nA Tilde ('~') is not allowed in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
