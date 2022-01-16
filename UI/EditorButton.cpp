@@ -18,8 +18,14 @@ namespace Armin::UI
 		this->Source = Source;
 		this->Host = Host;
 
+		Source->EditorButtons.Add(this);
+
 		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), NULL, WS_CHILD | WS_VISIBLE, XCoord, YCoord, Width, Height, Parent, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+	}
+	EditorButton::~EditorButton()
+	{
+		Source->EditorButtons.Remove(this);
 	}
 
 	ATOM EditorButton::_ThisAtom = ATOM();
@@ -65,10 +71,16 @@ namespace Armin::UI
 		HDC Dc = BeginPaint(_Base, &ps);
 		SetBkMode(Dc, TRANSPARENT);
 
-		AaColor BkColor = HasMouse ? Accent4 : ((_Clicked || (GetForegroundWindow() == _Base) ? Style.BorderBrush : Style.Background)), BorderColor = Style.BorderBrush, ForegroundColor = TextStyle.Foreground;
+		AaColor BorderColor = 0xFF'FF'FF'FF;
+		AaColor BkColor = (HasMouse || _Clicked || IsWindowVisible(*Source)) ? Accent4 : Style.Background;
+		AaColor ForegroundColor = 0xFF'FF'FF'FF;
 
-		if (GetAncestor(*Source, GA_ROOT) != GetAncestor(_Base, GA_ROOT))
-			BkColor = Accent2;
+		if (HasMouse)
+			BkColor.Reduce(0.8);
+		
+		bool CurrHostIsHost = Host == Source->Host; //Means that the host of the current editor button is the same as the source's host.
+		if (Source->EditorState & EDS_AppendError)
+			BkColor = 0xFF'FF'00'00;
 
 		if (!IsEnabled)
 		{
@@ -76,13 +88,18 @@ namespace Armin::UI
 			ForegroundColor.Reduce(0.7f);
 		}
 
-		HBRUSH BkBrush = CreateSolidBrush(BkColor);
+		HBRUSH BkBrush = CreateSolidBrush(BkColor), Hatchet = CreateHatchBrush(HS_BDIAGONAL, Accent2);;
+		SetBkColor(Dc, BkColor);
 		HPEN Border = CreatePen(PS_SOLID, Style.BorderThickness, BorderColor);
+
+		if (!CurrHostIsHost)
+			SelectObject(Dc, Hatchet);
+		else
+			SelectObject(Dc, BkBrush);
 
 		HFONT Font = CreateFontW(-MulDiv(TextStyle.FontSize, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, (TextStyle.Bold ? FW_BOLD : 0), TextStyle.Italic, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(TextStyle.FontFamily));
 		SetTextColor(Dc, ForegroundColor);
 
-		SelectObject(Dc, BkBrush);
 		SelectObject(Dc, Font);
 		if (Style.BorderThickness == 0)
 			SelectObject(Dc, GetStockObject(NULL_PEN));
@@ -106,6 +123,7 @@ namespace Armin::UI
 		DrawTextW(Dc, Text, TextLen, &WndRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 		DeleteObject(BkBrush);
+		DeleteObject(Hatchet);
 		DeleteObject(Border);
 		DeleteObject(Font);
 

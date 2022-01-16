@@ -160,6 +160,13 @@ namespace Armin::Editors
 		return false;
 	}
 
+	void EditorFrame::CurrentState(int New)
+	{
+		EditorState = New;
+		for (EditorButton* Item : EditorButtons)
+			Item->Redraw();
+	}
+
 	LRESULT __stdcall EditorFrame::EditorProc(EditorFrame* This, HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
 		switch (Message)
@@ -187,12 +194,12 @@ namespace Armin::Editors
 			delete This;
 			return Return;
 		}
-		case WM_SETFOCUS:
-			This->_CurrentState |= EDS_Focus;
-			break;
-		case WM_KILLFOCUS:
-			This->_CurrentState &= ~EDS_Focus;
-			break;
+		case WM_SHOWWINDOW:
+		{
+			for (EditorButton* Item : This->EditorButtons)
+				Item->Redraw();
+			return 0;
+		}
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}

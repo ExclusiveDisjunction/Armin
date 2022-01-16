@@ -326,6 +326,8 @@ namespace Armin::Files
 
         if (Return)
             EditorRegistry::CloseEditor(Host, false);
+        else
+            Host->CurrentState(Host->CurrentState() | EDS_AppendError);
 
         AppState |= APS_HasEdit;     
         return Return;
@@ -336,7 +338,11 @@ namespace Armin::Files
 
         bool Return = true;
         for (uint i = 0; i < Editors.Size; i++)
-            Return &= Apply(Editors[i], false);
+        {
+            EditorFrame* Current = Editors[i];
+            bool Temp = Apply(Current, false);
+            Return &= Temp;
+        }
 
         if (Return)
             MessageBoxW(NULL, L"Apply All was sucessfull.", L"Apply All:", MB_OK | MB_ICONINFORMATION);

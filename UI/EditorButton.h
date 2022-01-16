@@ -31,6 +31,7 @@ namespace Armin
 		public:
 			EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle);
 			EditorButton(int XCoord, int YCoord, int Width, int Height, ControlBase* Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle) : EditorButton(XCoord, YCoord, Width, Height, (!Parent ? NULL : *Parent), ins, Source, Host, Style, TextStyle) {}
+			~EditorButton();
 
 			LRESULT Paint() override;
 			LRESULT Click() override;

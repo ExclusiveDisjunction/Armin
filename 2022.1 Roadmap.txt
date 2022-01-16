@@ -1,6 +1,6 @@
 
 AppStates
-	Centralized numerical value that represents the whole scope of the program, instead of multiple headers. [IN PROGRESS]
+	Centralized numerical value that represents the whole scope of the program, instead of multiple headers. [CURRENT COMPLETE]
 
 File Locking
 	Partitions locked?

@@ -468,6 +468,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="2022.1 Roadmap.txt" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Local ToDo.txt" />

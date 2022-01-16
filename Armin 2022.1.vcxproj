@@ -320,6 +320,7 @@
     <Image Include="Resource\startup.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="2022.1 Roadmap.txt" />
   </ItemGroup>
   <ItemGroup>

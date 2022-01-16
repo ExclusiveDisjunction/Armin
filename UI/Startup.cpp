@@ -150,7 +150,7 @@ namespace Armin::UI
 		Font StdFont(&StdFam, 20);
 		Graph->DrawString(static_cast<const wchar_t*>(Version), -1, &StdFont, VersTextOrig, &WhiteBrush);
 
-		String FooterText = L"Armin | Artwork By: Connor Sellars";
+		String FooterText = L"Armin | Artwork By: Hollan Connor Sellars";
 		Font FooterFont(&StdFam, 13);
 
 		RectF FooterRect(0.0f, Area.Height - 30.0f, static_cast<float>(Area.Width), 30.0f);

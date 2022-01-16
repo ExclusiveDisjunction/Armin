@@ -34,7 +34,6 @@ namespace Armin
 	{
 		EDS_None = 0,
 		EDS_AppendError = 1,
-		EDS_Focus = 2
 	};
 
 	namespace Editors
@@ -95,7 +94,8 @@ namespace Armin
 				_EditorAtom = RegisterClassW(&wn);
 			}
 
-			int _CurrentState = EDS_None;
+			int EditorState = EDS_None;
+			Vector<UI::EditorButton*> EditorButtons;
 
 			inline static LRESULT __stdcall DummyProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 			{
@@ -104,13 +104,13 @@ namespace Armin
 			static LRESULT __stdcall EditorProc(EditorFrame* This, HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 		public:
 			friend EditorRegistry;
+			friend UI::EditorButton;
 			virtual ~EditorFrame();
 
-			int CurrentState() const { return _CurrentState; }
+			int CurrentState() const { return EditorState; }
 			void CurrentState(int New);
 			void ClearState() { CurrentState(0); }
 			EditorHost* const& Host = _Host;
-			Vector<UI::EditorButton*> EditorButtons;
 
 			virtual EditorTypes EditorType() const = 0;
 			virtual bool IsApplyable() const = 0;

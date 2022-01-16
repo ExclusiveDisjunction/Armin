@@ -466,7 +466,12 @@ namespace Armin::Editors
 
                 bool Result = Current->Apply(LoadedProject);
                 if (Result)
+                {
                     ToRemove.Add(Current);
+                    Current->ClearState();
+                }
+                else
+                    Current->CurrentState(Current->CurrentState() | EDS_AppendError);
 
                 Return &= Result;
             }
