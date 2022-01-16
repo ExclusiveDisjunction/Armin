@@ -264,8 +264,32 @@ namespace Armin::Editors::Tasks
 		if (Title.Contains(L'~') || Instructions.Contains(L'~'))
 		{
 			if (PromptErrors)
-				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"The title and instructions cannot contain a tilde (\"~\").", L"Add Task:", MB_OK | MB_ICONERROR);
+				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"The title and instructions feilds cannot contain a tilde (\"~\").", L"Add Task:", MB_OK | MB_ICONERROR);
 			return false;
+		}
+		if (Title.RemoveWhiteSpace() == String())
+		{
+			if (PromptErrors)
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("Please provide a title."), TEXT("Add Task:"), MB_OK | MB_ICONERROR);
+			return false;
+		}
+		if (AssignedTo.Size == 0)
+		{
+			if (PromptErrors)
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("Please assign this task to at least one user."), TEXT("Add Task:"), MB_OK | MB_ICONERROR);
+			return false;
+		}
+		if (DueBy == DateTime() || DueBy < DateTime::Now())
+		{
+			if (PromptErrors)
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("Please supply a due date, and ensure that the date is not before the current date and time."), TEXT("Add Task:"), MB_OK | MB_ICONERROR);
+			return false;
+		}
+		if (Instructions == String())
+		{
+			int Result = MessageBoxW(_Base, TEXT("The Instructions feild was left blank. Was this intentional?"), TEXT("Add Task:"), MB_YESNOCANCEL | MB_ICONWARNING);
+			if (Result != IDYES)
+				return false;
 		}
 
 		Files::Task* New = Target ? Target : new Task(File, Tasks);
