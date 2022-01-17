@@ -60,6 +60,7 @@ namespace Armin::Editors::Inventory
 			TextStyle.FontSize = 13;
 			TextStyle.Alignment = TA_RightAlignment;
 			TextStyle.Foreground = FontColor;
+			TextStyle.Bold = true;
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Serial Number:", EditorGrey, TextStyle, false));
 			YCoord += 10 + Height;
@@ -78,6 +79,7 @@ namespace Armin::Editors::Inventory
 
 			Width = WndRect.right - 10 - XCoord;
 			TextStyle.Alignment = TA_CenterAlignment;
+			TextStyle.Bold = false;
 
 			StyleSheet Style;
 			Style.Background = Grey3;
@@ -243,27 +245,34 @@ namespace Armin::Editors::Inventory
 		if (!Inv)
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"The current Project does not contain an Inventory System.", L"Add Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The current Project does not contain an Inventory System."), TEXT("Add Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 
-		if (SerialNumber == L"")
+		if (SerialNumber.RemoveWhiteSpace() == String())
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"The Serial Number must have a value.", L"Add Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number must have a value."), TEXT("Add Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 		if (SerialNumber.Contains(L'~') || Description.Contains(L'~') || Group.Contains(L'~'))
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"There cannot be a Tilde ('~') character in any feild.", L"Add Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("There cannot be a Tilde ('~') character in any feild."), TEXT("Add Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 		if (Inv->Contains(SerialNumber))
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again.", L"Add Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again."), TEXT("Add Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
+		}
+
+		if (Group.RemoveWhiteSpace() == String())
+		{
+			int Result = MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The group was left blank. Was this intentional?"), TEXT("Add Inventory Item:"), MB_YESNOCANCEL | MB_ICONWARNING);
+			if (Result != IDYES)
+				return false;
 		}
 
 		InventoryItem* New = new InventoryItem(_System, Inv);

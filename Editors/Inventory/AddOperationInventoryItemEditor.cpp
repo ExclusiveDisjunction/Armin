@@ -52,6 +52,7 @@ namespace Armin::Editors::Inventory
 			TextStyle.FontSize = 13;
 			TextStyle.Alignment = TA_RightAlignment;
 			TextStyle.Foreground = FontColor;
+			TextStyle.Bold = true;
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Serial Number:", EditorGrey, TextStyle, false));
 			YCoord += 10 + Height;
@@ -72,6 +73,7 @@ namespace Armin::Editors::Inventory
 			XCoord += 10 + Width;
 
 			TextStyle.Alignment = TA_CenterAlignment;
+			TextStyle.Bold = false;
 
 			StyleSheet Style;
 			Style.Background = Grey3;
@@ -113,8 +115,7 @@ namespace Armin::Editors::Inventory
 
 				Broken = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Broken", CBT_Radio, Style, TextStyle);
 				YCoord += 10 + Height;
-				Width = (OldWidth - 5) / 2;
-				XCoord = (OldX + (OldWidth / 2)) - Width - 2;
+				XCoord = OldX;
 
 				UnderRepair = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Under Repair", CBT_Radio, Style, TextStyle);
 				XCoord += 5 + Width;
@@ -237,8 +238,7 @@ namespace Armin::Editors::Inventory
 
 				Broken->Move(XCoord, YCoord, Width, Height);
 				YCoord += 10 + Height;
-				Width = (OldWidth - 5) / 2;
-				XCoord = (OldX + (OldWidth / 2)) - Width - 2;
+				XCoord = OldX;
 
 				UnderRepair->Move(XCoord, YCoord, Width, Height);
 				XCoord += 5 + Width;
@@ -305,23 +305,30 @@ namespace Armin::Editors::Inventory
 			return false;
 		}
 
-		if (SerialNumber == L"")
+		if (SerialNumber.RemoveWhiteSpace() == String())
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"The Serial Number must have a value.", L"Add Operation Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number must have a value."), TEXT("Add Operation Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 		if (SerialNumber.Contains(L'~') || Description.Contains(L'~') || Group.Contains(L'~'))
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"There cannot be a Tilde ('~') character in any feild.", L"Add Operation Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("There cannot be a Tilde ('~') character in any feild."), TEXT("Add Operation Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
 		if (Inv->Contains(SerialNumber))
 		{
 			if (PromptErrors)
-				MessageBoxW(NULL, L"The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again.", L"Add Operation Inventory Item:", MB_OK | MB_ICONERROR);
+				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again."), TEXT("Add Operation Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
+		}
+
+		if (Group.RemoveWhiteSpace() == String())
+		{
+			int Result = MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The group was left blank. Was this intentional?"), TEXT("Add Operation Inventory Item:"), MB_YESNOCANCEL | MB_ICONWARNING);
+			if (Result != IDYES)
+				return false;
 		}
 
 		OperationInventoryItem* New = new OperationInventoryItem(_System, Inv);
