@@ -8,13 +8,12 @@ namespace Armin::UI
 {
 	using namespace Editors;
 
-	EditorButton::EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, EditorFrame* Source, EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle)
+	EditorButton::EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, EditorFrame* Source, EditorHost* Host, AaColor BaseBk)
 	{
 		if (!_ThisAtom)
 			InitBase(ins);
 
-		this->Style = Style;
-		this->TextStyle = TextStyle;
+		this->_BaseBk = BaseBk;
 		this->Source = Source;
 		this->Host = Host;
 
@@ -71,16 +70,14 @@ namespace Armin::UI
 		HDC Dc = BeginPaint(_Base, &ps);
 		SetBkMode(Dc, TRANSPARENT);
 
-		AaColor BorderColor = 0xFF'FF'FF'FF;
-		AaColor BkColor = (HasMouse || _Clicked || IsWindowVisible(*Source)) ? Accent4 : Style.Background;
+		AaColor BorderColor = Source->EditorState & EDS_AppendError ? 0xFF'FF'00'00 : 0xFF'FF'FF'FF;
+		AaColor BkColor = (HasMouse || _Clicked || IsWindowVisible(*Source)) ? Accent4 : _BaseBk;
 		AaColor ForegroundColor = 0xFF'FF'FF'FF;
 
 		if (HasMouse)
 			BkColor.Reduce(0.8);
 		
 		bool CurrHostIsHost = Host == Source->Host; //Means that the host of the current editor button is the same as the source's host.
-		if (Source->EditorState & EDS_AppendError)
-			BkColor = 0xFF'FF'00'00;
 
 		if (!IsEnabled)
 		{
@@ -90,18 +87,18 @@ namespace Armin::UI
 
 		HBRUSH BkBrush = CreateSolidBrush(BkColor), Hatchet = CreateHatchBrush(HS_BDIAGONAL, Accent2);;
 		SetBkColor(Dc, BkColor);
-		HPEN Border = CreatePen(PS_SOLID, Style.BorderThickness, BorderColor);
+		HPEN Border = CreatePen(PS_SOLID, 3, BorderColor);
 
 		if (!CurrHostIsHost)
 			SelectObject(Dc, Hatchet);
 		else
 			SelectObject(Dc, BkBrush);
 
-		HFONT Font = CreateFontW(-MulDiv(TextStyle.FontSize, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, (TextStyle.Bold ? FW_BOLD : 0), TextStyle.Italic, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(TextStyle.FontFamily));
+		HFONT Font = CreateFontW(-MulDiv(13, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, false, false, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(StandardFontName));
 		SetTextColor(Dc, ForegroundColor);
 
 		SelectObject(Dc, Font);
-		if (Style.BorderThickness == 0)
+		if (3 == 0)
 			SelectObject(Dc, GetStockObject(NULL_PEN));
 		else
 			SelectObject(Dc, Border);
@@ -109,10 +106,7 @@ namespace Armin::UI
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 
-		if (Style.Radius > 0)
-			RoundRect(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom, Style.Radius, Style.Radius);
-		else
-			Rectangle(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom);
+		RoundRect(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom, 20, 20);
 
 		String RawName = Source->GetName();
 		const wchar_t* Text = static_cast<const wchar_t*>(RawName);

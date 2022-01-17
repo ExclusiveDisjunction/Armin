@@ -23,17 +23,6 @@ namespace Armin::Editors
 
 	void EditorButtonHost::AddEditorButton(EditorFrame* Editor)
 	{
-		StyleSheet Style;
-		Style.Background = Accent1;
-		Style.BorderBrush = 0xFFFFFFFF;
-		Style.BorderThickness = 3;
-		Style.Radius = 20;
-
-		TextStyleSheet TextStyle;
-		TextStyle.Foreground = 0xFFFFFFFF;
-		TextStyle.FontFamily = StandardFontName;
-		TextStyle.FontSize = 12;
-
 		RECT WndRect;
 		GetClientRect(this->EditorButtonsBase, &WndRect);
 
@@ -45,7 +34,7 @@ namespace Armin::Editors
 		this->EditorButtonsBase->Move(0, 0, WndRect.right, CurrentEdtBttnY + Height + 10);
 		EditorButtonsScroll->Reset();
 
-		EditorButtons.Add(new EditorButton(XCoord, YCoord, Width, Height, EditorButtonsBase, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(*EditorButtonsBase, GWLP_HINSTANCE)), Editor, this, Style, TextStyle));
+		EditorButtons.Add(new EditorButton(XCoord, YCoord, Width, Height, EditorButtonsBase, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(*EditorButtonsBase, GWLP_HINSTANCE)), Editor, this, Accent1));
 		CurrentEdtBttnY += Height + 10;
 	}
 	void EditorButtonHost::RemoveEditorButton(EditorFrame* Editor)
