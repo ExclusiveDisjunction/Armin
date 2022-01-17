@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -69,10 +70,10 @@ namespace Armin::Editors::Inventory
 				YCoord += 10 + Height;
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;
 
-				ImportCSV = new Button(XCoord, YCoord, Width, Height, L"Import from CSV/Excel", _Base, (HMENU)4, ins, Style, TextStyle);
+				ImportCSV = new StyleButton(XCoord, YCoord, Width, Height, L"Import from CSV/Excel", _Base, (HMENU)4, ins, Style, TextStyle, RECT{0, 0, 0, 5});
 				XCoord += 10 + Width;
 
-				InvSearch = new Button(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)5, ins, Style, TextStyle);
+				InvSearch = new StyleButton(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 
 				XCoord -= 10 + Width;
 				Width = 130;

@@ -1,5 +1,6 @@
 #include "..\EditorFrame.h"
 
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
@@ -66,10 +67,10 @@ namespace Armin::Editors::Inventory
 			{
 				Width = ((WndRect.right / 2) - (10 + XCoord + 10)) / 2;
 
-				Run = new Button(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Run = new StyleButton(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord += 10 + Width;
 
-				SaveResult = new Button(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle);
+				SaveResult = new StyleButton(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord = 10;
 				YCoord += 10 + Height;
 

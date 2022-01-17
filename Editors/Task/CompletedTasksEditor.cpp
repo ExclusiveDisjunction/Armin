@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
@@ -77,7 +78,7 @@ namespace Armin::Editors::Tasks
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;
 				XCoord += Width / 2;
 
-				GoToTasks = new Button(XCoord, YCoord, Width, Height, L"Go to Tasks", _Base, (HMENU)4, ins, Style, TextStyle);
+				GoToTasks = new StyleButton(XCoord, YCoord, Width, Height, L"Go to Tasks", _Base, (HMENU)4, ins, Style, TextStyle, RECT{0, 0, 0, 5});
 				XCoord -= Width / 2;
 				ResetY = YCoord += 10 + Height;
 			}

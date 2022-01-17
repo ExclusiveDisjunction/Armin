@@ -1,5 +1,6 @@
 #include "..\EditorFrame.h"
 
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
@@ -76,7 +77,7 @@ namespace Armin::Editors::RefGroups
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;
 				XCoord += Width / 2;
 
-				Search = new Button(XCoord, YCoord, Width, Height, L"Groups Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Search = new StyleButton(XCoord, YCoord, Width, Height, L"Groups Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{0, 0, 0, 5});
 				XCoord -= Width / 2;
 				ResetY = YCoord += 10 + Height;
 			}

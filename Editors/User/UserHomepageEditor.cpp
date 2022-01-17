@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -68,13 +69,15 @@ namespace Armin::Editors::Users
 			XCoord = 10;
 			Width = (WndRect.right - 10 - XCoord - 20) / 3;
 
-			SignOut = new Button(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)4, ins, Style, TextStyle);
+			RECT StyleRect = { 0, 0, 0, 5 };
+
+			SignOut = new StyleButton(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)4, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
-			Lock = new Button(XCoord, YCoord, Width, Height, L"Lock", _Base, (HMENU)5, ins, Style, TextStyle);
+			Lock = new StyleButton(XCoord, YCoord, Width, Height, L"Lock", _Base, (HMENU)5, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
-			GoToTasks = new Button(XCoord, YCoord, Width, Height, L"Go To Tasks", _Base, (HMENU)6, ins, Style, TextStyle);
+			GoToTasks = new StyleButton(XCoord, YCoord, Width, Height, L"Go To Tasks", _Base, (HMENU)6, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
 			//Timecard = new Button(XCoord, YCoord, Width, Height, L"Timecard", _Base, (HMENU)7, ins, Style, TextStyle);

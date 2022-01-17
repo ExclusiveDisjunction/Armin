@@ -1,5 +1,6 @@
 #include "..\EditorFrame.h"
 
+#include "UI\StyleButton.h"
 #include "..\..\Files\ArminSessions.h"
 
 namespace Armin::Editors::Users
@@ -61,13 +62,13 @@ namespace Armin::Editors::Users
 			{
 				Width = (WndRect.right - (10 + XCoord + 10 + 10)) / 3;
 
-				Search = new Button(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Search = new StyleButton(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord += 10 + Width;
 
-				SaveResult = new Button(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle);
+				SaveResult = new StyleButton(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord += 10 + Width;
 
-				DuplicateResult = new Button(XCoord, YCoord, Width, Height, L"Duplicate Result", _Base, (HMENU)6, ins, Style, TextStyle);
+				DuplicateResult = new StyleButton(XCoord, YCoord, Width, Height, L"Duplicate Result", _Base, (HMENU)6, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 
 				XCoord = 10;
 				Width = 130;

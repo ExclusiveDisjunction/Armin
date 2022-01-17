@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -83,10 +84,10 @@ namespace Armin::Editors::Users
 				YCoord += 10 + Height;
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;				
 
-				Search = new Button(XCoord, YCoord, Width, Height, L"User Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Search = new StyleButton(XCoord, YCoord, Width, Height, L"User Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord += Width + 10;
 
-				SignOut = new Button(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)5, ins, Style, TextStyle);
+				SignOut = new StyleButton(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord -= Width + 10;
 				ResetY = YCoord += 10 + Height;
 			}
