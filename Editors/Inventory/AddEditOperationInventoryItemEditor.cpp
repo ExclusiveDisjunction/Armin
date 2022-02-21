@@ -60,9 +60,6 @@ namespace Armin::Editors::Inventory
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", EditorGrey, TextStyle, false));
 			YCoord += 10 + Height;
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", EditorGrey, TextStyle, false));
-			YCoord += 10 + Height;
-
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Status:", EditorGrey, TextStyle, false));
 			YCoord += 10 + Height;
 			YCoord += 10 + Height;
@@ -173,12 +170,9 @@ namespace Armin::Editors::Inventory
 
 			MiscControls[1]->Move(XCoord, YCoord, Width, Height);
 			YCoord += 10 + Height;
-
-			MiscControls[2]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 10 + Height;
 			YCoord += 10 + Height;
 			
-			MiscControls[3]->Move(XCoord, YCoord, Width, Height);
+			MiscControls[2]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 10 + Width;

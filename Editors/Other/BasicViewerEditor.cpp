@@ -103,9 +103,6 @@ namespace Armin::Editors::Misc
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", BaseBk, TextStyle, false));
 			YCoord += (5 + Height);
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Description:", BaseBk, TextStyle, false));
 
 			YCoord = BaseYCoord;
@@ -163,9 +160,6 @@ namespace Armin::Editors::Misc
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", BaseBk, TextStyle, false));
 			YCoord += (5 + Height);
-
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Description:", BaseBk, TextStyle, false));
 
@@ -298,9 +292,6 @@ namespace Armin::Editors::Misc
 			YCoord += (5 + Height);
 
 			MiscControls[4]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 5 + Height;
-
-			MiscControls[5]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;
@@ -339,9 +330,6 @@ namespace Armin::Editors::Misc
 			YCoord += (5 + Height);
 
 			MiscControls[4]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 5 + Height;
-
-			MiscControls[5]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;

@@ -68,8 +68,6 @@ namespace Armin::Editors::Inventory
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", EditorGrey, TextStyle, false));
 			YCoord += 10 + Height;
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", EditorGrey, TextStyle, false));
-			YCoord += 10 + Height;
 			YCoord += 10 + Height;
 
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Description:", EditorGrey, TextStyle, false));
@@ -97,6 +95,7 @@ namespace Armin::Editors::Inventory
 			SelectGroup = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
 
 			YCoord += Height + 10;
+			XCoord -= (Width - Height);
 
 			IsInPossession = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, true, L"Is In Possession", CBT_CheckBox, Style, TextStyle);
 			YCoord += 10 + Height;
@@ -152,12 +151,9 @@ namespace Armin::Editors::Inventory
 
 			MiscControls[1]->Move(XCoord, YCoord, Width, Height);
 			YCoord += 10 + Height;
+			YCoord += 10 + Height;
 
 			MiscControls[2]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 10 + Height;
-			YCoord += 10 + Height;
-
-			MiscControls[3]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 10 + Width;
