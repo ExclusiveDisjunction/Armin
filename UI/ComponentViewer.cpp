@@ -236,8 +236,12 @@ namespace Armin::UI
 				if (Open)
 				{
 					ComponentTypes Type = Current->ObjectType();
-					if (Type == CT_JobPosition || Type == CT_InventoryItem || Type == CT_OperationInventoryItem)
-						EditorRegistry::OpenEditor(new Editors::Misc::BasicEditorEditor(Current), nullptr);
+					if (Type == CT_JobPosition)
+						EditorRegistry::OpenEditor(new Users::AddEditJobPositionEditor(dynamic_cast<JobPosition*>(Current)), nullptr);
+					else if (Type == CT_InventoryItem)
+						EditorRegistry::OpenEditor(new Inventory::AddEditInventoryItemEditor(dynamic_cast<InventoryItem*>(Current)), nullptr);
+					else if (Type == CT_OperationInventoryItem)
+						EditorRegistry::OpenEditor(new Inventory::AddEditOperationInventoryItemEditor(dynamic_cast<OperationInventoryItem*>(Current)), nullptr);
 					else if (Type == CT_User)
 						EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(dynamic_cast<User*>(Current)), nullptr);
 					else if (Type == CT_Task)
@@ -438,10 +442,16 @@ namespace Armin::UI
 					EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(dynamic_cast<Task*>(_Source)), Parent);
 				break;
 			case CT_InventoryItem:
+				if ((AppState & APS_HasUser))
+					EditorRegistry::OpenEditor(new Inventory::AddEditInventoryItemEditor(dynamic_cast<InventoryItem*>(_Source)), Parent);
+				break;
 			case CT_OperationInventoryItem:
+				if ((AppState & APS_HasUser))
+					EditorRegistry::OpenEditor(new Inventory::AddEditOperationInventoryItemEditor(dynamic_cast<OperationInventoryItem*>(_Source)), Parent);
+				break;
 			case CT_JobPosition:
 				if ((AppState & APS_HasUser))
-					EditorRegistry::OpenEditor(new Misc::BasicEditorEditor(_Source), Parent);
+					EditorRegistry::OpenEditor(new Users::AddEditJobPositionEditor(dynamic_cast<JobPosition*>(_Source)), Parent);
 				break;
 			case CT_User:
 				if ((AppState & APS_HasAdminUser) || CurrentUser == dynamic_cast<Files::User*>(_Source))

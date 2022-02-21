@@ -952,6 +952,8 @@ namespace Armin
 
 		namespace Misc
 		{
+			/*
+			
 			class BasicEditorEditor : public EditorFrame
 			{
 			private:
@@ -966,14 +968,6 @@ namespace Armin
 				Label* L1, * L2; //Labels
 				Vector<ControlBase*> GridList; //For Scroll Viewer
 				Vector<Files::Component*> ComponentList;
-
-				/*
-				* BasicEditor & BasicViewer
-				*
-				* Since the data for each component is diffrent, the basic viewer & editor have 'slot' controls, that can be used to display/edit data about an object.
-				*
-				* Not every slot must be used, and only specific slots will be used/loaded according to which component is targeted.
-				*/
 
 				Files::Component* ThisTarget; //The source and modify location of the current editor.
 				bool _DummySelect;
@@ -1006,6 +1000,8 @@ namespace Armin
 
 				void Reset() override;
 			};
+			*/
+
 			class BasicViewerEditor : public EditorFrame
 			{
 			private:
@@ -1044,6 +1040,7 @@ namespace Armin
 
 				void Reset() override;
 			};
+
 			class QuickSearchEditor : public EditorFrame
 			{
 			private:

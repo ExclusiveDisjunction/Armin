@@ -53,7 +53,7 @@ namespace Armin
 		EDT_ViewEditReferenceGroup = 4'194'304,
 		EDT_ReferenceGroups = 8'388'608,
 
-		EDT_BasicEditor = 16'777'216,
+		//EDT_BasicEditor = 16'777'216,
 		EDT_BasicViewer = 33'554'432,
 		EDT_QuickSearch = 67'108'864,
 		EDT_ProjectSettings = 134'217'728,
@@ -64,6 +64,6 @@ namespace Armin
 		EDT_Welcome = 2'147'483'648,
 
 		EDT_None = 0,
-		EDT_All = EDT_Tasks | EDT_AddEditTask | EDT_ViewTask | EDT_CompleteTask | EDT_CompletedTasks | EDT_ViewCompletedTask | EDT_AddEditRequest | EDT_ViewRequest | EDT_JobPositions | EDT_AddJobEditPosition | EDT_Users | EDT_ViewUser | EDT_CreateEditUser | EDT_UserSearch | EDT_AddEditChecklist | EDT_ViewChecklist | EDT_Inventory | EDT_OperationInventory | EDT_AddEditInventoryItem | EDT_AddEditOperationInventoryItem | EDT_InventorySearch |EDT_AddReferenceGroup | EDT_ViewEditReferenceGroup | EDT_ReferenceGroups | EDT_BasicEditor | EDT_BasicViewer | EDT_QuickSearch | EDT_ProjectSettings | EDT_Settings | EDT_UserHomepage | EDT_Welcome
+		EDT_All = EDT_Tasks | EDT_AddEditTask | EDT_ViewTask | EDT_CompleteTask | EDT_CompletedTasks | EDT_ViewCompletedTask | EDT_AddEditRequest | EDT_ViewRequest | EDT_JobPositions | EDT_AddJobEditPosition | EDT_Users | EDT_ViewUser | EDT_CreateEditUser | EDT_UserSearch | EDT_AddEditChecklist | EDT_ViewChecklist | EDT_Inventory | EDT_OperationInventory | EDT_AddEditInventoryItem | EDT_AddEditOperationInventoryItem | EDT_InventorySearch |EDT_AddReferenceGroup | EDT_ViewEditReferenceGroup | EDT_ReferenceGroups | EDT_QuickSearch | EDT_ProjectSettings | EDT_Settings | EDT_UserHomepage | EDT_Welcome | EDT_BasicViewer
 	};
 }

@@ -36,12 +36,6 @@
     <ClCompile Include="Editors\Inventory\OperationInventoryEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Other\BasicEditorEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editors\Other\BasicViewerEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Editors\Other\ProjectSettingsEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -286,6 +280,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Other\WelcomeEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editors\Other\BasicViewerEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

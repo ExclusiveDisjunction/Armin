@@ -168,6 +168,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Editors\Other\BasicViewerEditor.cpp" />
     <ClCompile Include="Editors\Other\WelcomeEditor.cpp" />
     <ClCompile Include="Files\Checklist.cpp" />
     <ClCompile Include="Common.cpp" />
@@ -182,8 +183,6 @@
     <ClCompile Include="Editors\Inventory\InventoryEditor.cpp" />
     <ClCompile Include="Editors\Inventory\InventorySearchEditor.cpp" />
     <ClCompile Include="Editors\Inventory\OperationInventoryEditor.cpp" />
-    <ClCompile Include="Editors\Other\BasicEditorEditor.cpp" />
-    <ClCompile Include="Editors\Other\BasicViewerEditor.cpp" />
     <ClCompile Include="Editors\Other\ProjectSettingsEditor.cpp" />
     <ClCompile Include="Editors\Other\QuickSearchEditor.cpp" />
     <ClCompile Include="Editors\Other\SettingsEditor.cpp" />

@@ -297,11 +297,26 @@ namespace Armin::Editors::Inventory
 				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("There cannot be a Tilde ('~') character in any feild."), TEXT("Add Operation Inventory Item:"), MB_OK | MB_ICONERROR);
 			return false;
 		}
-		if (Inv->Contains(SerialNumber))
+
+		if (Inv->Count != 0)
 		{
-			if (PromptErrors)
-				MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again."), TEXT("Add Operation Inventory Item:"), MB_OK | MB_ICONERROR);
-			return false;
+			OperationInventoryItem* TTarget = nullptr;
+
+			if (Target)
+				TTarget = dynamic_cast<OperationInventoryItem*>(Target->Target());
+
+			for (OperationInventoryItem* Current = Inv->Item(0); Current != nullptr; Current = Current->Next)
+			{
+				if (Current == TTarget)
+					continue;
+
+				if (Current->SerialNumber == SerialNumber)
+				{
+					if (PromptErrors)
+						MessageBox(GetAncestor(_Base, GA_ROOT), TEXT("The Serial Number provided is non-unique.\n\nPlease provide a unique Serial Number and try again."), TEXT("Add Inventory Item:"), MB_OK | MB_ICONERROR);
+					return false;
+				}
+			}
 		}
 
 		if (Group.RemoveWhiteSpace() == String())
