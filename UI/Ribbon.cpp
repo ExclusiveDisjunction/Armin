@@ -549,13 +549,13 @@ namespace Armin::UI
 			EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
 			break;
 		case 51: //AddInvItem
-			EditorRegistry::OpenEditor(new Inventory::AddInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new Inventory::AddEditInventoryItemEditor(), nullptr);
 			break;
 		case 52: //Oper inventory
 			EditorRegistry::OpenEditor(new Inventory::OperationInventoryEditor(nullptr), nullptr);
 			break;
 		case 53: //Add oper inventory item
-			EditorRegistry::OpenEditor(new Inventory::AddOperationInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new Inventory::AddEditOperationInventoryItemEditor(), nullptr);
 			break;
 		case 54: //Inventory Search
 			EditorRegistry::OpenEditor(new Inventory::InventorySearchEditor(nullptr, true), nullptr);

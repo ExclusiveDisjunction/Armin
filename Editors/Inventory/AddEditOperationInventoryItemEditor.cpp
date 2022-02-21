@@ -10,30 +10,38 @@ namespace Armin::Editors::Inventory
 	using namespace Files;
 	using namespace UI::Tool;
 
-	AddOperationInventoryItemEditor::AddOperationInventoryItemEditor()
+	AddEditOperationInventoryItemEditor::AddEditOperationInventoryItemEditor(OperationInventoryItem* ToEdit)
 	{
+		if (ToEdit)
+			Target = new ComponentReference(ToEdit);
+		else
+			Target = nullptr;
 	}
 
-	LRESULT __stdcall AddOperationInventoryItemEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	LRESULT __stdcall AddEditOperationInventoryItemEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
-		AddOperationInventoryItemEditor* This = reinterpret_cast<AddOperationInventoryItemEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		AddEditOperationInventoryItemEditor* This = reinterpret_cast<AddEditOperationInventoryItemEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!This)
 			return DefWindowProcW(Window, Message, wp, lp);
 
 		return EditorProc(This, Window, Message, wp, lp);
 	}
 
-	void AddOperationInventoryItemEditor::LoadControls()
+	void AddEditOperationInventoryItemEditor::LoadControls()
 	{
 		int BaseXCoord = 10;
 		int BaseYCoord = this->BaseYCoord;
 
-		_Loaded = true;
+		if (Target && !Target->Target())
+		{
+			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"The target Inventory Item has been deleted or moved. The editor will now add a new inventory item.", L"Error:", MB_OK | MB_ICONERROR);
+			delete Target;
+			Target = nullptr;
+		}
 
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
-		OperationInventoryItemGroup* Inventory = !File ? nullptr : File->OperationInventoryItems;
-		if (!File || !Inventory)
-			return;
+		OperationInventoryItem* TrueTarget = !Target ? nullptr : dynamic_cast<OperationInventoryItem*>(Target->Target());
+
+		_Loaded = true;
 
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
@@ -80,11 +88,11 @@ namespace Armin::Editors::Inventory
 			Style.Radius = 15;
 
 			Width = WndRect.right - 10 - XCoord;
-			SerialNumber = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, L"", Style, TextStyle);
+			SerialNumber = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, TrueTarget ? TrueTarget->SerialNumber : String(), Style, TextStyle);
 
 			YCoord += Height + 10;
 
-			Group = new TextBox(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, L"", Style, TextStyle);
+			Group = new TextBox(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, TrueTarget ? TrueTarget->Group : String(), Style, TextStyle);
 			XCoord += (Width - Height);
 			SelectGroup = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
 			
@@ -97,20 +105,20 @@ namespace Armin::Editors::Inventory
 
 				Width = (Width - 10) / 3;
 
-				WorkingOrder = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, true, L"Working Order", CBT_Radio, Style, TextStyle);
+				WorkingOrder = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->CurrentState == OperationInventoryItem::IS_WorkingOrder : true, L"Working Order", CBT_Radio, Style, TextStyle);
 				XCoord += 5 + Width;
 
-				PartialWorkingOrder = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Partial Working Order", CBT_Radio, Style, TextStyle);
+				PartialWorkingOrder = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->CurrentState == OperationInventoryItem::IS_PartialWorkingOrder : false, L"Partial Working Order", CBT_Radio, Style, TextStyle);
 				XCoord += 5 + Width;
 
-				Broken = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Broken", CBT_Radio, Style, TextStyle);
+				Broken = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->CurrentState == OperationInventoryItem::IS_Broken : false, L"Broken", CBT_Radio, Style, TextStyle);
 				YCoord += 10 + Height;
 				XCoord = OldX;
 
-				UnderRepair = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Under Repair", CBT_Radio, Style, TextStyle);
+				UnderRepair = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->CurrentState == OperationInventoryItem::IS_UnderRepair : false, L"Under Repair", CBT_Radio, Style, TextStyle);
 				XCoord += 5 + Width;
 
-				NotInPossession = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, false, L"Not In Possession", CBT_Radio, Style, TextStyle);
+				NotInPossession = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->CurrentState == OperationInventoryItem::IS_NotInPossession : false, L"Not In Possession", CBT_Radio, Style, TextStyle);
 				XCoord += 5 + Width;
 
 				XCoord = OldX;
@@ -120,11 +128,11 @@ namespace Armin::Editors::Inventory
 			YCoord += 10 + Height;
 			Height = WndRect.bottom - (YCoord + 10);
 
-			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, L"", Style, TextStyle, true);
+			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, TrueTarget ? TrueTarget->Description : String(), Style, TextStyle, true);
 		}
 	}
 
-	LRESULT AddOperationInventoryItemEditor::Command(WPARAM wp, LPARAM lp)
+	LRESULT AddEditOperationInventoryItemEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		switch (wp)
 		{
@@ -137,7 +145,7 @@ namespace Armin::Editors::Inventory
 		}
 		return 0;
 	}
-	LRESULT AddOperationInventoryItemEditor::KeyDown(WPARAM Key)
+	LRESULT AddEditOperationInventoryItemEditor::KeyDown(WPARAM Key)
 	{
 		if (Key == VK_ESCAPE)
 			Command(1, 0);
@@ -146,7 +154,7 @@ namespace Armin::Editors::Inventory
 
 		return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
 	}
-	LRESULT AddOperationInventoryItemEditor::Size()
+	LRESULT AddEditOperationInventoryItemEditor::Size()
 	{
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
@@ -223,20 +231,28 @@ namespace Armin::Editors::Inventory
 
 		return 0;
 	}
-	LRESULT AddOperationInventoryItemEditor::Destroy()
+	LRESULT AddEditOperationInventoryItemEditor::Destroy()
 	{
 		return 0;
 	}
 
-	void AddOperationInventoryItemEditor::Reset()
+	void AddEditOperationInventoryItemEditor::Reset()
 	{
 		SerialNumber->SetText(String());
 		Description->SetText(String());
 		Group->SetText(String());
 		WorkingOrder->SetCheckState(true);
 	}
-	bool AddOperationInventoryItemEditor::Apply(ProjectBase* File, bool PromptErrors)
+	bool AddEditOperationInventoryItemEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
+		if (Target && !Target->Target())
+		{
+			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"This Operation Inventory Item has already been deleted, and cannot be edited anymore.", L"Error:", MB_OK | MB_ICONERROR);
+			EditorRegistry::CloseEditor(this, false);
+			return false;
+		}
+
+
 		String SerialNumber = this->SerialNumber->GetText();
 		String Description = this->Description->GetText();
 		String Group = this->Group->GetText();
@@ -295,7 +311,7 @@ namespace Armin::Editors::Inventory
 				return false;
 		}
 
-		OperationInventoryItem* New = new OperationInventoryItem(_System, Inv);
+		OperationInventoryItem* New = Target ? dynamic_cast<OperationInventoryItem*>(Target->Target()) : new OperationInventoryItem(_System, Inv);
 		New->SerialNumber = SerialNumber;
 		New->Description = Description;
 		New->Group = Group;
@@ -306,8 +322,20 @@ namespace Armin::Editors::Inventory
 
 		return true;
 	}
-	bool AddOperationInventoryItemEditor::TestOnCondition(Vector<void*> Args) const
+	Vector<void*> AddEditOperationInventoryItemEditor::CondenseArgs() const
 	{
-		return true;
+		return Target ? Target->Target() : Vector<void*>();
+	}
+	bool AddEditOperationInventoryItemEditor::TestOnCondition(Vector<void*> Args) const
+	{
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target->Target();
+		return false;
+	}
+	bool AddEditOperationInventoryItemEditor::EquatableTo(EditorFrame* Other) const
+	{
+		if (Target)
+			return dynamic_cast<AddEditOperationInventoryItemEditor*>(Other) != nullptr && Other->TestOnCondition(CondenseArgs());
+		return false;
 	}
 }

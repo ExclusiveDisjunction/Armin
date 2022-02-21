@@ -18,16 +18,15 @@ namespace Armin
 		class ProjectBase;
 		class CompletedTask;
 		class Component;
-		class Image;
+		class InventoryItem;
 		class JobPosition;
 		class InventorySystem;
+		class OperationInventoryItem;
 		class User;
 		class UserSystem;
 		class RefrenceGroup;
-		class ResourceSystem;
 		class Task;
 		class TaskSystem;
-		class TimecardEntry;
 	}
 
 	enum EditorStates
@@ -723,9 +722,11 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class AddInventoryItemEditor : public EditorFrame
+			class AddEditInventoryItemEditor : public EditorFrame
 			{
 			private:
+				Files::ComponentReference* Target; //If Target == nullptr, then it is adding. If Target != nullptr && Target->Target() == nullptr, the component was deleted. 
+
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* IsInPossession;
 				Button* SelectGroup;
@@ -739,24 +740,26 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddInventoryItemEditor();
+				AddEditInventoryItemEditor(Files::InventoryItem* ToEdit = nullptr);
 
 				EditorTypes EditorType() const override { return EDT_AddEditInventoryItem; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				Vector<void*> CondenseArgs() const override;
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Inventory Item"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Inventory Item" : L"Add Inventory Item"; }
 				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class AddOperationInventoryItemEditor : public EditorFrame
+			class AddEditOperationInventoryItemEditor : public EditorFrame
 			{
 			private:
+				Files::ComponentReference* Target;
+
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* WorkingOrder, * PartialWorkingOrder, * Broken, * UnderRepair, * NotInPossession;
 				Button* SelectGroup;
@@ -770,16 +773,16 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddOperationInventoryItemEditor();
+				AddEditOperationInventoryItemEditor(Files::OperationInventoryItem* Target = nullptr);
 
 				EditorTypes EditorType() const override { return EDT_AddEditOperationInventoryItem; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
 				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				Vector<void*> CondenseArgs() const override;
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Operation Inventory Item"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Operation Inventory Item" : L"Add Operation Inventory Item"; }
 				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 

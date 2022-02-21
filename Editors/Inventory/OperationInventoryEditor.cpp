@@ -142,7 +142,7 @@ namespace Armin::Editors::Inventory
 			EditorRegistry::OpenEditor(new InventorySearchEditor(_System, false), nullptr);
 			break;
 		case 5: //Add
-			EditorRegistry::OpenEditor(new AddOperationInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new AddEditOperationInventoryItemEditor(), nullptr);
 			break;
 		case 6: //Remove
 		{

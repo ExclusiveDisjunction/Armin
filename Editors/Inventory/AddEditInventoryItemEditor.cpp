@@ -10,38 +10,38 @@ namespace Armin::Editors::Inventory
 	using namespace Files;
 	using namespace UI::Tool;
 
-	AddInventoryItemEditor::AddInventoryItemEditor()
+	AddEditInventoryItemEditor::AddEditInventoryItemEditor(InventoryItem* ToEdit)
 	{
+		if (ToEdit)
+			Target = new ComponentReference(ToEdit);
+		else
+			Target = nullptr;
 	}
 
-	LRESULT __stdcall AddInventoryItemEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	LRESULT __stdcall AddEditInventoryItemEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
-		AddInventoryItemEditor* This = reinterpret_cast<AddInventoryItemEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		AddEditInventoryItemEditor* This = reinterpret_cast<AddEditInventoryItemEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!This)
 			return DefWindowProcW(Window, Message, wp, lp);
 
 		return EditorProc(This, Window, Message, wp, lp);
 	}
 
-	void AddInventoryItemEditor::LoadControls()
+	void AddEditInventoryItemEditor::LoadControls()
 	{
 		int BaseXCoord = 10;
 		int BaseYCoord = this->BaseYCoord;
 
-		_Loaded = true;
-
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
-		InventoryItemGroup* Inventory = !File ? nullptr : File->InventoryItems;
-		if (!File || !Inventory)
-			return;
-
-		StringList Groups;
-		for (uint i = 0; i < Inventory->Count; i++)
+		if (Target && !Target->Target())
 		{
-			String Current = Inventory->Item(i)->Group;
-			if (!Groups.Contains(Current))
-				Groups.Add(Current);
+			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"The target Inventory Item has been deleted or moved. The editor will now add a new inventory item.", L"Error:", MB_OK | MB_ICONERROR);
+			delete Target;
+			Target = nullptr;
 		}
+
+		InventoryItem* TrueTarget = !Target ? nullptr : dynamic_cast<InventoryItem*>(Target->Target());
+
+		_Loaded = true;
 
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
@@ -86,26 +86,26 @@ namespace Armin::Editors::Inventory
 			Style.BaseBackground = EditorGrey;
 			Style.Radius = 15;
 
-			SerialNumber = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle);
+			SerialNumber = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, TrueTarget ? TrueTarget->SerialNumber : String(), Style, TextStyle);
 
 			YCoord += Height + 10;
 
-			Group = new TextBox(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, String(), Style, TextStyle);
+			Group = new TextBox(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, TrueTarget ? TrueTarget->Group : String(), Style, TextStyle);
 			XCoord += (Width - Height);
 			SelectGroup = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
 
 			YCoord += Height + 10;
 			XCoord -= (Width - Height);
 
-			IsInPossession = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, true, L"Is In Possession", CBT_CheckBox, Style, TextStyle);
+			IsInPossession = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, TrueTarget ? TrueTarget->IsInPossession : true, L"Is In Possession", CBT_CheckBox, Style, TextStyle);
 			YCoord += 10 + Height;
 			Height = WndRect.bottom - 10 - Height;
 
-			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, String(), Style, TextStyle, true, false);
+			Description = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, TrueTarget ? TrueTarget->Description : String(), Style, TextStyle, true, false);
 		}
 	}
 
-	LRESULT AddInventoryItemEditor::Command(WPARAM wp, LPARAM lp)
+	LRESULT AddEditInventoryItemEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		switch (wp)
 		{
@@ -118,7 +118,7 @@ namespace Armin::Editors::Inventory
 		}
 		return 0;
 	}
-	LRESULT AddInventoryItemEditor::KeyDown(WPARAM Key)
+	LRESULT AddEditInventoryItemEditor::KeyDown(WPARAM Key)
 	{
 		if (Key == VK_ESCAPE)
 			Command(1, 0);
@@ -127,7 +127,7 @@ namespace Armin::Editors::Inventory
 
 		return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
 	}
-	LRESULT AddInventoryItemEditor::Size()
+	LRESULT AddEditInventoryItemEditor::Size()
 	{
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
@@ -179,20 +179,27 @@ namespace Armin::Editors::Inventory
 
 		return 0;
 	}
-	LRESULT AddInventoryItemEditor::Destroy()
+	LRESULT AddEditInventoryItemEditor::Destroy()
 	{
 		return 0;
 	}
 
-	void AddInventoryItemEditor::Reset()
+	void AddEditInventoryItemEditor::Reset()
 	{
 		SerialNumber->SetText(String());
 		Description->SetText(String());
 		Group->SetText(String());
 		IsInPossession->SetCheckState(true);
 	}
-	bool AddInventoryItemEditor::Apply(ProjectBase* File, bool PromptErrors)
+	bool AddEditInventoryItemEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
+		if (Target && !Target->Target())
+		{
+			MessageBoxW(GetAncestor(_Base, GA_ROOT), L"This Inventory Item has already been deleted, and cannot be edited anymore.", L"Error:", MB_OK | MB_ICONERROR);
+			EditorRegistry::CloseEditor(this, false);
+			return false;
+		}
+
 		String SerialNumber = this->SerialNumber->GetText();
 		String Description = this->Description->GetText();
 		String Group = this->Group->GetText();
@@ -240,7 +247,7 @@ namespace Armin::Editors::Inventory
 				return false;
 		}
 
-		InventoryItem* New = new InventoryItem(_System, Inv);
+		InventoryItem* New = Target ? dynamic_cast<InventoryItem*>(Target->Target()) : new InventoryItem(_System, Inv);
 		New->SerialNumber = SerialNumber;
 		New->Description = Description;
 		New->Group = Group;
@@ -251,8 +258,20 @@ namespace Armin::Editors::Inventory
 
 		return true;
 	}
-	bool AddInventoryItemEditor::TestOnCondition(Vector<void*> Args) const
+	Vector<void*> AddEditInventoryItemEditor::CondenseArgs() const
 	{
-		return true;
+		return Target ? Target->Target() : Vector<void*>();
+	}
+	bool AddEditInventoryItemEditor::TestOnCondition(Vector<void*> Args) const
+	{
+		if (Target)
+			return Args.Size != 0 && Args[0] == Target->Target();
+		return false;
+	}
+	bool AddEditInventoryItemEditor::EquatableTo(EditorFrame* Other) const
+	{
+		if (Target)
+			return dynamic_cast<AddEditInventoryItemEditor*>(Other) != nullptr && Other->TestOnCondition(CondenseArgs());
+		return false;
 	}
 }
