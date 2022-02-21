@@ -144,23 +144,6 @@ namespace Armin::Files
         if (UserSys && FooterOutput) //If the main window has already been loaded, then prompt a sign in.
             SignIn();
 
-        ResourceSystem* Resources = dynamic_cast<ResourceSystem*>(LoadedProject);
-        if (Resources)
-        {
-            Vector<AString> Missing;
-            bool Result = Resources->CheckResources(Missing);
-            if (!Result)
-            {
-                String Text = L"The following resource files could not be found:\n";
-                for (AString Item : Missing)
-                    Text += L'\n' + (String)Item;
-
-                Text += L"\n\nPlease re-locate the files to the current project to access the resources.";
-
-                MessageBoxW(NULL, (LPCWSTR)Text, L"Resources:", MB_OK | MB_ICONWARNING);
-            }
-        }
-
         {
             InventorySystem* Conv = dynamic_cast<InventorySystem*>(LoadedProject);
             if (Conv && !UserSys && FooterOutput)

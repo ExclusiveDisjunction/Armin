@@ -131,9 +131,6 @@ namespace Armin::Editors::Misc
 			OperationInventoryItems = new CheckableButton(XCoord, YCoord, Width, Height, TypesView, ins, NULL, Filter & CT_OperationInventoryItem, L"Operation Inventory Items", CBT_CheckBox, Style, TextStyle);
 			YCoord += 5 + Height;
 
-			Images = new CheckableButton(XCoord, YCoord, Width, Height, TypesView, ins, NULL, Filter & CT_Image, L"Images", CBT_CheckBox, Style, TextStyle);
-			YCoord += 5 + Height;
-
 			RefrenceGroups = new CheckableButton(XCoord, YCoord, Width, Height, TypesView, ins, NULL, Filter & CT_RefrenceGroup, L"Refrence Groups", CBT_CheckBox, Style, TextStyle);
 		}
 
@@ -392,14 +389,13 @@ namespace Armin::Editors::Misc
 		CompletedTasks->SetCheckState(Filter & CT_CompletedTask);
 		InventoryItems->SetCheckState(Filter & CT_InventoryItem);
 		JobPositions->SetCheckState(Filter & CT_JobPosition);
-		Images->SetCheckState(Filter & CT_Image);
 		OperationInventoryItems->SetCheckState(Filter & CT_OperationInventoryItem);
 		RefrenceGroups->SetCheckState(Filter & CT_RefrenceGroup);
 	}
 	void QuickSearchEditor::RunSearch()
 	{
 		String Criteria = SearchCriteria->GetText();
-		int AllowedTypes = (Users->GetCheckState() ? CT_User : 0) | (Tasks->GetCheckState() ? CT_Task : 0) | (CompletedTasks->GetCheckState() ? CT_CompletedTask : 0) | (InventoryItems->GetCheckState() ? CT_InventoryItem : 0) | (JobPositions->GetCheckState() ? CT_JobPosition : 0) | (Images->GetCheckState() ? CT_ConfigItem : 0) | (OperationInventoryItems->GetCheckState() ? CT_OperationInventoryItem : 0) | (RefrenceGroups->GetCheckState() ? CT_RefrenceGroup : 0);
+		int AllowedTypes = (Users->GetCheckState() ? CT_User : 0) | (Tasks->GetCheckState() ? CT_Task : 0) | (CompletedTasks->GetCheckState() ? CT_CompletedTask : 0) | (InventoryItems->GetCheckState() ? CT_InventoryItem : 0) | (JobPositions->GetCheckState() ? CT_JobPosition : 0) | (OperationInventoryItems->GetCheckState() ? CT_OperationInventoryItem : 0) | (RefrenceGroups->GetCheckState() ? CT_RefrenceGroup : 0);
 
 		class SearchCriteria CriteriaObj;
 		CriteriaObj.AllowedTypes = AllowedTypes;

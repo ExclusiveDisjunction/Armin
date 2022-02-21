@@ -119,12 +119,6 @@ namespace Armin::Files
 			else if (Name == "Description") Description = (String)Value.ReplaceChar('`', '\n');
 			else if (Name == "Group") Group = (String)Value;
 			else if (Name == "CurrentState") CurrentState = (ItemState)Value.ToInt();
-			else if (Name == "TargetImage")
-			{
-				unsigned long long ID = Value.ToULong();
-				Component* Target = _ParentFile->GetFromID(ID, CT_Image);
-				TargetImage = new ComponentReference(Target);
-			}
 			else if (Name == "ID") _ID = Value.ToLong();
 		}
 	}
@@ -135,7 +129,7 @@ namespace Armin::Files
 			TabIndexValue += "\t";
 
 		OutFile << TabIndexValue << "begin~OperationInventoryItem";
-		OutFile << "~SerialNumber:" << SerialNumber << "~Description:" << Description.ReplaceChar('\n', '`') << "~Group:" << Group << "~CurrentState:" << (int)CurrentState << "~TargetImage:" << (!TargetImage || !TargetImage->Target() ? 0 : TargetImage->Target()->ID) << "~ID:" << _ID;
+		OutFile << "~SerialNumber:" << SerialNumber << "~Description:" << Description.ReplaceChar('\n', '`') << "~Group:" << Group << "~CurrentState:" << (int)CurrentState << "~ID:" << _ID;
 
 		OutFile << "~end" << endl;
 	}

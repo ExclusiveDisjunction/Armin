@@ -21,10 +21,10 @@
     <ClCompile Include="Recent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Inventory\AddInventoryItemEditor.cpp">
+    <ClCompile Include="Editors\Inventory\AddEditInventoryItemEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Inventory\AddOperationInventoryItemEditor.cpp">
+    <ClCompile Include="Editors\Inventory\AddEditOperationInventoryItemEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\Inventory\InventoryEditor.cpp">
@@ -60,12 +60,6 @@
     <ClCompile Include="Editors\RefGroups\ViewEditRefrenceGroupEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Resources\ImagesEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editors\Resources\ViewImageEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Editors\Task\AddEditTaskEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,9 +78,6 @@
     <ClCompile Include="Editors\Task\ViewTaskEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Editors\Timecards\Timeclock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Editors\User\AddEditJobPositionEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,9 +85,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editors\User\TimecardsEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Editors\User\UserHomepageEditor.cpp">
@@ -123,9 +111,6 @@
     <ClCompile Include="Editors\EditorRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\ArminSessions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Files\BaseTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,9 +121,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\ConfigItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\InventoryItem.cpp">
@@ -165,9 +147,6 @@
     <ClCompile Include="Files\Task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\TimecardEntry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Files\User.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -175,9 +154,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\Tool\ComponentListRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Tool\CreateImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\Tool\DatePicker.cpp">
@@ -357,9 +333,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Tool\ComponentListRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Tool\CreateImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Tool\DatePicker.h">

@@ -21,12 +21,10 @@ namespace Armin::UI
 		InventorySystem* RInvFile = dynamic_cast<InventorySystem*>(Current);
 		UserSystem* RUsrFile = dynamic_cast<UserSystem*>(Current);
 		TaskSystem* RTskFile = dynamic_cast<TaskSystem*>(Current);
-		ResourceSystem* RRcFile = dynamic_cast<ResourceSystem*>(Current);
 
 		bool InventoryFile = RInvFile != nullptr,
 			UserFile = RUsrFile != nullptr,
-			TaskFile = RTskFile != nullptr,
-			ResourceFile = RRcFile != nullptr;
+			TaskFile = RTskFile != nullptr;
 
 		bool File = AppState & APS_FileLoaded;
 		bool User = !UserFile ? true : (AppState & APS_HasUser);
@@ -39,17 +37,15 @@ namespace Armin::UI
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
 			(InventoryFile && SignedIn ? CT_OperationInventoryItem : 0) |
 			(TaskFile && SignedIn ? CT_Task | CT_CompletedTask : 0) |
-			(UserFile && SignedIn ? CT_User | CT_JobPosition : 0) | 
-			(File && SignedIn ? CT_RefrenceGroup : 0) |
-			(ResourceFile && SignedIn ? CT_Image : 0);
+			(UserFile && SignedIn ? CT_User | CT_JobPosition : 0) |
+			(File && SignedIn ? CT_RefrenceGroup : 0);
 		int AllowedForEdit = !File ? 0 :
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
 			(InventoryFile && SignedIn ? CT_OperationInventoryItem : 0) |
 			(TaskFile && AdminSignedIn ? CT_Task : 0) |
 			(UserFile && AdminSignedIn ? CT_User : 0) |
 			(UserFile && SignedIn ? CT_JobPosition : 0) |
-			(File && SignedIn ? CT_RefrenceGroup : 0) | 
-			(ResourceFile && SignedIn ? CT_Image : 0);
+			(File && SignedIn ? CT_RefrenceGroup : 0);
 
 		HideRibbonGrids();
 		ShowWindow(*FileGrid, SW_SHOW);
@@ -72,9 +68,6 @@ namespace Armin::UI
 			EnableWindow(*ProjectSettingsCmd, AdminSignedIn);
 			EnableWindow(*RefrenceGroupsCmd, SignedIn);
 			EnableWindow(*QuickSearchCmd, SignedIn);
-
-			EnableWindow(*ViewImages, AllowedForEdit & CT_Image);
-			EnableWindow(*CreateImage, AllowedForEdit & CT_Image);
 		}
 
 		//Tasks
@@ -257,12 +250,6 @@ namespace Armin::UI
 			XCoord += 12 + Width;
 
 			QuickSearchCmd = new Button(XCoord, YCoord, Width, Height, L"Quick Search", EditGrid, (HMENU)33, ins, Style, TextStyle);
-			XCoord += 12 + Width;
-
-			ViewImages = new Button(XCoord, YCoord, Width, Height, L"Images", EditGrid, (HMENU)38, ins, Style, TextStyle);
-			XCoord += 3 + Width;
-
-			CreateImage = new Button(XCoord, YCoord, Width, Height, L"Create Image", EditGrid, (HMENU)39, ins, Style, TextStyle);
 		}
 
 		{
@@ -342,11 +329,6 @@ namespace Armin::UI
 
 			JobPositions = new Button(XCoord, YCoord, Width, Height, L"Positions", UserGrid, (HMENU)67, ins, Style, TextStyle);
 			XCoord += 12 + Width;
-
-			//TimecardCmd = new Button(XCoord, YCoord, Width, Height, L"Timecard", UserGrid, (HMENU)68, ins, Style, TextStyle);
-			//XCoord += 3 + Width;
-
-			//TimeclockCmd = new Button(XCoord, YCoord, Width, Height, L"Timeclock", UserGrid, (HMENU)69, ins, Style, TextStyle);
 		}
 
 		{
@@ -536,14 +518,9 @@ namespace Armin::UI
 		case 35: //Unused
 		case 36: //Unused
 		case 37: //Unused
-		case 38: //Images
-			EditorRegistry::OpenEditor(new Resources::ImagesEditor(), nullptr);
+		case 38: //Unused
+		case 39: //Unused
 			break;
-		case 39: //CreateImage			
-		{
-			Image* Target = Tool::CreateImage::Execute(ins, false);
-			break;
-		}
 
 			//Tasks
 		case 40: //Tasks
@@ -622,11 +599,8 @@ namespace Armin::UI
 		case 67: //JobPositions
 			EditorRegistry::OpenEditor(new Users::JobPositionsEditor(nullptr), nullptr);
 			break;
-		case 68: //Timecard
-			EditorRegistry::OpenEditor(new Users::TimecardsEditor(CurrentUser), nullptr);
-			break;
-		case 69: //Timeclock
-			//EditorRegistry::OpenEditor(new Timecards::TimeclockEditor(), nullptr);
+		case 68: //Unused
+		case 69: //Unused
 			break;
 
 			//Window

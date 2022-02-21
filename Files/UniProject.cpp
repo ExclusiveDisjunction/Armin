@@ -23,7 +23,6 @@ namespace Armin::Files
 		delete Positions;
 		delete Tasks;
 		delete CompletedTasks;
-		delete Images;
 		delete Checklists;
 		delete Requests;
 
@@ -44,8 +43,6 @@ namespace Armin::Files
 			InventoryItems = new InventoryItemGroup(this, this);
 			OperationInventoryItems = new OperationInventoryItemGroup(this, this);
 		}
-		if (Config & UPC_Resource)
-			Images = new ImageList(this, this);
 	}
 
 	void UniProject::Save()
@@ -54,8 +51,6 @@ namespace Armin::Files
 
 		OutFile << "begin~UniProject" << "~ID:" << CurrentID << "~Config:" << Config << endl;
 
-		if (Images)
-			Images->Push(OutFile, 1);
 		if (ConfigItems)
 			ConfigItems->Push(OutFile, 1);
 		if (Positions)
@@ -141,8 +136,6 @@ namespace Armin::Files
 						RefrenceGroups->Fill(InFile);
 					else if (ThisParts[1] == ConfigItems->Name)
 						ConfigItems->Fill(InFile);
-					else if (ThisParts[1] == Images->Name && (Config & UPC_Resource))
-						Images->Fill(InFile);
 					else
 						InFile.seekg(ThisPos);
 				}
@@ -166,10 +159,9 @@ namespace Armin::Files
 			}
 		}
 
-		if (Users && ((Filter & CT_User) || (Filter & CT_TimecardEntry) || (Filter & CT_Checklist)))
+		if (Users && ((Filter & CT_User) || (Filter & CT_Checklist)))
 		{
 			bool User = Filter & CT_User;
-			bool Timecard = Filter & CT_TimecardEntry;
 			bool Checklists = Filter & CT_Checklist;
 
 			for (uint i = 0; i < Users->Count; i++)
@@ -177,16 +169,6 @@ namespace Armin::Files
 				class User* Current = Users->Item(i);
 				if (Current->ID == ID && Users)
 					Return = Current;
-
-				if (Timecard)
-				{
-					for (uint i = 0; i < Current->TimecardEntries->Count; i++)
-					{
-						TimecardEntry* Time = Current->TimecardEntries->Item(i);
-						if (Time->ID == ID)
-							Return = Current;
-					}
-				}
 
 				if (Checklists)
 				{
@@ -269,16 +251,6 @@ namespace Armin::Files
 				RefrenceGroup* Group = RefrenceGroups->Item(i);
 				if (Group->ID == ID)
 					Return = Group;
-			}
-		}
-
-		if (Images && (Filter & CT_Image))
-		{
-			for (uint i = 0; i < Images->Count; i++)
-			{
-				Image* This = Images->Item(i);
-				if (This->ID == ID)
-					Return = This;
 			}
 		}
 

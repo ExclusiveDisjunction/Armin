@@ -609,42 +609,6 @@ namespace Armin
 
 				void Reset() override;
 			};
-			class TimecardsEditor : public EditorFrame
-			{
-			private:
-				Files::User* _TargetUser;
-				
-				Button* NextMonth, * LastMonth;
-				Label* CurrentMonth;
-				Vector<CalendarGrid*> Grids;
-				int _ThisMonth, _ThisYear;
-
-				void SetupMonth();
-				void FillRecords();
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			protected:
-				void LoadControls() override;
-
-				LRESULT Size() override;
-				LRESULT KeyDown(WPARAM wp) override;
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-			public:
-				TimecardsEditor(Files::User* Target);
-
-				EditorTypes EditorType() const override { return EDT_Timecards; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override;
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Timecards"; }
-				String GetNotes() const override { return L""; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
 
 			class UserSearch : public EditorFrame
 			{
@@ -764,8 +728,7 @@ namespace Armin
 			private:
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* IsInPossession;
-				Button* SelectGroup, *SelectImage;
-				UI::ComponentViewer* TargetImage;
+				Button* SelectGroup;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -796,8 +759,7 @@ namespace Armin
 			private:
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* WorkingOrder, * PartialWorkingOrder, * Broken, * UnderRepair, * NotInPossession;
-				Button* SelectGroup, * SelectImage;
-				UI::ComponentViewer* TargetImage;
+				Button* SelectGroup;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -985,76 +947,6 @@ namespace Armin
 			};
 		}
 
-		namespace Resources
-		{
-			class ViewImageEditor : public EditorFrame
-			{
-			private:
-				HGLOBAL _Target;
-				ImageViewer* Img;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			protected:
-				void LoadControls() override;
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-			public:
-				ViewImageEditor(Files::Image* Target);
-				~ViewImageEditor();
-
-				EditorTypes EditorType() const override { return EDT_ViewImage; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override { return _Target; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"View Image"; }
-				String GetNotes() const override { return L""; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-
-			class ImagesEditor : public EditorFrame
-			{
-			private:
-				Files::ResourceSystem* _System;
-
-				Button *Add, * Remove, * View, *Edit, *SelectAll, *DeSelectAll, *Compress;
-				ScrollViewer* ObjectScroll;
-				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-
-				void FillObjects();
-			protected:
-				void LoadControls() override;
-
-				LRESULT Size() override;
-				LRESULT KeyDown(WPARAM wp) override;
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-			public:
-				ImagesEditor(Files::ResourceSystem* TargetSys = nullptr);
-				
-				EditorTypes EditorType() const override { return EDT_Images; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override { return _System; }
-				bool TestOnCondition(Vector<void*> Other) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Images"; }
-				String GetNotes() const override { return L""; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-		}
-
 		namespace Misc
 		{
 			class BasicEditorEditor : public EditorFrame
@@ -1156,7 +1048,7 @@ namespace Armin
 
 				TextBox* SearchCriteria;
 				Button* Remove, * Add, * View, * Edit, * SaveResults, * DuplicateResults, * _RunSearch, * SelectAll, * ClearSelection; //Remove and Add do not actually remove the components from the file. They only add or remove to the search result. DuplicateResults opens the current components in ComponentListRenderer. SaveResulsts creates a new RefrenceGroup object that is stored in the project.
-				CheckableButton* Users, * Tasks, * CompletedTasks, * InventoryItems, * JobPositions, * OperationInventoryItems, * RefrenceGroups, *Images;
+				CheckableButton* Users, * Tasks, * CompletedTasks, * InventoryItems, * JobPositions, * OperationInventoryItems, * RefrenceGroups;
 				ScrollViewer* ObjectScroll, * TypesScroll;
 				Grid* ObjectView, * TypesView;
 				Vector<UI::ComponentViewer*> Objects;

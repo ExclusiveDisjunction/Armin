@@ -6,7 +6,7 @@ using namespace std;
 
 namespace Armin::Files
 {
-	User::User(ProjectBase* File, UserSet* ParentList) : Component(File, true), TimecardEntryParent(File), ChecklistParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList) : Component(File, true), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -15,7 +15,7 @@ namespace Armin::Files
 		IsAdmin = IsAssurance = false;
 		Username = FirstName = MiddleName = LastName = Password = String();
 	}
-	User::User(ProjectBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), TimecardEntryParent(File), ChecklistParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, User* ToClone) : Component(File, true), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -30,17 +30,13 @@ namespace Armin::Files
 			LastName = ToClone->LastName;
 			IsAdmin = ToClone->IsAdmin;
 			IsAssurance = ToClone->IsAssurance;
-			TargetImage = new ComponentReference(ToClone->TargetImage);
 			Positions = ToClone->Positions;
-
-			for (uint i = 0; i < ToClone->TimecardEntries->Count; i++)
-				new TimecardEntry(File, TimecardEntries, ToClone->TimecardEntries->Item(i));
 
 			for (uint i = 0; i < ToClone->Checklists->Count; i++)
 				new Checklist(File, Checklists, ToClone->Checklists->Item(i));
 		}
 	}
-	User::User(ProjectBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), TimecardEntryParent(File), ChecklistParent(File)
+	User::User(ProjectBase* File, UserSet* ParentList, std::ifstream& InFile) : Component(File, false), ChecklistParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -49,10 +45,7 @@ namespace Armin::Files
 		Fill(InFile);
 	}
 	User::~User()
-	{		
-		if (TargetImage)
-			delete TargetImage;
-
+	{
 		_ParentList->Pop(this);
 	}
 
@@ -88,9 +81,7 @@ namespace Armin::Files
 						continue;
 
 					streampos Pos = InFile.tellg();
-					if (ThisParts[1] == TimecardEntries->Name)
-						TimecardEntries->Fill(InFile);
-					else if (ThisParts[1] == Checklists->Name)
+					if (ThisParts[1] == Checklists->Name)
 						Checklists->Fill(InFile);
 					else
 						InFile.seekg(Pos);
@@ -117,12 +108,6 @@ namespace Armin::Files
 			else if (Name == "IsAdmin") IsAdmin = (Value == "True");
 			else if (Name == "IsAsurance") IsAssurance = (Value == "True");
 			else if (Name == "ID") _ID = Value.ToULong();
-			else if (Name == "TargetImage")
-			{
-				unsigned long long ID = Value.ToULong();
-				Component* Object = _ParentFile->GetFromID(ID, CT_Image);
-				TargetImage = new ComponentReference(Object);
-			}
 			else if (Name == "Positions") Positions = ReferenceList(Value, _ParentFile);
 		}
 	}
@@ -134,13 +119,11 @@ namespace Armin::Files
 
 		AString Header = TabIndexValue + "begin~User";
 		OutFile << Header;
-		OutFile << "~Username:" << Username << "~FirstName:" << FirstName << "~MiddleName:" << MiddleName << "~LastName:" << LastName << "~IsAdmin:" << (IsAdmin ? "True" : "False") << "~IsAssurance:" << (IsAssurance ? "True" : "False") << "~Password:" << Password.ShiftEachChar(-15) << "~TargetImage:" << (!TargetImage || !TargetImage->Target() ? 0 : TargetImage->Target()->ID) << "~ID:" << ID << "~Positions:" << Positions.ToString();
+		OutFile << "~Username:" << Username << "~FirstName:" << FirstName << "~MiddleName:" << MiddleName << "~LastName:" << LastName << "~IsAdmin:" << (IsAdmin ? "True" : "False") << "~IsAssurance:" << (IsAssurance ? "True" : "False") << "~Password:" << Password.ShiftEachChar(-15) << "~ID:" << ID << "~Positions:" << Positions.ToString();
 
-		if (TimecardEntries->Count != 0 || Checklists->Count != 0)
+		if (Checklists->Count != 0)
 		{
 			OutFile << endl;
-			if (TimecardEntries->Count != 0)
-				TimecardEntries->Push(OutFile, PreIndex + 1);
 			if (Checklists->Count != 0)
 				Checklists->Push(OutFile, PreIndex + 1);
 			OutFile << TabIndexValue << "end~User" << endl;

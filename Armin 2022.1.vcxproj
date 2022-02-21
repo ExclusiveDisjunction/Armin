@@ -173,8 +173,8 @@
     <ClCompile Include="Editors\EditorFrame.cpp" />
     <ClCompile Include="Editors\EditorHost.cpp" />
     <ClCompile Include="Editors\EditorRegistry.cpp" />
-    <ClCompile Include="Editors\Inventory\AddInventoryItemEditor.cpp" />
-    <ClCompile Include="Editors\Inventory\AddOperationInventoryItemEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\AddEditInventoryItemEditor.cpp" />
+    <ClCompile Include="Editors\Inventory\AddEditOperationInventoryItemEditor.cpp" />
     <ClCompile Include="Editors\Inventory\InventoryEditor.cpp" />
     <ClCompile Include="Editors\Inventory\InventorySearchEditor.cpp" />
     <ClCompile Include="Editors\Inventory\OperationInventoryEditor.cpp" />
@@ -186,19 +186,15 @@
     <ClCompile Include="Editors\RefGroups\AddRefrenceGroupEditor.cpp" />
     <ClCompile Include="Editors\RefGroups\RefrenceGroupsEditor.cpp" />
     <ClCompile Include="Editors\RefGroups\ViewEditRefrenceGroupEditor.cpp" />
-    <ClCompile Include="Editors\Resources\ImagesEditor.cpp" />
-    <ClCompile Include="Editors\Resources\ViewImageEditor.cpp" />
     <ClCompile Include="Editors\Task\AddEditTaskEditor.cpp" />
     <ClCompile Include="Editors\Task\CompletedTasksEditor.cpp" />
     <ClCompile Include="Editors\Task\CompleteTaskEditor.cpp" />
     <ClCompile Include="Editors\Task\TasksEditor.cpp" />
     <ClCompile Include="Editors\Task\ViewCompletedTaskEditor.cpp" />
     <ClCompile Include="Editors\Task\ViewTaskEditor.cpp" />
-    <ClCompile Include="Editors\Timecards\Timeclock.cpp" />
     <ClCompile Include="Editors\User\AddEditJobPositionEditor.cpp" />
     <ClCompile Include="Editors\User\CreateEditUserEditor.cpp" />
     <ClCompile Include="Editors\User\JobPositionsEditor.cpp" />
-    <ClCompile Include="Editors\User\TimecardsEditor.cpp" />
     <ClCompile Include="Editors\User\UserHomepageEditor.cpp" />
     <ClCompile Include="Editors\User\UserSearchEditor.cpp" />
     <ClCompile Include="Editors\User\UsersEditor.cpp" />
@@ -225,12 +221,10 @@
     <ClCompile Include="Files\2021.2\TeamProject211.cpp" />
     <ClCompile Include="Files\2021.2\TeamProjectRc211.cpp" />
     <ClCompile Include="Files\2021.2\User211.cpp" />
-    <ClCompile Include="Files\ArminSessions.cpp" />
     <ClCompile Include="Files\BaseTypes.cpp" />
     <ClCompile Include="Files\CompletedTask.cpp" />
     <ClCompile Include="Files\ComponentRefrence.cpp" />
     <ClCompile Include="Files\ConfigItem.cpp" />
-    <ClCompile Include="Files\Image.cpp" />
     <ClCompile Include="Files\InventoryItem.cpp" />
     <ClCompile Include="Files\JobPosition.cpp" />
     <ClCompile Include="Files\OperationInventoryItem.cpp" />
@@ -239,7 +233,6 @@
     <ClCompile Include="Files\SearchCriteria.cpp" />
     <ClCompile Include="Files\SessionControl.cpp" />
     <ClCompile Include="Files\Task.cpp" />
-    <ClCompile Include="Files\TimecardEntry.cpp" />
     <ClCompile Include="Files\UniProject.cpp" />
     <ClCompile Include="Files\User.cpp" />
     <ClCompile Include="Files\Request.cpp" />
@@ -254,7 +247,6 @@
     <ClCompile Include="UI\SideHost.cpp" />
     <ClCompile Include="UI\Startup.cpp" />
     <ClCompile Include="UI\Tool\ComponentListRenderer.cpp" />
-    <ClCompile Include="UI\Tool\CreateImage.cpp" />
     <ClCompile Include="UI\Tool\DatePicker.cpp" />
     <ClCompile Include="UI\Tool\FileProgress.cpp" />
     <ClCompile Include="UI\Tool\GroupSelector.cpp" />
@@ -298,7 +290,6 @@
     <ClInclude Include="UI\SideHost.h" />
     <ClInclude Include="UI\Startup.h" />
     <ClInclude Include="UI\Tool\ComponentListRenderer.h" />
-    <ClInclude Include="UI\Tool\CreateImage.h" />
     <ClInclude Include="UI\Tool\DatePicker.h" />
     <ClInclude Include="UI\Tool\FileProgress.h" />
     <ClInclude Include="UI\Tool\FileVersionControl.h" />

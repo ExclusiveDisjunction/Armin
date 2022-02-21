@@ -31,17 +31,6 @@ namespace Armin::Files
 	public:
 		TaskSystem() : ProjectBase(), TaskParent(this), CompletedTaskParent(this), RequestParent(this) { }
 	};
-	/// <summary>
-	/// Represents a collection system of Resource tools.
-	/// </summary>
-	class ResourceSystem : virtual public ProjectBase, public ImageParent
-	{
-	public:
-		ResourceSystem() : ProjectBase(), ImageParent(this)	{ }
-
-		AString ResourcePath;
-		bool CheckResources(Vector<AString>& MissingPaths);
-	};
 
 	/// <summary>
 	/// Used to configure a UniProject's systems and what data it can store.
@@ -51,14 +40,13 @@ namespace Armin::Files
 		UPC_Users = 1,
 		UPC_Tasks = 2,
 		UPC_Inventory = 4,
-		UPC_Resource = 8,
-		UPC_All = UPC_Users | UPC_Tasks | UPC_Inventory | UPC_Resource
+		UPC_All = UPC_Users | UPC_Tasks | UPC_Inventory
 	};
 
 	/// <summary>
 	/// Represents the root node of the Component Model tree. This class is dynamic and can support different types of systems.
 	/// </summary>
-	class UniProject : public UserSystem, public TaskSystem, public InventorySystem, public ResourceSystem
+	class UniProject : public UserSystem, public TaskSystem, public InventorySystem
 	{
 	public:
 		UniProject();

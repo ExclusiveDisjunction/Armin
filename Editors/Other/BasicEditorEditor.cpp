@@ -26,16 +26,6 @@ namespace Armin::Editors::Misc
 
 	void BasicEditorEditor::ProcessCommand(WPARAM wp)
 	{
-		if (ThisTarget->ObjectType() == CT_InventoryItem || ThisTarget->ObjectType() == CT_OperationInventoryItem)
-		{
-			SearchCriteria Criteria;
-			Criteria.AllowedTypes = CT_Image;
-			Criteria.Multiselect = false;
-			Criteria.PreSelected = CV1->Target();
-
-			Vector<Component*> Objects = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
-			CV1->Target(Objects.Size == 0 ? nullptr : Objects[0]);
-		}
 	}
 	void BasicEditorEditor::LoadControls()
 	{
@@ -130,10 +120,6 @@ namespace Armin::Editors::Misc
 			TB2 = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, Style, TextStyle);
 			YCoord += 5 + Height;
 
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
-			B1 = new Button(XCoord + (Width - Height), YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
-			YCoord += 5 + Height;
-
 			CB1 = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, NULL, ConvTarget->IsInPossession, L"Is In Possession", CBT_CheckBox, Style, TextStyle);
 			YCoord += 5 + Height;
 
@@ -197,10 +183,6 @@ namespace Armin::Editors::Misc
 			DD1->Seek(OperationInventoryItem::ISToString(ConvTarget->CurrentState));
 			YCoord += 5 + Height;
 
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
-			B1 = new Button(XCoord + (Width - Height), YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
-			YCoord += 5 + Height;
-
 			TB2 = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, Style, TextStyle);
 			YCoord += 5 + Height;
 
@@ -253,43 +235,6 @@ namespace Armin::Editors::Misc
 			Height = WndRect.bottom - (10 + YCoord);
 
 			TB2 = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Description, Style, TextStyle, true);
-			break;
-		}
-		case CT_Image:
-		{
-			Image* ConvTarget = dynamic_cast<Image*>(ThisTarget);
-			if (!ConvTarget)
-				return;
-
-			int XCoord = 10;
-			int YCoord = BaseYCoord;
-			int Width = BaseWidth;
-			int Height = BaseHeight;
-
-			TextStyleSheet TextStyle;
-			TextStyle.FontFamily = StandardFontName;
-			TextStyle.FontSize = 13;
-			TextStyle.Alignment = TA_RightAlignment;
-			TextStyle.Foreground = FontColor;
-			TextStyle.Bold = true;
-
-			AaColor BaseBk = EditorGrey;
-
-			StyleSheet Style;
-			Style.Background = Grey3;
-			Style.BaseBackground = BaseBk;
-			Style.BorderBrush = Accent4;
-			Style.BorderThickness = 3;
-			Style.Radius = 20;
-
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Title:", BaseBk, TextStyle, false));
-
-			XCoord += 5 + Width;
-			Width = WndRect.right - (10 + XCoord);
-			TextStyle.Alignment = TA_LeftAlignment;
-			TextStyle.Bold = false;
-
-			TB1 = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Title(), Style, TextStyle);
 			break;
 		}
 		}
@@ -438,20 +383,6 @@ namespace Armin::Editors::Misc
 
 			TB2->Move(XCoord, YCoord, Width, Height);
 		}
-		if (ThisTarget->ObjectType() == CT_Image)
-		{
-			int XCoord = 10;
-			int YCoord = BaseYCoord;
-			int Width = BaseWidth;
-			int Height = BaseHeight;
-
-			MiscControls[0]->Move(XCoord, YCoord, Width, Height);
-
-			XCoord += 5 + Width;
-			Width = WndRect.right - (10 + XCoord);
-
-			TB1->Move(XCoord, YCoord, Width, Height);
-		}
 
 		return 0;
 	}
@@ -501,10 +432,6 @@ namespace Armin::Editors::Misc
 			TB2->SetText(ConvTarget->Description);
 			break;
 		}
-		case CT_Image:
-		{
-			break;
-		}
 		}
 
 	}
@@ -529,7 +456,6 @@ namespace Armin::Editors::Misc
 			String Group = TB2->GetText();
 			bool Possession = CB1->GetCheckState();
 			String Description = TB3->GetText();
-			Image* TargetImage = dynamic_cast<Image*>(CV1->Target());
 
 			InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 			InventoryItemGroup* Inv = !File ? nullptr : File->InventoryItems;
@@ -563,10 +489,6 @@ namespace Armin::Editors::Misc
 			ConvTarget->Group = Group;
 			ConvTarget->IsInPossession = Possession;
 			ConvTarget->Description = Description;
-			if (ConvTarget->TargetImage)
-				ConvTarget->TargetImage->SetTarget(TargetImage);
-			else
-				ConvTarget->TargetImage = new ComponentReference(TargetImage);
 
 			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_Inventory);
@@ -586,7 +508,6 @@ namespace Armin::Editors::Misc
 			String Group = TB2->GetText();
 			String Description = TB3->GetText();
 			String RawState = DD1->Current();
-			Image* TargetImage = dynamic_cast<Image*>(CV1->Target());
 
 			OperationInventoryItem::ItemState NewState = OperationInventoryItem::IS_NotInPossession;
 			if (RawState == L"Working Order")
@@ -632,10 +553,6 @@ namespace Armin::Editors::Misc
 			ConvTarget->Description = Description;
 			ConvTarget->Group = Group;
 			ConvTarget->CurrentState = NewState;
-			if (ConvTarget->TargetImage)
-				ConvTarget->TargetImage->SetTarget(TargetImage);
-			else
-				ConvTarget->TargetImage = new ComponentReference(TargetImage);
 
 			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_OperationInventory);
@@ -673,14 +590,6 @@ namespace Armin::Editors::Misc
 
 			AppState |= APS_HasEdit;
 			EditorRegistry::ResetEditorOfType(EDT_JobPositions);
-			break;
-		}
-		case CT_Image:
-		{
-			Image* ConvTarget = dynamic_cast<Image*>(ThisTarget);
-			ConvTarget->Title(TB1->GetText());
-
-			AppState |= APS_HasEdit;
 			break;
 		}
 		}

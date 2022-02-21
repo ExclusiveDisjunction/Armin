@@ -82,12 +82,6 @@ namespace Armin::Files
 			else if (Name == "Description") Description = (String)Value.ReplaceChar(L'\n', L'`');
 			else if (Name == "Group") Group = (String)Value;
 			else if (Name == "IsInPossession") IsInPossession = Value == "True" ? true : false;
-			else if (Name == "TargetImage")
-			{
-				unsigned long long ID = Value.ToULong();
-				Component* Target = _ParentFile->GetFromID(ID, CT_Image);
-				TargetImage = new ComponentReference(Target);
-			}
 			else if (Name == "ID") _ID = Value.ToLong();
 		}
 	}
@@ -98,7 +92,7 @@ namespace Armin::Files
 			TabIndexValue += "\t";
 
 		OutFile << TabIndexValue << "begin~InventoryItem";
-		OutFile << "~SerialNumber:" << SerialNumber << "~Description:" << Description.ReplaceChar('\n', '`') << "~Group:" << Group << "~IsInPossession:" << (IsInPossession ? "True" : "False") << "~TargetImage:" << (!TargetImage || !TargetImage->Target() ? 0 : TargetImage->Target()->ID) << "~ID:" << _ID;
+		OutFile << "~SerialNumber:" << SerialNumber << "~Description:" << Description.ReplaceChar('\n', '`') << "~Group:" << Group << "~IsInPossession:" << (IsInPossession ? "True" : "False") << "~ID:" << _ID;
 
 		OutFile << "~end" << endl;
 	}

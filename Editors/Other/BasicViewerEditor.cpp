@@ -125,9 +125,6 @@ namespace Armin::Editors::Misc
 			Data.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, BaseBk, TextStyle, false));
 			YCoord += 5 + Height;
 
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
-			YCoord += 5 + Height;
-
 			Height = WndRect.bottom - 10 - YCoord;
 
 			Data.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Description, BaseBk, TextStyle, true));
@@ -187,9 +184,6 @@ namespace Armin::Editors::Misc
 			YCoord += 5 + Height;
 
 			Data.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
 			YCoord += 5 + Height;
 
 			Height = WndRect.bottom - 10 - YCoord;

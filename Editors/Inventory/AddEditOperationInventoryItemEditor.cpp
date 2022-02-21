@@ -90,13 +90,6 @@ namespace Armin::Editors::Inventory
 			Group = new TextBox(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, L"", Style, TextStyle);
 			XCoord += (Width - Height);
 			SelectGroup = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)4, ins, Style, TextStyle);
-
-			YCoord += Height + 10;
-			XCoord -= (Width - Height);
-
-			TargetImage = new UI::ComponentViewer(XCoord, YCoord, Width - Height - 5, Height, _Base, ins, nullptr, nullptr, false);
-			XCoord += (Width - Height);
-			SelectImage = new Button(XCoord, YCoord, Height, Height, L"...", _Base, (HMENU)5, ins, Style, TextStyle);
 			
 			YCoord += Height + 10;
 			XCoord -= (Width - Height);
@@ -142,21 +135,6 @@ namespace Armin::Editors::Inventory
 		{
 			StringList List = GroupSelector::Execute(reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)), nullptr, GSS_OperationInventory, false);
 			this->Group->SetText(List.Size == 0 ? String() : List[0]);
-			break;
-		}
-		case 5:
-		{
-			SearchCriteria Criteria;
-			Criteria.AllowedTypes = CT_Image;
-			Criteria.Multiselect = false;
-			Criteria.PreSelected = TargetImage->Target();
-
-			Vector<Component*> Selected = UI::Search::SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
-
-			if (Selected.Size == 0)
-				break;
-
-			TargetImage->Target(Selected[0]);
 			break;
 		}
 		}
@@ -214,13 +192,6 @@ namespace Armin::Editors::Inventory
 			XCoord += (Width - Height);
 			SelectGroup->Move(XCoord, YCoord, Height, Height);
 
-			YCoord += 10 + Height;
-			XCoord -= (Width - Height);
-
-			TargetImage->Move(XCoord, YCoord, Width - Height - 5, Height);
-			XCoord += (Width - Height);
-			SelectImage->Move(XCoord, YCoord, Height, Height);
-
 			YCoord += Height + 10;
 			XCoord -= (Width - Height);
 
@@ -276,7 +247,6 @@ namespace Armin::Editors::Inventory
 		String Description = this->Description->GetText();
 		String Group = this->Group->GetText();
 		OperationInventoryItem::ItemState State = OperationInventoryItem::IS_NotInPossession;
-		Image* TargetImage = dynamic_cast<Image*>(this->TargetImage->Target());
 
 		if (WorkingOrder->GetCheckState())
 			State = OperationInventoryItem::IS_WorkingOrder;
@@ -336,7 +306,6 @@ namespace Armin::Editors::Inventory
 		New->Description = Description;
 		New->Group = Group;
 		New->CurrentState = State;
-		New->TargetImage = new ComponentReference(TargetImage);
 
 		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_OperationInventory);

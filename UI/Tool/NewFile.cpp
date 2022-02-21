@@ -296,7 +296,7 @@ namespace Armin::UI
 				_Password = Pass;
 			}
 
-			_Config = (Inv ? UPC_Inventory : 0) | (User ? UPC_Users : 0) | (Task ? UPC_Tasks : 0) | (Resource ? UPC_Resource : 0);
+			_Config = (Inv ? UPC_Inventory : 0) | (User ? UPC_Users : 0) | (Task ? UPC_Tasks : 0);
 			String Dir = Directory->GetText();
 			_Return = Dir + (Dir[Dir.Length() - 1] == L'\\' ? String() : L"\\") + Name->GetText() + L".arminuni";
 		}

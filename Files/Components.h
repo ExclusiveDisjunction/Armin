@@ -22,12 +22,6 @@ namespace Armin::Files
 	class ConfigItemParent;
 	using ConfigItemSet = ComponentList<ConfigItem, ConfigItemParent>;
 
-	//ResourceSystem
-
-	class Image;
-	class ImageParent;
-	using ImageList = ComponentList<Image, ImageParent>;
-
 	//UserSystem
 
 	class JobPosition;
@@ -124,6 +118,7 @@ namespace Armin::Files
 		ConfigItemSet*& ConfigItems = _ConfigItems;
 	};
 
+/*
 #pragma region Resources
 
 	class Image : public Component
@@ -176,6 +171,7 @@ namespace Armin::Files
 	};
 
 #pragma endregion
+*/
 
 #pragma region Users
 
@@ -227,54 +223,6 @@ namespace Armin::Files
 		JobPositionList*& Positions = _Positions;
 	};
 
-	class TimecardEntry : public Component
-	{
-	private:
-		TimecardEntryList* _ParentList;
-		TimecardEntryParent* _Parent;
-	public:
-		TimecardEntry() = delete;
-		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList);
-		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, TimecardEntry* ToClone);
-		TimecardEntry(ProjectBase* File, TimecardEntryList* ParentList, std::ifstream& InFile);
-		TimecardEntry(const TimecardEntry& Obj) = delete;
-		TimecardEntry(const TimecardEntry&& Obj) = delete;
-		~TimecardEntry();
-
-		TimecardEntry& operator=(const TimecardEntry& Obj) = delete;
-		TimecardEntry& operator=(const TimecardEntry&& Obj) = delete;
-
-		TimecardEntry* Next, * Last;
-		TimecardEntryParent* const& Parent = _Parent;
-		inline static const String ThisName = L"TimecardEntry";
-
-		String Title() const override { return L"<,.>"; }
-		void Title(String Value) override { }
-
-		DateTime TimeIn, TimeOut, Date;
-		String Description;
-
-		ComponentTypes ObjectType() const override { return CT_TimecardEntry; }
-		void Fill(std::ifstream& InFile) override;
-		void Push(std::ofstream& OutFile, uint TabIndex) const override;
-	};
-	class TimecardEntryParent : public ComponentParent
-	{
-	private:
-		TimecardEntryList* _TimecardEntries;
-	protected:
-		TimecardEntryParent(ProjectBase* File) : _TimecardEntries(new TimecardEntryList(File, this)) {}
-		TimecardEntryParent() : _TimecardEntries(nullptr) {}
-	public:
-		~TimecardEntryParent()
-		{
-			delete _TimecardEntries;
-			_TimecardEntries = nullptr;
-		}
-
-		TimecardEntryList*& TimecardEntries = _TimecardEntries;
-	};
-
 	class Checklist : public Component
 	{
 	private:
@@ -320,7 +268,7 @@ namespace Armin::Files
 		ChecklistGroup*& Checklists = _Checklists;
 	};
 
-	class User : public Component, public TimecardEntryParent, public ChecklistParent
+	class User : public Component, public ChecklistParent
 	{
 	private:
 		UserSet* _ParentList;
@@ -347,7 +295,6 @@ namespace Armin::Files
 
 		String Username, Password, FirstName, MiddleName, LastName;
 		bool IsAdmin = false, IsAssurance = false;
-		ComponentReference* TargetImage = nullptr;
 		ReferenceList Positions;
 
 		ComponentTypes ObjectType() const override { return ComponentTypes::CT_User; }
@@ -383,16 +330,12 @@ namespace Armin::Files
 	public:
 		virtual ~InventoryBase()
 		{
-			if (TargetImage)
-				delete TargetImage;
-			TargetImage = nullptr;
 		}
 
 		String Title() const override { return SerialNumber; }
 		void Title(String New) override { SerialNumber = New; }
 
 		String SerialNumber, Description, Group;
-		ComponentReference* TargetImage = nullptr;
 	};
 
 	class InventoryItem : public InventoryBase

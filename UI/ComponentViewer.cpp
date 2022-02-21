@@ -224,7 +224,6 @@ namespace Armin::UI
 				case CT_JobPosition:
 				case CT_OperationInventoryItem:
 				case CT_RefrenceGroup:
-				case CT_Image:
 					Open = (AppState & APS_HasUser);
 					break;
 				case CT_CompletedTask:
@@ -237,7 +236,7 @@ namespace Armin::UI
 				if (Open)
 				{
 					ComponentTypes Type = Current->ObjectType();
-					if (Type == CT_JobPosition || Type == CT_InventoryItem || Type == CT_OperationInventoryItem || Type == CT_Image)
+					if (Type == CT_JobPosition || Type == CT_InventoryItem || Type == CT_OperationInventoryItem)
 						EditorRegistry::OpenEditor(new Editors::Misc::BasicEditorEditor(Current), nullptr);
 					else if (Type == CT_User)
 						EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(dynamic_cast<User*>(Current)), nullptr);
@@ -267,7 +266,6 @@ namespace Armin::UI
 				case CT_OperationInventoryItem:
 				case CT_RefrenceGroup:
 				case CT_CompletedTask:
-				case CT_Image:
 					Open = (AppState & APS_HasUser);
 					break;
 				case CT_ConfigItem:
@@ -289,8 +287,6 @@ namespace Armin::UI
 						EditorRegistry::OpenEditor(new Tasks::ViewCompletedTaskEditor(dynamic_cast<CompletedTask*>(Current)), nullptr);
 					else if (Type == CT_RefrenceGroup)
 						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<RefrenceGroup*>(Current), false), nullptr);
-					else if (Type == CT_Image)
-						EditorRegistry::OpenEditor(new Resources::ViewImageEditor(dynamic_cast<Image*>(Current)), nullptr);
 				}
 			}
 		}
@@ -444,7 +440,6 @@ namespace Armin::UI
 			case CT_InventoryItem:
 			case CT_OperationInventoryItem:
 			case CT_JobPosition:
-			case CT_Image:
 				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Misc::BasicEditorEditor(_Source), Parent);
 				break;
@@ -477,9 +472,6 @@ namespace Armin::UI
 				if ((AppState & APS_HasUser))
 					EditorRegistry::OpenEditor(new Users::ViewUserEditor(dynamic_cast<User*>(_Source)), Parent);
 				break;
-			case CT_Image:
-				if ((AppState & APS_HasUser))
-					EditorRegistry::OpenEditor(new Resources::ViewImageEditor(dynamic_cast<Image*>(_Source)), Parent);
 			}
 		}
 
