@@ -240,6 +240,7 @@
     <ClCompile Include="Files\User.cpp" />
     <ClCompile Include="Files\Request.cpp" />
     <ClCompile Include="UI\About.cpp" />
+    <ClCompile Include="UI\ComponentSidebar.cpp" />
     <ClCompile Include="UI\ComponentViewer.cpp" />
     <ClCompile Include="UI\EditorButton.cpp" />
     <ClCompile Include="UI\EditorPopout.cpp" />
@@ -284,6 +285,7 @@
     <ClInclude Include="UICommon.h" />
     <ClInclude Include="UI\About.h" />
     <ClInclude Include="UI\ArminControls.h" />
+    <ClInclude Include="UI\ComponentSidebar.h" />
     <ClInclude Include="UI\ComponentViewer.h" />
     <ClInclude Include="UI\EditorButton.h" />
     <ClInclude Include="UI\EditorPopout.h" />

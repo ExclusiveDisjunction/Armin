@@ -285,6 +285,9 @@
     <ClCompile Include="Editors\Other\BasicViewerEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\ComponentSidebar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ins.h">
@@ -414,6 +417,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\WindowState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ComponentSidebar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
