@@ -19,6 +19,11 @@ namespace Armin::Editors::Users
         else
             _System = System;
     }
+    JobPositionsEditor::~JobPositionsEditor()
+    {
+        if (Objects)
+            delete Objects;
+    }
 
     LRESULT __stdcall JobPositionsEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
     {
@@ -130,6 +135,11 @@ namespace Armin::Editors::Users
             ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
             ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
             ObjectScroll->SetViewer(ObjectView);
+
+            if (Objects)
+                delete Objects;
+            Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
             FillObjects();
         }
     }
@@ -142,9 +152,8 @@ namespace Armin::Editors::Users
         Vector<JobPosition*> Sorted = *List;
         QuickSort(Sorted, [](JobPosition*& One, JobPosition*& Two) { return static_cast<wstring>(One->Title()) < static_cast<wstring>(Two->Title()); });
 
-        CloseControls(Objects);
-        Objects = ComponentViewer::GenerateList(Sorted, ObjectView, NULL, true, true, ObjectScroll);
-        ObjectCount->SetText(Objects.Size);
+        Objects->GenerateList(Sorted, NULL, true, true);
+        ObjectCount->SetText(Objects->Size);
     }
 
     void JobPositionsEditor::Reset()
@@ -172,7 +181,7 @@ namespace Armin::Editors::Users
             }
 
             Vector<ComponentViewer*> Selected;
-            Vector<Component*> RawTargets = ComponentViewer::RetriveFromList(Objects, Selected);
+            Vector<Component*> RawTargets = Objects->RetriveFromList(Selected);
 
             if (RawTargets.Size == 0)
             {
@@ -192,24 +201,20 @@ namespace Armin::Editors::Users
 
                 delete Temp;
                 ComponentViewer* Viewer = Selected[i];
-                Objects.Remove(Viewer);
                 delete Viewer;
             }
 
             AppState |= APS_HasEdit;
-            ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+            Objects->ReSizeList();
             break;
         }
         case 7: //View        
         case 8: //Edit
-            ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && (AppState & APS_HasAdminUser));
+            Objects->OpenSelectedForEditView(wp == 8 && (AppState & APS_HasAdminUser));
         case 9: //Select All
-            for (ComponentViewer* Obj : Objects)
-                Obj->CheckState(true);
-            break;
         case 10: //DeSelectAll
-            for (ComponentViewer* Obj : Objects)
-                Obj->CheckState(false);
+            for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+                Obj->CheckState(wp == 9);
             break;
         }
         return 0;
@@ -231,7 +236,7 @@ namespace Armin::Editors::Users
         case 'V':
         case 'E':
             if (GetKeyState(VK_CONTROL) & 0x8000)
-                ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E' && (AppState & APS_HasAdminUser));
+                Objects->OpenSelectedForEditView(Key == 'E' && (AppState & APS_HasAdminUser));
             break;
         default:
             return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
@@ -306,7 +311,7 @@ namespace Armin::Editors::Users
             Height = WndRect.bottom - (10 + YCoord);
 
             ObjectScroll->Move(XCoord, YCoord, Width, Height);
-            ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+            Objects->ReSizeList();
         }
 
         return 0;

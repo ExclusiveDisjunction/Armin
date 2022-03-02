@@ -19,6 +19,11 @@ namespace Armin::Editors::Tasks
 		else
 			_System = System;
 	}
+	CompletedTasksEditor::~CompletedTasksEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	LRESULT __stdcall CompletedTasksEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -111,6 +116,11 @@ namespace Armin::Editors::Tasks
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -122,9 +132,8 @@ namespace Armin::Editors::Tasks
 
 		Vector<CompletedTask*> Tasks = *List;
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Tasks, ObjectView, NULL, true, false, ObjectScroll);
-		ObjectCount->SetText(Objects.Size);
+		Objects->GenerateList(Tasks, NULL, true, false);
+		ObjectCount->SetText(Objects->Size);
 	}
 
 	LRESULT CompletedTasksEditor::Size()
@@ -187,7 +196,7 @@ namespace Armin::Editors::Tasks
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -201,7 +210,7 @@ namespace Armin::Editors::Tasks
 			break;
 		case 'V':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, false);
+				Objects->OpenSelectedForEditView(false);
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, wp, 0);
@@ -216,12 +225,13 @@ namespace Armin::Editors::Tasks
 			EditorRegistry::OpenEditor(new TasksEditor(nullptr), nullptr);
 			break;
 		case 5: //View
-			ComponentViewer::OpenSelectedForEditView(Objects, false);
+			Objects->OpenSelectedForEditView(false);
 			break;
 		case 6: //Select All
 		case 7: //DeSelectAll
-			for (ComponentViewer* Obj : Objects)
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 				Obj->CheckState(wp == 7);
+			break;
 		}
 		return 0;
 	}

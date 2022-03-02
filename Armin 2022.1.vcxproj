@@ -240,6 +240,7 @@
     <ClCompile Include="Files\User.cpp" />
     <ClCompile Include="Files\Request.cpp" />
     <ClCompile Include="UI\About.cpp" />
+    <ClCompile Include="UI\ComponentReferenceList.cpp" />
     <ClCompile Include="UI\ComponentSidebar.cpp" />
     <ClCompile Include="UI\ComponentViewer.cpp" />
     <ClCompile Include="UI\EditorButton.cpp" />

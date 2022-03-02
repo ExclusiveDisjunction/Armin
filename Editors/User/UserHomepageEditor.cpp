@@ -15,6 +15,11 @@ namespace Armin::Editors::Users
 	{
 		_Target = Target;
 	}
+	UserHomepageEditor::~UserHomepageEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	LRESULT __stdcall UserHomepageEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -64,7 +69,7 @@ namespace Armin::Editors::Users
 			XCoord += 5 + Width;
 			Width = WndRect.right - 10 - XCoord;
 
-			CurrentUser = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, _Target, true);
+			CurrentUser = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, _Target, true, nullptr);
 			YCoord += 20 + Height;
 			XCoord = 10;
 			Width = (WndRect.right - 10 - XCoord - 20) / 3;
@@ -116,6 +121,10 @@ namespace Armin::Editors::Users
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+			
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 
 			FillObjects();
 		}
@@ -137,8 +146,7 @@ namespace Armin::Editors::Users
 
 		QuickSort(Assigned, [](Task* One, Task* Two) { return One->DueBy < Two->DueBy; });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Assigned, ObjectView, nullptr, true, true, ObjectScroll);
+		Objects->GenerateList(Assigned, nullptr, true, true);
 	}
 
 	LRESULT UserHomepageEditor::Size()
@@ -209,7 +217,7 @@ namespace Armin::Editors::Users
 			Height = WndRect.bottom - 10 - YCoord;
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -224,7 +232,7 @@ namespace Armin::Editors::Users
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && (AppState & APS_HasAdminUser));
+				Objects->OpenSelectedForEditView(wp == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, wp, 0);
@@ -249,28 +257,24 @@ namespace Armin::Editors::Users
 			break;
 		case 8: //Complete Task
 		{
-			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 			{
-				Vector<Task*> Tasks;
-				for (ComponentViewer* Obj : Objects)
-				{
-					Task* Conv = dynamic_cast<Task*>(Obj->Target());
-					if (Conv)
-						Tasks.Add(Conv);
-				}
+				if (!Obj->CheckState())
+					continue;
 
-				for (Task* Obj : Tasks)
-					EditorRegistry::OpenEditor(new Tasks::CompleteTaskEditor(Obj), nullptr);
+				Task* Conv = dynamic_cast<Task*>(Obj->Target());
+				if (Conv)
+					EditorRegistry::OpenEditor(new Tasks::CompleteTaskEditor(Conv), nullptr);
 			}
 			break;
 		}
 		case 9: //View
 		case 10: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+			Objects->OpenSelectedForEditView(wp == 9);
 			break;
 		case 11: //SelectAll
 		case 12: //DeSelectAll
-			for (ComponentViewer* Obj : Objects)
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 				Obj->CheckState(wp == 11);
 			break;
 		}

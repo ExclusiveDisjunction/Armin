@@ -20,6 +20,10 @@ namespace Armin::Editors::Misc
 	{
 		this->Filter = Filter;
 	}
+	QuickSearchEditor::~QuickSearchEditor()
+	{
+		delete Objects;
+	}
 
 	LRESULT __stdcall QuickSearchEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -190,6 +194,10 @@ namespace Armin::Editors::Misc
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+		
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 		}
 	}
 
@@ -207,40 +215,35 @@ namespace Armin::Editors::Misc
 			Criteria.Multiselect = true;
 
 			Vector<Component*> New = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
-			Vector<Component*> Old = ComponentViewer::GetAllComponents(Objects);
+			Vector<Component*> Old = Objects->GetAllComponents();
 			Old.Add(New);
 
 			QuickSort(Old, [](Component* One, Component* Two) -> bool { return One->ObjectType() < Two->ObjectType(); });
 
-			CloseControls(Objects);
-			Objects = ComponentViewer::GenerateList(Old, ObjectView, NULL, _Multiselect, true, ObjectScroll);			
+			Objects->GenerateList(Old, NULL, _Multiselect, true);			
 			break;
 		}
 		case 6: //Remove
 		{
 			Vector<ComponentViewer*> Select;
-			ComponentViewer::RetriveFromList(Objects, Select);
+			Objects->RetriveFromList(Select);
 
 			for (uint i = 0; i < Select.Size; i++)
 			{
 				ComponentViewer* Current = Select[i];
-				Objects.Remove(Current);
 				delete Select[i];
 			}
 
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 			break;
 		}
 		case 7: //View
 		case 8: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8);
+			Objects->OpenSelectedForEditView(wp == 8);
 		case 9: //Select All
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(true);
-			break;
 		case 10: //Clear Selection
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(false);
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+				Obj->CheckState(wp == 9);
 			break;
 		case 11: //Save Selection
 		{
@@ -249,7 +252,7 @@ namespace Armin::Editors::Misc
 				break;
 
 			RefrenceGroup* New = new RefrenceGroup(LoadedProject, RefGroups);
-			New->Targets = ComponentReference::Generate(ComponentViewer::GetAllComponents(Objects));
+			New->Targets = ComponentReference::Generate(Objects->GetAllComponents());
 
 			AppState |= APS_HasEdit;
 			EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(New, true), nullptr);
@@ -257,7 +260,7 @@ namespace Armin::Editors::Misc
 		}
 		case 12: //Duplicate Selection
 		{
-			Vector<Component*> Selection = ComponentViewer::GetAllComponents(Objects);
+			Vector<Component*> Selection = Objects->GetAllComponents();
 			String Query = SearchCriteria->GetText();
 
 			new ComponentListRenderer(Selection, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)), L"Search Results for \"" + Query + L"\"");
@@ -372,7 +375,7 @@ namespace Armin::Editors::Misc
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -380,8 +383,8 @@ namespace Armin::Editors::Misc
 
 	void QuickSearchEditor::Reset()
 	{
-		CloseControls(Objects);
-		ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+		Objects->Clear();
+		Objects->ReSizeList();
 		SearchCriteria->SetText(String());
 
 		Users->SetCheckState(Filter & CT_User);
@@ -408,8 +411,7 @@ namespace Armin::Editors::Misc
 		{
 			QuickSort(Components, [](Component* One, Component* Two) -> bool { return One->ObjectType() < Two->ObjectType(); });
 
-			CloseControls(Objects);
-			Objects = ComponentViewer::GenerateList(Components, ObjectView, NULL, _Multiselect, true, ObjectScroll);
+			Objects->GenerateList(Components, NULL, _Multiselect, true);
 		}
 	}
 }

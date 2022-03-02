@@ -66,7 +66,7 @@ namespace Armin::Editors::Misc
 			TextStyle.Alignment = TA_LeftAlignment;
 			TextStyle.Bold = false;
 
-			Target = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, ThisTarget, _DummySelect, false, true);
+			Target = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, ThisTarget, _DummySelect, nullptr, false, true);
 			BaseYCoord = YCoord += 40 + Height;
 		}
 

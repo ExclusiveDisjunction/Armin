@@ -19,6 +19,15 @@ namespace Armin::UI::Search
 		this->Criteria = Criteria;
 		this->File = !File ? LoadedProject : File;
 	}
+	SearchByName::~SearchByName()
+	{
+		SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+		DestroyWindow(_Base);
+
+		if (Objects)
+			delete Objects;
+	}
+
 	void SearchByName::Construct(HINSTANCE ins)
 	{
 		if (!_ThisAtom)
@@ -161,22 +170,25 @@ namespace Armin::UI::Search
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 		}
 
 		Refresh();
 	}
 	void SearchByName::GetReturn()
 	{
-		Return = ComponentViewer::RetriveFromList(Objects);
+		Return = Objects->RetriveFromList();
 	}
 	void SearchByName::Refresh()
 	{
 		Criteria.Arguments = NameToSearch->GetText();
 		Vector<Component*> Selected = Criteria.GetComponents(File);
 		
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Selected, ObjectView, NULL, Criteria.Multiselect, true, ObjectScroll);
-
+		Objects->GenerateList(Selected, NULL, Criteria.Multiselect, true);
+		
 		if (_FirstRefresh)
 		{
 			Vector<Component*>& PreSelected = Criteria.PreSelected;
@@ -184,9 +196,9 @@ namespace Armin::UI::Search
 			if (!Criteria.Multiselect)
 				PreSelected.Resize(1);
 
-			for (uint i = 0; i < this->Objects.Size; i++)
+			for (uint i = 0; i < this->Objects->Size; i++)
 			{
-				ComponentViewer* This = this->Objects[i];
+				ComponentViewer* This = this->Objects->Item(i);
 				if (PreSelected.Contains(This->Target()))
 				{
 					PreSelected.Remove(This->Target());
@@ -316,7 +328,7 @@ namespace Armin::UI::Search
 		}
 
 		{
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -350,18 +362,18 @@ namespace Armin::UI::Search
 			DestroyWindow(_Base);
 			break;
 		case 3: //Select All
-			if (Objects.Size != 0 && !Criteria.Multiselect)
+			if (Objects->Size != 0 && !Criteria.Multiselect)
 			{
 				EnableWindow(*SelectAll, false);
 				break;
 			}
 
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(true);
+			for (uint i = 0; i < Objects->Size; i++)
+				Objects->Item(i)->CheckState(true);
 			break;
 		case 4: //Clear Selection
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(false);
+			for (uint i = 0; i < Objects->Size; i++)
+				Objects->Item(i)->CheckState(false);
 			break;
 		}
 		return 0;

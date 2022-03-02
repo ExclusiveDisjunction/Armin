@@ -83,7 +83,7 @@ namespace Armin::Editors::Tasks
 			Width = WndRect.right - 10 - XCoord;
 			TextStyle.Alignment = TA_LeftAlignment;
 
-			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, nullptr, false);
+			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, nullptr, false, nullptr);
 			YCoord += 10 + Height;
 
 			int ButtonSize = Height;

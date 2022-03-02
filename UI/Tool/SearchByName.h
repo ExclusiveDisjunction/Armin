@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "Container.h"
 #include "UI\ControlDef.h"
+#include "..\ComponentViewer.h"
 #include "..\..\UICommon.h"
 #include "..\..\Files\SearchCriteria.h"
 
@@ -43,7 +44,7 @@ namespace Armin
 				TextBox* NameToSearch;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView, * ButtonHost;
-				Vector<ComponentViewer*> Objects;
+				ComponentViewerList* Objects;
 				Button* Submit, * Cancel, * SelectAll, * ClearSelection, * _RunSearch;
 
 				static ATOM _ThisAtom;
@@ -58,11 +59,7 @@ namespace Armin
 			public:
 				SearchByName(const SearchByName& Obj) = delete;
 				SearchByName(const SearchByName&& Obj) = delete;
-				~SearchByName()
-				{
-					SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
-					DestroyWindow(_Base);
-				}
+				~SearchByName();
 
 				SearchByName& operator=(const SearchByName& Obj) = delete;
 				SearchByName& operator=(const SearchByName&& Obj) = delete;

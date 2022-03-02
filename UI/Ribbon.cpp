@@ -94,7 +94,7 @@ namespace Armin::UI
 			EnableWindow(*CurrentUserCmd, SignedIn);
 			EnableWindow(*UsersCmd, AllowedForView & CT_User);
 			EnableWindow(*AddUserCmd, AllowedForEdit & CT_User);
-			EnableWindow(*UserSearch, AdminSignedIn);
+			EnableWindow(*UserSearchEditor, AdminSignedIn);
 			EnableWindow(*JobPositions, SignedIn);
 
 			//(*TimecardCmd, SignedIn);
@@ -324,7 +324,7 @@ namespace Armin::UI
 			AddUserCmd = new Button(XCoord, YCoord, Width, Height, L"Add User", UserGrid, (HMENU)65, ins, Style, TextStyle);
 			XCoord += 12 + Width;
 
-			UserSearch = new Button(XCoord, YCoord, Width, Height, L"User Search", UserGrid, (HMENU)66, ins, Style, TextStyle);
+			UserSearchEditor = new Button(XCoord, YCoord, Width, Height, L"User Search", UserGrid, (HMENU)66, ins, Style, TextStyle);
 			XCoord += 12 + Width;
 
 			JobPositions = new Button(XCoord, YCoord, Width, Height, L"Positions", UserGrid, (HMENU)67, ins, Style, TextStyle);
@@ -594,7 +594,7 @@ namespace Armin::UI
 				EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(nullptr), nullptr);
 			break;
 		case 66: //UserSearch
-			EditorRegistry::OpenEditor(new Users::UserSearch(nullptr), nullptr);
+			EditorRegistry::OpenEditor(new Users::UserSearchEditor(nullptr), nullptr);
 			break;
 		case 67: //JobPositions
 			EditorRegistry::OpenEditor(new Users::JobPositionsEditor(nullptr), nullptr);

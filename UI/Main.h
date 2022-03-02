@@ -50,7 +50,7 @@ namespace Armin
 			Button* SettingsCmd, *ProjectSettingsCmd, *RefrenceGroupsCmd, *QuickSearchCmd; //Edit 30 - 37
 			Button* TasksCmd, * AddTaskCmd, * CompletedTasksCmd; //Tasks 40-49
 			Button* InventoryCmd, * AddInvItemCmd, * OperInventoryCmd, * AddOperInvItemCmd, *InvSearch; //Inventory 50-59
-			Button* SignInCmd, * SignOutCmd, * LockCmd, * CurrentUserCmd, * UsersCmd, * AddUserCmd, *UserSearch, *JobPositions; //User 60-67
+			Button* SignInCmd, * SignOutCmd, * LockCmd, * CurrentUserCmd, * UsersCmd, * AddUserCmd, *UserSearchEditor, *JobPositions; //User 60-67
 			Button* MaximizeCmd, * MinimizeCmd, * NormalSizeCmd, *SideHost, * Quit; //Window 70 - 79
 			Button* AboutCmd; //Help 80-89
 

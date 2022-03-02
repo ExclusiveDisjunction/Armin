@@ -17,6 +17,11 @@ namespace Armin::Editors::Users
 		else
 			this->Target = nullptr;
 	}
+	CreateEditUserEditor::~CreateEditUserEditor()
+	{
+		if (Positions)
+			delete Positions;
+	}
 
 	LRESULT __stdcall CreateEditUserEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -142,8 +147,12 @@ namespace Armin::Editors::Users
 			PositionsView = new Grid(0, 0, 910, 37, PositionsScroll, ins, Style);
 			PositionsScroll->SetViewer(PositionsView);
 
+			if (Positions)
+				delete Positions;
+			Positions = new ComponentViewerList(PositionsView, PositionsScroll);
+
 			if (Target)
-				Positions = ComponentViewer::GenerateListRef(Target->Positions, PositionsView, nullptr, true, true, PositionsScroll);
+				Positions->GenerateListRef(Target->Positions, nullptr, true, true);
 		}
 	}
 
@@ -226,7 +235,7 @@ namespace Armin::Editors::Users
 			Height = WndRect.bottom - (10 + YCoord);
 
 			PositionsScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Positions, PositionsView, PositionsScroll);
+			Positions->ReSizeList();
 		}
 
 		return 0;
@@ -241,7 +250,7 @@ namespace Armin::Editors::Users
 		{
 		case 4:
 		{
-			Vector<Component*> OldItems = ComponentViewer::GetAllComponents(Positions);
+			Vector<Component*> OldItems = Positions->GetAllComponents();
 
 			SearchCriteria Criteria;
 			Criteria.AllowedTypes = CT_JobPosition;
@@ -250,12 +259,11 @@ namespace Armin::Editors::Users
 
 			Vector<Component*> New = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
 
-			CloseControls(Positions);
-			Positions = ComponentViewer::GenerateList(New, PositionsView, NULL, true, true, PositionsScroll);
+			Positions->GenerateList(New, NULL, true, true);
 			break;
 		}
 		case 5:
-			ComponentViewer::OpenSelectedForEditView(Positions, false);
+			Positions->OpenSelectedForEditView(false);
 			break;
 		}
 		return 0;
@@ -270,7 +278,7 @@ namespace Armin::Editors::Users
 		LastName->SetText(Target ? Target->LastName : String());
 		UserType->Seek(Target ? (Target->IsAdmin ? L"Admin" : Target->IsAssurance ? L"Assurance" : L"Standard") : L"Standard");
 		
-		CloseControls(Positions);
+		Positions->Clear();
 		PositionsView->Move(0, 0, 910, 32);
 		PositionsScroll->Reset();
 	}
@@ -296,7 +304,7 @@ namespace Armin::Editors::Users
 		bool IsAdmin = this->UserType->Current() == L"Admin";
 		bool IsAssurance = this->UserType->Current() == L"Assurance";
 		
-		Vector<Component*> TempPositions = ComponentViewer::GetAllComponents(Positions);
+		Vector<Component*> TempPositions = Positions->GetAllComponents();
 		Vector<JobPosition*> Positions;
 		for (uint i = 0; i < TempPositions.Size; i++)
 		{

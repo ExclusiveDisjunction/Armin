@@ -8,24 +8,29 @@ namespace Armin::Editors::Users
 	using namespace Files;
 	using namespace UI;
 
-	UserSearch::UserSearch(UserSystem* System)
+	UserSearchEditor::UserSearchEditor(UserSystem* System)
 	{
 		if (!System)
 			_System = dynamic_cast<UserSystem*>(LoadedProject);
 		else
 			_System = System;
 	}
-
-	LRESULT __stdcall UserSearch::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	UserSearchEditor::~UserSearchEditor()
 	{
-		UserSearch* Item = reinterpret_cast<UserSearch*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+		if (Objects)
+			delete Objects;
+	}
+
+	LRESULT __stdcall UserSearchEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+	{
+		UserSearchEditor* Item = reinterpret_cast<UserSearchEditor*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
 		if (!Item)
 			return DefWindowProcW(Window, Message, wp, lp);
 		
 		return EditorProc(Item, Window, Message, wp, lp);
 	}
 
-	void UserSearch::LoadControls()
+	void UserSearchEditor::LoadControls()
 	{
 		if (_Loaded)
 			return;
@@ -153,10 +158,14 @@ namespace Armin::Editors::Users
 				ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 				ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 				ObjectScroll->SetViewer(ObjectView);
+
+				if (Objects)
+					delete Objects;
+				Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 			}
 		}
 	}
-	void UserSearch::RunSearch()
+	void UserSearchEditor::RunSearch()
 	{
 		UserSet* Users = !_System ? nullptr : _System->Users;
 		if (!Users || Users->Count == 0)
@@ -212,11 +221,10 @@ namespace Armin::Editors::Users
 				Revised.Add(User);
 		}
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Revised, ObjectView, nullptr, true, true, ObjectScroll);
+		Objects->GenerateList(Revised, nullptr, true, true);
 	}
 
-	LRESULT UserSearch::Size()
+	LRESULT UserSearchEditor::Size()
 	{
 		if (!_Loaded)
 			return 0;
@@ -322,13 +330,13 @@ namespace Armin::Editors::Users
 				Height = WndRect.bottom - (10 + YCoord);
 
 				ObjectScroll->Move(XCoord, YCoord, Width, Height);
-				ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+				Objects->ReSizeList();
 			}
 		}
 
 		return 0;
 	}
-	LRESULT UserSearch::KeyDown(WPARAM wp)
+	LRESULT UserSearchEditor::KeyDown(WPARAM wp)
 	{
 		bool Shift = GetKeyState(VK_SHIFT) & 0x8000;
 		bool Control = GetKeyState(VK_CONTROL) & 0x8000;
@@ -341,7 +349,7 @@ namespace Armin::Editors::Users
 		case 'V':
 		case 'E':
 			if (Shift && Control)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E');
+				Objects->OpenSelectedForEditView(wp == 'E');
 			break;
 		case 'D':
 			if (Control)
@@ -357,7 +365,7 @@ namespace Armin::Editors::Users
 
 		return 0;
 	}
-	LRESULT UserSearch::Command(WPARAM wp, LPARAM lp)
+	LRESULT UserSearchEditor::Command(WPARAM wp, LPARAM lp)
 	{
 		switch (wp)
 		{
@@ -365,18 +373,18 @@ namespace Armin::Editors::Users
 			RunSearch();
 			break;
 		case 5: //Save Result
-			ComponentViewer::SaveSelectedAsGroup(Objects);
+			Objects->SaveSelectedAsGroup();
 			break;
 		case 6: //Duplicate Result
-			ComponentViewer::PopoutObjects(Objects, L"User Search Result", reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
+			Objects->PopoutObjects(L"User Search Result", reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
 			break;
 		case 7: //View
 		case 8: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8);
+			Objects->OpenSelectedForEditView(wp == 8);
 			break;
 		case 9: //SelectAll
 		case 10: //DeSelectAll
-			for (ComponentViewer* Obj : Objects)
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 				Obj->CheckState(wp == 9);
 			break;
 		}
@@ -384,7 +392,7 @@ namespace Armin::Editors::Users
 		return 0;
 	}
 
-	void UserSearch::Reset()
+	void UserSearchEditor::Reset()
 	{
 		Username->SetText(String());
 		FirstName->SetText(String());
@@ -393,6 +401,6 @@ namespace Armin::Editors::Users
 		Assurance->SetCheckState(true);
 		Standard->SetCheckState(true);
 
-		CloseControls(Objects);
+		Objects->Clear();
 	}
 }

@@ -21,6 +21,11 @@ namespace Armin::Editors::Inventory
 		else
 			_System = System;
 	}
+	InventoryEditor::~InventoryEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	void InventoryEditor::LoadControls()
 	{
@@ -121,6 +126,12 @@ namespace Armin::Editors::Inventory
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+			
+			if (Objects)
+				delete Objects;
+
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -135,8 +146,7 @@ namespace Armin::Editors::Inventory
 
 		QuickSort(Items, [](InventoryItem*& One, InventoryItem*& Two) { return static_cast<wstring>(One->SerialNumber) < static_cast<wstring>(Two->SerialNumber); });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Items, ObjectView, NULL, true, true, ObjectScroll);
+		Objects->GenerateList(Items, NULL, true, true);
 	}
 
 	LRESULT InventoryEditor::Command(WPARAM wp, LPARAM lp)
@@ -155,7 +165,7 @@ namespace Armin::Editors::Inventory
 		case 7: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			Vector<Component*> Targets = ComponentViewer::RetriveFromList(Objects, Selected);
+			Vector<Component*> Targets = Objects->RetriveFromList(Selected);
 
 			if (Targets.Size == 0)
 			{
@@ -176,25 +186,21 @@ namespace Armin::Editors::Inventory
 				delete Item;
 
 				ComponentViewer* Viewer = Selected[i];
-				Objects.Remove(Viewer);
 				delete Viewer;
 			}
 
 			AppState |= APS_HasEdit;
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 			break;
 		}
 		case 9: //Edit		
 		case 8: //View
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+			Objects->OpenSelectedForEditView(wp == 9);
 			break;
 		case 10: //SelectAll
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(true);
-			break;
 		case 11: //DelectAll
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(false);
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+				Obj->CheckState(wp == 10);
 			break;
 		}
 		return 0;
@@ -222,7 +228,7 @@ namespace Armin::Editors::Inventory
 			}
 
 			if ((GetKeyState(VK_CONTROL) & 0x8000))
-				ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E');
+				Objects->OpenSelectedForEditView(Key == 'E');
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
@@ -306,7 +312,7 @@ namespace Armin::Editors::Inventory
 		}
 
 		{
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;

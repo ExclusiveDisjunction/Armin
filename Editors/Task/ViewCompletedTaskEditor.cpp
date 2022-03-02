@@ -88,13 +88,13 @@ namespace Armin::Editors::Tasks
 			Width = WndRect.right - (10 + XCoord);
 			LabelStyle.Alignment = TA_LeftAlignment;
 
-			Task = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, Target->Tasks->Item(0), false, false);
+			Task = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, Target->Tasks->Item(0), false, nullptr, false);
 			YCoord += 10 + Height;
 
 			DateCompleted = new Label(XCoord, YCoord, Width, Height, _Base, ins, Target->DateCompleted.ToString(DateStringFormat::ShortDate), BaseBk, TextStyle, false);
 			YCoord += 10 + Height;
 
-			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, Target->AssuredBy->Target(), false);
+			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, Target->AssuredBy->Target(), false, nullptr);
 			YCoord += 10 + Height;
 
 			int ButtonSize = Height;

@@ -15,6 +15,11 @@ namespace Armin::Editors::Tasks
         Source = Target;		
 		_EditMode = EditMode;
 	}
+    ViewTaskEditor::~ViewTaskEditor()
+    {
+        if (AssignedObjects)
+            delete AssignedObjects;
+    }
 
 	LRESULT __stdcall ViewTaskEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -109,6 +114,10 @@ namespace Armin::Editors::Tasks
                 AssignedView = new Grid(0, 0, 910, 32, AssignedScroll, ins, Style);
                 AssignedScroll->SetViewer(AssignedView);
 
+                if (AssignedObjects)
+                    delete AssignedObjects;
+                AssignedObjects = new ComponentViewerList(AssignedView, AssignedScroll);
+
                 FillAssigned();
             }
 
@@ -141,9 +150,8 @@ namespace Armin::Editors::Tasks
             return;
 
         Vector<Files::User*> Assigned = ComponentReference::Convert<User>(Source->AssignedTo);
-        CloseControls(AssignedObjects);
 
-        AssignedObjects = ComponentViewer::GenerateList(Assigned, AssignedView, NULL, _DummySelect, true, AssignedScroll);
+        AssignedObjects->GenerateList(Assigned, NULL, _DummySelect, true);
 	}
 
 	LRESULT ViewTaskEditor::Command(WPARAM wp, LPARAM lp)
@@ -230,7 +238,7 @@ namespace Armin::Editors::Tasks
                 Height = WndRect.bottom - (10 + YCoord);
 
                 AssignedScroll->Move(XCoord, YCoord, Width, Height);
-                ComponentViewer::ReSizeList(AssignedObjects, AssignedView, AssignedScroll);
+                AssignedObjects->ReSizeList();
             }
 
             XCoord = (WndRect.right / 2) + 10;

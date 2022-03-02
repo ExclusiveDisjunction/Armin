@@ -20,6 +20,11 @@ namespace Armin::Editors::Tasks
 		else
 			_System = System;
 	}
+	TasksEditor::~TasksEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	LRESULT __stdcall TasksEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -127,6 +132,11 @@ namespace Armin::Editors::Tasks
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -140,8 +150,7 @@ namespace Armin::Editors::Tasks
 
 		QuickSort(SortedTasks, [](Task*& One, Task*& Two) { return One->DueBy < Two->DueBy; });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(SortedTasks, ObjectView, NULL, true, true, ObjectScroll);
+		Objects->GenerateList(SortedTasks, NULL, true, true);
 		this->ObjectCount->SetText(SortedTasks.Size);
 	}
 
@@ -216,7 +225,7 @@ namespace Armin::Editors::Tasks
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -238,7 +247,7 @@ namespace Armin::Editors::Tasks
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && (AppState & APS_HasAdminUser));
+				Objects->OpenSelectedForEditView(wp == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		case 'C':
 			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
@@ -269,7 +278,7 @@ namespace Armin::Editors::Tasks
 			}
 
 			Vector<ComponentViewer*> Viewers;
-			Vector<Component*> Targets = ComponentViewer::RetriveFromList(Objects, Viewers);
+			Vector<Component*> Targets = Objects->RetriveFromList(Viewers);
 
 			if (Targets.Size == 0)
 			{
@@ -288,29 +297,26 @@ namespace Armin::Editors::Tasks
 					continue;
 
 				delete Conv;
-
-				ComponentViewer* Viewer = Viewers[i];
-				Objects.Remove(Viewer);
-				delete Viewer;
+				delete Viewers[i];
 			}
 
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 
 			AppState |= APS_HasEdit;
 			break;
 		}
 		case 7: //View
 		case 8: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && (AppState & APS_HasAdminUser));
+			Objects->OpenSelectedForEditView(wp == 8 && (AppState & APS_HasAdminUser));
 			break;
 		case 9: //SelectAll
 		case 10: //DeSelectAll
-			for (ComponentViewer* Obj : Objects)
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 				Obj->CheckState(wp == 9);
 			break;
 		case 11: //CompleteTask
 		{
-			Vector<Component*> Raw = ComponentViewer::RetriveFromList(Objects);
+			Vector<Component*> Raw = Objects->RetriveFromList();
 
 			for (uint i = 0; i < Raw.Size; i++)
 			{

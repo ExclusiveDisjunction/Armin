@@ -155,7 +155,7 @@ namespace Armin
 				Button* Search, * Add, * Remove, * View, * Edit, * SelectAll, * DeSelectAll, * CompleteTask;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -169,6 +169,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				TasksEditor(Files::TaskSystem* System);
+				~TasksEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
@@ -194,7 +195,7 @@ namespace Armin
 				Label* Title, * Instructions, * DueBy, * RequiresAssurance;
 				ScrollViewer* AssignedScroll;
 				Grid* AssignedView;
-				Vector<UI::ComponentViewer*> AssignedObjects;
+				UI::ComponentViewerList* AssignedObjects;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -207,6 +208,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				ViewTaskEditor(Files::Task* Target, bool EditMode = true);
+				~ViewTaskEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
@@ -276,7 +278,7 @@ namespace Armin
 				Button* GoToTasks, * View, *SelectAll, *DeSelectAll;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -290,6 +292,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				CompletedTasksEditor(Files::TaskSystem* System);
+				~CompletedTasksEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
@@ -395,7 +398,7 @@ namespace Armin
 				Button* Add, * Remove, * View, * Edit, * SelectAll, * DeSelectAll, * Search;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -409,6 +412,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				JobPositionsEditor(Files::UserSystem* System);
+				~JobPositionsEditor();
 
 				EditorTypes EditorType() const override { return EDT_JobPositions; }
 				bool IsApplyable() const override { return false; }
@@ -465,7 +469,7 @@ namespace Armin
 				Button* Search, * SignOut, * Add, * Remove, * Edit, * View, *SelectAll, *DeSelectAll;
 				Grid* ObjectView;
 				ScrollViewer* ObjectScroll;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -479,6 +483,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				UsersEditor(Files::UserSystem* System);
+				~UsersEditor();
 
 				EditorTypes EditorType() const override { return EDT_Users; }
 				bool IsApplyable() const override { return false; }
@@ -501,7 +506,7 @@ namespace Armin
 				Grid* PositionView;
 				Button* Change, * Timecards, *Homepage;
 
-				Vector<UI::ComponentViewer*> Positions;
+				UI::ComponentViewerList* Positions;
 
 				Files::User* Current;
 
@@ -541,7 +546,7 @@ namespace Armin
 				ComboBox* UserType;
 				ScrollViewer* PositionsScroll;
 				Grid* PositionsView;
-				Vector<UI::ComponentViewer*> Positions;
+				UI::ComponentViewerList* Positions;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
@@ -557,6 +562,7 @@ namespace Armin
 				/// </summary>
 				/// <param name="Target">If Target != nullptr, edit mode is enabled, add mode if not.</param>
 				CreateEditUserEditor(Files::User* Target);
+				~CreateEditUserEditor();
 
 				EditorTypes EditorType() const override { return EDT_CreateEditUser; }
 				bool IsApplyable() const override { return true; }
@@ -580,7 +586,7 @@ namespace Armin
 				UI::ComponentViewer* CurrentUser;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 				Button* SignOut, * Lock, * GoToTasks, * Timecard;
 				Button* CompleteTask, * View, * Edit, *SelectAll, *DeSelectAll;
 
@@ -594,6 +600,7 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
 				UserHomepageEditor(Files::User* Target);
+				~UserHomepageEditor();
 
 				EditorTypes EditorType() const override { return EDT_UserHomepage; }
 				bool IsApplyable() const override { return false; }
@@ -609,7 +616,7 @@ namespace Armin
 				void Reset() override;
 			};
 
-			class UserSearch : public EditorFrame
+			class UserSearchEditor : public EditorFrame
 			{
 			private:
 				Files::UserSystem* _System;
@@ -622,7 +629,7 @@ namespace Armin
 
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
@@ -632,7 +639,8 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
-				UserSearch(Files::UserSystem* System);
+				UserSearchEditor(Files::UserSystem* System);
+				~UserSearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_UserSearch; }
 				bool IsApplyable() const override { return false; }
@@ -640,7 +648,7 @@ namespace Armin
 				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
-				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearch*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
+				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearchEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"User Search"; }
 				String GetNotes() const override { return L"Use commas (',') to separate Usernames and Names.\nA blank record in any feild will result in allowing all data to pass through that filter."; }
 				WNDPROC ThisProc() const override { return WndProc; }
@@ -660,7 +668,7 @@ namespace Armin
 				Button* ImportCSV = nullptr, *InvSearch = nullptr, * Add = nullptr, * Remove = nullptr, * Edit = nullptr, * View = nullptr, *SelectAll = nullptr, *DeSelectAll = nullptr;
 				Grid* ObjectView = nullptr;
 				ScrollViewer* ObjectScroll = nullptr;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -672,6 +680,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				InventoryEditor(Files::InventorySystem* System);
+				~InventoryEditor();
 
 				EditorTypes EditorType() const override { return EDT_Inventory; }
 				bool IsApplyable() const override { return false; }
@@ -695,7 +704,7 @@ namespace Armin
 				Button* Add, * Remove, * View, * Edit, * Search, * SelectAll, * DeSelectAll;
 				Grid* ObjectView;
 				ScrollViewer* ObjectScroll;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -708,6 +717,7 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				OperationInventoryEditor(Files::InventorySystem* System);
+				~OperationInventoryEditor();
 
 				EditorTypes EditorType() const override { return EDT_OperationInventory; }
 				bool IsApplyable() const override { return false; }
@@ -800,7 +810,7 @@ namespace Armin
 				ScrollViewer* ObjectScroll = nullptr;
 				Grid* ObjectView = nullptr;
 				Button* View = nullptr, * Edit = nullptr, * DuplicateResult = nullptr;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				TextBox* SerialNumber = nullptr, * Group = nullptr;
 				Button* SelectGroups = nullptr;
@@ -820,6 +830,7 @@ namespace Armin
 				
 			public:
 				InventorySearchEditor(Files::InventorySystem* System, bool Mode = false);
+				~InventorySearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_InventorySearch; }
 				bool IsApplyable() const override { return false; }
@@ -844,7 +855,7 @@ namespace Armin
 				TextBox* Name;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 				Button* Modify, * Remove, * View, * Edit;
 
 				bool _Multiselect;
@@ -859,6 +870,7 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
 				AddReferenceGroupEditor();
+				~AddReferenceGroupEditor();
 
 				EditorTypes EditorType() const override { return EDT_AddReferenceGroup; }
 				bool IsApplyable() const override { return true; }
@@ -884,7 +896,7 @@ namespace Armin
 				Button* Modify, * Remove, * View, * Edit;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				bool _Multiselect = true;
 
@@ -897,6 +909,7 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp);
 			public:
 				ViewEditReferenceGroupEditor(Files::RefrenceGroup* Target, bool EditMode);
+				~ViewEditReferenceGroupEditor();
 
 				EditorTypes EditorType() const override { return EDT_ViewEditReferenceGroup; }
 				bool IsApplyable() const override { return _EditMode; }
@@ -920,7 +933,7 @@ namespace Armin
 				Button* Add, * Remove, * Edit, * View, *SelectAll, *DeSelectAll, *Search;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -934,6 +947,7 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
 				ReferenceGroupsEditor(Files::ProjectBase* Source);
+				~ReferenceGroupsEditor();
 
 				EditorTypes EditorType() const override { return EDT_ReferenceGroups; }
 				bool IsApplyable() const override { return false; }
@@ -1051,7 +1065,7 @@ namespace Armin
 				CheckableButton* Users, * Tasks, * CompletedTasks, * InventoryItems, * JobPositions, * OperationInventoryItems, * RefrenceGroups;
 				ScrollViewer* ObjectScroll, * TypesScroll;
 				Grid* ObjectView, * TypesView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				bool _Multiselect = true;
 
@@ -1066,6 +1080,7 @@ namespace Armin
 
 			public:
 				QuickSearchEditor(int Filter = Files::ComponentTypes::CT_All);
+				~QuickSearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_QuickSearch; }
 				bool IsApplyable() const override { return false; }

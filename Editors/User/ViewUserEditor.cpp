@@ -17,7 +17,9 @@ namespace Armin::Editors::Users
 	ViewUserEditor::~ViewUserEditor()
 	{
 		MiscControls.Clear();
-		Positions.Clear();
+		
+		if (Positions)
+			delete Positions;
 	}
 
 	LRESULT __stdcall ViewUserEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -130,8 +132,12 @@ namespace Armin::Editors::Users
 			PositionView = new Grid(0, 0, Width, Height, PositionScroll, ins, Style);
 			PositionScroll->SetViewer(PositionView);
 
+			if (Positions)
+				delete Positions;
+			Positions = new ComponentViewerList(PositionView, PositionScroll);
+
 			if (Current != nullptr)
-				Positions = ComponentViewer::GenerateListRef(Current->Positions, PositionView, NULL, true, true, PositionScroll);
+				Positions->GenerateListRef(Current->Positions, NULL, true, true);
 		}
 	}
 
@@ -237,7 +243,7 @@ namespace Armin::Editors::Users
 			Height = WndRect.bottom - 10 - YCoord;
 
 			PositionScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Positions, PositionView, PositionScroll);
+			Positions->ReSizeList();
 		}
 
 		return 0;
@@ -252,10 +258,7 @@ namespace Armin::Editors::Users
 		LastName->SetText(Current->LastName);
 		UserType->SetText(Current->IsAdmin ? L"Admin" : Current->IsAssurance ? L"Assurance" : L"Standard");
 
-		{
-			CloseControls(Positions);
-			Positions = ComponentViewer::GenerateListRef(Current->Positions, PositionView, NULL, true, true, PositionScroll);
-		}
+		Positions->GenerateListRef(Current->Positions, NULL, true, true);
 	}
 	bool ViewUserEditor::TestOnCondition(Vector<void*> Args) const
 	{

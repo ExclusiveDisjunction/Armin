@@ -18,6 +18,11 @@ namespace Armin::Editors::RefGroups
 		else
 			_Source = Source;
 	}
+	ReferenceGroupsEditor::~ReferenceGroupsEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	LRESULT __stdcall ReferenceGroupsEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -119,6 +124,11 @@ namespace Armin::Editors::RefGroups
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -130,9 +140,8 @@ namespace Armin::Editors::RefGroups
 
 		Vector<RefrenceGroup*> New = *Groups;
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(New, ObjectView, NULL, true, true, ObjectScroll);
-		ObjectCount->SetText(Objects.Size);
+		Objects->GenerateList(New, NULL, true, true);
+		ObjectCount->SetText(Objects->Size);
 	}
 
 	LRESULT ReferenceGroupsEditor::Size()
@@ -142,6 +151,7 @@ namespace Armin::Editors::RefGroups
 
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
+
 
 		MoveUpperButtons(WndRect);
 
@@ -204,7 +214,7 @@ namespace Armin::Editors::RefGroups
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 		return 0;
 	}
@@ -225,7 +235,7 @@ namespace Armin::Editors::RefGroups
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E');
+				Objects->OpenSelectedForEditView(wp == 'E');
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, wp, 0);
@@ -245,7 +255,7 @@ namespace Armin::Editors::RefGroups
 		case 6: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			Vector<Component*> RTargets = ComponentViewer::RetriveFromList(Objects, Selected);
+			Vector<Component*> RTargets = Objects->RetriveFromList(Selected);
 			Vector<RefrenceGroup*> Targets;
 			for (uint i = 0; i < RTargets.Size; i++)
 			{
@@ -264,12 +274,12 @@ namespace Armin::Editors::RefGroups
 				if (Result == IDYES)
 				{
 					for (uint i = 0; i < Targets.Size; i++)
+					{
 						delete Targets[i];
+						delete Selected[i];
+					}
 
-					for (uint i = 0; i < Selected.Size; i++)
-						Objects.Remove(Selected[i]);
-					CloseControls(Selected);
-					ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+					Objects->ReSizeList();
 				}
 			}
 			else
@@ -278,15 +288,12 @@ namespace Armin::Editors::RefGroups
 		}
 		case 7: //View
 		case 8: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 8);
+			Objects->OpenSelectedForEditView(wp == 8);
 			break;
 		case 9: //Select All
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(false);
-			break;
 		case 10: //DeSelect All
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(false);
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+				Obj->CheckState(wp == 9);
 			break;
 		}
 		return 0;
