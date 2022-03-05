@@ -103,7 +103,7 @@ namespace Armin::Files::V2021
 		{
 			for (uint i = 0; i < RefrenceGroups->Count; i++)
 			{
-				RefrenceGroup* This = RefrenceGroups->Item(i);
+				ReferenceGroup* This = RefrenceGroups->Item(i);
 				if (This->ID == ID)
 					Return = This;
 			}

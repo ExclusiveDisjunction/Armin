@@ -248,7 +248,7 @@ namespace Armin::Files
 		{
 			for (uint i = 0; i < RefrenceGroups->Count; i++)
 			{
-				RefrenceGroup* Group = RefrenceGroups->Item(i);
+				ReferenceGroup* Group = RefrenceGroups->Item(i);
 				if (Group->ID == ID)
 					Return = Group;
 			}

@@ -6,13 +6,13 @@ using namespace std;
 
 namespace Armin::Files::V2021
 {
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList) : Component(File, true)
+	ReferenceGroup::ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone) : Component(File, true)
+	ReferenceGroup::ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList, ReferenceGroup* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -25,7 +25,7 @@ namespace Armin::Files::V2021
 			Targets = ToClone->Targets;
 		}
 	}
-	RefrenceGroup::RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, std::ifstream& InFile) : Component(File, false)
+	ReferenceGroup::ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -33,7 +33,7 @@ namespace Armin::Files::V2021
 
 		Fill(InFile);
 	}
-	RefrenceGroup::~RefrenceGroup()
+	ReferenceGroup::~ReferenceGroup()
 	{
 		for (ComponentReference* Ref : Targets)
 			delete Ref;
@@ -42,7 +42,7 @@ namespace Armin::Files::V2021
 		_ParentList->Pop(this);
 	}
 
-	void RefrenceGroup::Fill(ifstream& InFile)
+	void ReferenceGroup::Fill(ifstream& InFile)
 	{
 		AString Header;
 		getline(InFile, Header);
@@ -65,7 +65,7 @@ namespace Armin::Files::V2021
 					continue;
 
 				AStringList ThisParts = Temp.Split('~');
-				if (ThisLine.TabIndex() == TabIndex && ThisParts[1] == "RefrenceGroup" && ThisParts[0] == "end")
+				if (ThisLine.TabIndex() == TabIndex && ThisParts[1] == "ReferenceGroup" && ThisParts[0] == "end")
 					break;
 			}
 		}
@@ -87,7 +87,7 @@ namespace Armin::Files::V2021
 			else if (Name == "ID") _ID = Value.ToLong();
 		}
 	}
-	void RefrenceGroup::Push(ofstream& OutFile, uint PreIndex) const
+	void ReferenceGroup::Push(ofstream& OutFile, uint PreIndex) const
 	{
 		AString TabIndexValue;
 		for (uint i = 0; i < PreIndex; i++)

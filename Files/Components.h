@@ -65,9 +65,9 @@ namespace Armin::Files
 	class OperationInventoryItemParent;
 	using OperationInventoryItemGroup = ComponentList<OperationInventoryItem, OperationInventoryItemParent>;
 
-	class RefrenceGroup;
+	class ReferenceGroup;
 	class RefrenceGroupParent;
-	using RefrenceGroupList = ComponentList<RefrenceGroup, RefrenceGroupParent>;
+	using ReferenceGroupList = ComponentList<ReferenceGroup, RefrenceGroupParent>;
 
 	class ComponentReference;
 
@@ -601,41 +601,41 @@ namespace Armin::Files
 
 #pragma endregion
 
-	class RefrenceGroup : public Component
+	class ReferenceGroup : public Component
 	{
 	private:
-		RefrenceGroupList* _ParentList;
+		ReferenceGroupList* _ParentList;
 		RefrenceGroupParent* _Parent;
 	public:
-		RefrenceGroup() = delete;
-		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList);
-		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone);
-		RefrenceGroup(ProjectBase* File, RefrenceGroupList* ParentList, std::ifstream& OutFile);
-		RefrenceGroup(const RefrenceGroup& Obj) = delete;
-		RefrenceGroup(const RefrenceGroup&& Obj) = delete;
-		~RefrenceGroup();
+		ReferenceGroup() = delete;
+		ReferenceGroup(ProjectBase* File, ReferenceGroupList* ParentList);
+		ReferenceGroup(ProjectBase* File, ReferenceGroupList* ParentList, ReferenceGroup* ToClone);
+		ReferenceGroup(ProjectBase* File, ReferenceGroupList* ParentList, std::ifstream& OutFile);
+		ReferenceGroup(const ReferenceGroup& Obj) = delete;
+		ReferenceGroup(const ReferenceGroup&& Obj) = delete;
+		~ReferenceGroup();
 
-		RefrenceGroup& operator=(const RefrenceGroup& Obj) = delete;
-		RefrenceGroup& operator=(const RefrenceGroup&& Obj) = delete;
+		ReferenceGroup& operator=(const ReferenceGroup& Obj) = delete;
+		ReferenceGroup& operator=(const ReferenceGroup&& Obj) = delete;
 
-		RefrenceGroup* Next, * Last;
+		ReferenceGroup* Next, * Last;
 		RefrenceGroupParent* const& Parent = _Parent;
-		inline static const String ThisName = L"RefrenceGroup";
+		inline static const String ThisName = L"ReferenceGroup";
 
 		ReferenceList Targets;
 		String Notes;
 
 		ComponentTypes ObjectType() const override { return CT_RefrenceGroup; }
-		String ToString() const override { return L"Refrence Group | Title: " + Title(); }
+		String ToString() const override { return L"Reference Group | Title: " + Title(); }
 		void Fill(std::ifstream& InFile) override;
 		void Push(std::ofstream& OutFile, uint TabIndex) const override;
 	};
 	class RefrenceGroupParent : public ComponentParent
 	{
 	private:
-		RefrenceGroupList* _RefrenceGroups;
+		ReferenceGroupList* _RefrenceGroups;
 	protected:
-		RefrenceGroupParent(ProjectBase* File) : _RefrenceGroups(new RefrenceGroupList(File, this)) { }
+		RefrenceGroupParent(ProjectBase* File) : _RefrenceGroups(new ReferenceGroupList(File, this)) { }
 		RefrenceGroupParent() : _RefrenceGroups(nullptr) {}
 	public:
 		~RefrenceGroupParent()
@@ -644,7 +644,7 @@ namespace Armin::Files
 			_RefrenceGroups = nullptr;
 		}
 
-		RefrenceGroupList*& RefrenceGroups = _RefrenceGroups;
+		ReferenceGroupList*& RefrenceGroups = _RefrenceGroups;
 	};
 
 	class ProjectBase : public ConfigItemParent, public RefrenceGroupParent

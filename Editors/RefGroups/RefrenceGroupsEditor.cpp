@@ -134,11 +134,11 @@ namespace Armin::Editors::RefGroups
 	}
 	void ReferenceGroupsEditor::FillObjects()
 	{
-		RefrenceGroupList* Groups = !LoadedProject ? nullptr : LoadedProject->RefrenceGroups;
+		ReferenceGroupList* Groups = !LoadedProject ? nullptr : LoadedProject->RefrenceGroups;
 		if (!Groups)
 			return;
 
-		Vector<RefrenceGroup*> New = *Groups;
+		Vector<ReferenceGroup*> New = *Groups;
 
 		Objects->GenerateList(New, NULL, true, true);
 		ObjectCount->SetText(Objects->Size);
@@ -256,15 +256,15 @@ namespace Armin::Editors::RefGroups
 		{
 			Vector<ComponentViewer*> Selected;
 			Vector<Component*> RTargets = Objects->RetriveFromList(Selected);
-			Vector<RefrenceGroup*> Targets;
+			Vector<ReferenceGroup*> Targets;
 			for (uint i = 0; i < RTargets.Size; i++)
 			{
-				RefrenceGroup* Conv = dynamic_cast<RefrenceGroup*>(RTargets[i]);
+				ReferenceGroup* Conv = dynamic_cast<ReferenceGroup*>(RTargets[i]);
 				if (Conv)
 					Targets.Add(Conv);
 			}
 
-			RefrenceGroupList* Groups = LoadedProject->RefrenceGroups;
+			ReferenceGroupList* Groups = LoadedProject->RefrenceGroups;
 			if (!Groups)
 				break;
 

@@ -12,7 +12,7 @@ namespace Armin::Editors::RefGroups
 	using namespace UI;
 	using namespace UI::Search;
 
-	ViewEditReferenceGroupEditor::ViewEditReferenceGroupEditor(RefrenceGroup* Target, bool EditMode)
+	ViewEditReferenceGroupEditor::ViewEditReferenceGroupEditor(ReferenceGroup* Target, bool EditMode)
 	{
 		_EditMode = EditMode;
 		_Target = Target;		
@@ -35,6 +35,9 @@ namespace Armin::Editors::RefGroups
 	void ViewEditReferenceGroupEditor::LoadControls()
 	{
 		if (_Loaded)
+			return;
+
+		if (_Target && _BTarget && !_BTarget->Target())
 			return;
 
 		_Loaded = true;
@@ -79,7 +82,7 @@ namespace Armin::Editors::RefGroups
 
 			{
 				if (_EditMode)
-					TitleEd = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, _Target->Title(), Style, TextStyle);
+					TitleEd = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, _Target ? _Target->Title() : String(), Style, TextStyle);
 				else
 					TitleVi = new Label(XCoord, YCoord, Width, Height, _Base, ins, _Target->Title(), Grey3, TextStyle, false);
 			}
@@ -115,7 +118,7 @@ namespace Armin::Editors::RefGroups
 				ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 				ObjectScroll->SetViewer(ObjectView);
 
-				Objects->GenerateListRef(_Target->Targets, NULL, _Multiselect, true);
+				Objects->GenerateListRef(!_Target ? ReferenceList() : _Target->Targets, NULL, _Multiselect, true);
 			}
 		}
 	}

@@ -24,7 +24,7 @@ namespace Armin
 		class OperationInventoryItem;
 		class User;
 		class UserSystem;
-		class RefrenceGroup;
+		class ReferenceGroup;
 		class Task;
 		class TaskSystem;
 	}
@@ -888,7 +888,8 @@ namespace Armin
 			class ViewEditReferenceGroupEditor : public EditorFrame
 			{
 			private:
-				Files::RefrenceGroup* _Target;
+				Files::ComponentReference* _BTarget;
+				Files::ReferenceGroup* _Target;
 				bool _EditMode = false;
 
 				TextBox* TitleEd;
@@ -908,7 +909,7 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp);
 			public:
-				ViewEditReferenceGroupEditor(Files::RefrenceGroup* Target, bool EditMode);
+				ViewEditReferenceGroupEditor(Files::ReferenceGroup* Target, bool EditMode);
 				~ViewEditReferenceGroupEditor();
 
 				EditorTypes EditorType() const override { return EDT_ViewEditReferenceGroup; }

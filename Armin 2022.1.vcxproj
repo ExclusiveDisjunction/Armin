@@ -232,7 +232,7 @@
     <ClCompile Include="Files\JobPosition.cpp" />
     <ClCompile Include="Files\OperationInventoryItem.cpp" />
     <ClCompile Include="Files\ReferenceList.cpp" />
-    <ClCompile Include="Files\RefrenceGroup.cpp" />
+    <ClCompile Include="Files\ReferenceGroup.cpp" />
     <ClCompile Include="Files\SearchCriteria.cpp" />
     <ClCompile Include="Files\SessionControl.cpp" />
     <ClCompile Include="Files\Task.cpp" />

@@ -247,11 +247,11 @@ namespace Armin::Editors::Misc
 			break;
 		case 11: //Save Selection
 		{
-			RefrenceGroupList* RefGroups = LoadedProject->RefrenceGroups;
+			ReferenceGroupList* RefGroups = LoadedProject->RefrenceGroups;
 			if (!RefGroups)
 				break;
 
-			RefrenceGroup* New = new RefrenceGroup(LoadedProject, RefGroups);
+			ReferenceGroup* New = new ReferenceGroup(LoadedProject, RefGroups);
 			New->Targets = ComponentReference::Generate(Objects->GetAllComponents());
 
 			AppState |= APS_HasEdit;

@@ -253,7 +253,7 @@ namespace Armin::UI
 					else if (Type == CT_Task)
 						EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(dynamic_cast<Task*>(Current)), nullptr);
 					else if (Type == CT_RefrenceGroup)
-						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<RefrenceGroup*>(Current), true), nullptr);
+						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<ReferenceGroup*>(Current), true), nullptr);
 				}
 			}
 		}
@@ -296,20 +296,20 @@ namespace Armin::UI
 					else if (Type == CT_CompletedTask)
 						EditorRegistry::OpenEditor(new Tasks::ViewCompletedTaskEditor(dynamic_cast<CompletedTask*>(Current)), nullptr);
 					else if (Type == CT_RefrenceGroup)
-						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<RefrenceGroup*>(Current), false), nullptr);
+						EditorRegistry::OpenEditor(new RefGroups::ViewEditReferenceGroupEditor(dynamic_cast<ReferenceGroup*>(Current), false), nullptr);
 				}
 			}
 		}
 	}
-	RefrenceGroup* ComponentViewerList::SaveSelectedAsGroup(bool Mode)
+	ReferenceGroup* ComponentViewerList::SaveSelectedAsGroup(bool Mode)
 	{
 		Vector<Component*> Targets = Mode ? RetriveFromList() : GetAllComponents();
 
-		RefrenceGroupList* Groups = LoadedProject->RefrenceGroups;
+		ReferenceGroupList* Groups = LoadedProject->RefrenceGroups;
 		if (!Groups)
 			return nullptr;
 
-		RefrenceGroup* New = new RefrenceGroup(LoadedProject, Groups);
+		ReferenceGroup* New = new ReferenceGroup(LoadedProject, Groups);
 		New->Targets = ComponentReference::Generate(Targets);
 
 		AppState |= APS_HasEdit;

@@ -129,7 +129,7 @@
     <ClCompile Include="Files\ReferenceList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\RefrenceGroup.cpp">
+    <ClCompile Include="Files\ReferenceGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Files\SearchCriteria.cpp">

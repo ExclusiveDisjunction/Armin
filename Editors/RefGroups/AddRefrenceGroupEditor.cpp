@@ -218,7 +218,7 @@ namespace Armin::Editors::RefGroups
 				return false;
 		}
 
-		RefrenceGroupList* Groups = File->RefrenceGroups;
+		ReferenceGroupList* Groups = File->RefrenceGroups;
 		if (!Groups)
 		{
 			if (PromptErrors)
@@ -226,7 +226,7 @@ namespace Armin::Editors::RefGroups
 			return false;
 		}
 
-		RefrenceGroup* New = new RefrenceGroup(File, Groups);
+		ReferenceGroup* New = new ReferenceGroup(File, Groups);
 		New->Title(Title);
 		New->Targets = ComponentReference::Generate(Targets);
 

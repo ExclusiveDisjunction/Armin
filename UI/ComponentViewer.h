@@ -16,7 +16,7 @@ namespace Armin
 	{
 		class Component;
 		class ComponentReference;
-		class RefrenceGroup;
+		class ReferenceGroup;
 		class ReferenceList;
 	}
 
@@ -74,7 +74,7 @@ namespace Armin
 			}
 
 			void OpenSelectedForEditView(bool EditMode);
-			Files::RefrenceGroup* SaveSelectedAsGroup(bool Mode = false);
+			Files::ReferenceGroup* SaveSelectedAsGroup(bool Mode = false);
 			void PopoutObjects(String Title, HINSTANCE ins);
 		};
 

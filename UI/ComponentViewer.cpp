@@ -138,6 +138,8 @@ namespace Armin::UI
 		String RawText;
 		if (_BSource && _BSource->Target() != _Source)
 			RawText = L"Deleted Component";
+		else if (!_Source)
+			RawText = L"No Data";
 		else
 			RawText = _Source->ToString();
 

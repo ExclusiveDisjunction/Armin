@@ -3,7 +3,6 @@
 #include "Files\Stream.h"
 #include "About.h"
 #include "SideHost.h"
-#include "Tool\CreateImage.h"
 #include "..\UserRegistry.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"

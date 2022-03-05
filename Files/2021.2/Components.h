@@ -70,9 +70,9 @@ namespace Armin::Files::V2021
 	class OperationInventoryItemParent;
 	using OperationInventoryItemGroup = ComponentList<OperationInventoryItem, OperationInventoryItemParent>;
 
-	class RefrenceGroup;
+	class ReferenceGroup;
 	class RefrenceGroupParent;
-	using RefrenceGroupList = ComponentList<RefrenceGroup, RefrenceGroupParent>;
+	using ReferenceGroupList = ComponentList<ReferenceGroup, RefrenceGroupParent>;
 
 	class ComponentReference;
 
@@ -619,26 +619,26 @@ namespace Armin::Files::V2021
 
 #pragma endregion
 
-	class RefrenceGroup : public Component
+	class ReferenceGroup : public Component
 	{
 	private:
-		RefrenceGroupList* _ParentList;
+		ReferenceGroupList* _ParentList;
 		RefrenceGroupParent* _Parent;
 	public:
-		RefrenceGroup() = delete;
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList);
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, RefrenceGroup* ToClone);
-		RefrenceGroup(ArminSessionBase* File, RefrenceGroupList* ParentList, std::ifstream& OutFile);
-		RefrenceGroup(const RefrenceGroup& Obj) = delete;
-		RefrenceGroup(const RefrenceGroup&& Obj) = delete;
-		~RefrenceGroup();
+		ReferenceGroup() = delete;
+		ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList);
+		ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList, ReferenceGroup* ToClone);
+		ReferenceGroup(ArminSessionBase* File, ReferenceGroupList* ParentList, std::ifstream& OutFile);
+		ReferenceGroup(const ReferenceGroup& Obj) = delete;
+		ReferenceGroup(const ReferenceGroup&& Obj) = delete;
+		~ReferenceGroup();
 
-		RefrenceGroup& operator=(const RefrenceGroup& Obj) = delete;
-		RefrenceGroup& operator=(const RefrenceGroup&& Obj) = delete;
+		ReferenceGroup& operator=(const ReferenceGroup& Obj) = delete;
+		ReferenceGroup& operator=(const ReferenceGroup&& Obj) = delete;
 
-		RefrenceGroup* Next, * Last;
+		ReferenceGroup* Next, * Last;
 		RefrenceGroupParent* const& Parent = _Parent;
-		inline static const String ThisName = L"RefrenceGroup";
+		inline static const String ThisName = L"ReferenceGroup";
 
 		ReferenceList Targets;
 		String Notes;
@@ -651,9 +651,9 @@ namespace Armin::Files::V2021
 	class RefrenceGroupParent : public ComponentParent
 	{
 	private:
-		RefrenceGroupList* _RefrenceGroups;
+		ReferenceGroupList* _RefrenceGroups;
 	protected:
-		RefrenceGroupParent(ArminSessionBase* File) : _RefrenceGroups(new RefrenceGroupList(File, this)) { }
+		RefrenceGroupParent(ArminSessionBase* File) : _RefrenceGroups(new ReferenceGroupList(File, this)) { }
 		RefrenceGroupParent() : _RefrenceGroups(nullptr) {}
 	public:
 		~RefrenceGroupParent()
@@ -662,7 +662,7 @@ namespace Armin::Files::V2021
 			_RefrenceGroups = nullptr;
 		}
 
-		RefrenceGroupList* const& RefrenceGroups = _RefrenceGroups;
+		ReferenceGroupList* const& RefrenceGroups = _RefrenceGroups;
 	};
 
 	class ArminSessionBase : public ConfigItemParent, public RefrenceGroupParent

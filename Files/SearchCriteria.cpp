@@ -172,7 +172,7 @@ namespace Armin::Files
         }
         if (RefrenceGroups && File->RefrenceGroups)
         {
-            RefrenceGroupList* Groups = File->RefrenceGroups;
+            ReferenceGroupList* Groups = File->RefrenceGroups;
             for (uint i = 0; i < Groups->Count; i++)
                 Return.Add(Groups->Item(i));
         }
