@@ -1,0 +1,10 @@
+Timecards are children of Users
+Fix View User editor to not include tasks, but include timecards.
+Re-do timecard editor.
+Write Timeclock editor.
+Remove the timecard system.
+Make a new editor that displays basic user information and their tasks, along with timecard info.
+
+PILOT (2022.1)
+	Merge all add/edit editors to one single editor.
+	Create view editor for each control.

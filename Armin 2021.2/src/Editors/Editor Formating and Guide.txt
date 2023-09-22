@@ -1,0 +1,114 @@
+Terminology:
+
+	1. Editor: A collection of controls that preforms a specific action to display,edit,create,and present data to a user. 
+	2. EditorFrame: A base class that all editors must inherit to be considered in Armin's editor system.
+	3. EditorRegistry: A complex static class that controls ALL of Armin's editors and their data, status, and memory management.
+	4. Apply: An action that takes the data presented/edited/created in an editor and modifies the loaded data in memory.
+	5. Popout Editor: An editor that has the EditorPopout window as its parent.
+	6. Host Editor: An editor that has the Main window as its parent.
+
+Editor Classification & Applying
+
+	Editors fall under 6 sub types:
+		1. Applyable: An editor that modifies data in memory, or preforms some change. 
+		2. Condition Specific: An editor that has some kind of condition carried with it. The conditon is called an Argument.
+		3. Non-applyable: An editor that preforms no applyable actions to the file in memory. If something is modified, it is direct.
+		4. Modifyer (Applyable & Condition Specific): An editor that makes change to a specific object or system, and is applyable.
+		5. Renderer (Non-applyable & Condition Specific): An editor that shows data about an object or system without changing it. 
+		6. Toggle Condition: An editor that can be applyable or non-applyable based on some criteira in its condition. This is a rare type. This editor is ALWAYS object specific.
+
+	Most editors that are Applyable and only Applyable are responsible for creating data.
+	Most editors that are Non-applyable and only Non-applyable are responsible for representing systems & information. 
+	Most editors that are Modifyers modify components.
+	Most editors that are Renderers view components.
+	Most editors that are Toggle Condition are used for code simplicity and combining of a Modifyer and Renderer of a specific compoennt.
+
+	Based on the editor's type, the Apply button and Apply keyboard shortcut will be disabled if the Editor is non-applyable.
+
+Inheriting EditorFrame:
+	
+	There are several functions that must be inherited in order for an editor to work. They can be grouped as such:
+
+	Window Messages:
+		LRESULT KeyDown(WPARAM Key) :: Called when a key is pressed and this editor or any of it's sub compoennts recive the WM_KEYDOWN message.
+		LRESULT Command(WPARAM wp, LPARAM lp) :: Called when a button, component viewer, or checkablebutton is pressed.
+		LRESULT Size() :: Called when the editor is re-sized. This is used to adjust the control's position and sizing for correct rendering.
+		static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp) :: See section (Setting up editor for loading)
+
+	Controls:
+		void GenerateBase(HWND Parent, RECT Placement) :: Called by EditorRegistry to create the base of this window. See section (Setting up editor for loading)
+		void LoadControls() :: Loads and places all controls for the first time.
+		void Reset() :: Resets the data presented by the editor and controls.
+
+	Information:
+		EditorTypes EditorType() const :: Returns the type of editor for identification
+		bool IsApplyable() const :: If true, the editor can be applyed and (bool Apply) will be called when applyed. 
+		bool ConditionSpecific() const :: If true, the editor has arguments and condtions that mark the editor as unique. If this is true, then CondenseArgs() and TestOnCondtion() MUST be implemented.
+		bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) :: Applys the editor. If the editor is non-applyable (IsApplyable() == false), this function should return true. If (IsApplyable() == true), then this function must be implemented.
+		Vector<void*> CondenseArgs() const :: Returns a vector of void* that represents the arguments for this editor. 
+		bool TestOnCondtion(Vector<void*> Args) const :: Returns a boolean of weather or not the current arguments match the arguments in the paramter.
+		bool EquateableTo(EditorFrame* Other) const :: Determines if another EditorFrame matches the current one.
+		String GetName() const :: Returns a string that is to be presented to users.
+
+Setting up Editor for Loading:
+
+	There is multi-step process between calling the editor's constructor and loading controls. Here is the process:
+
+	The Constructor of an Editor should only contain data that is specific to the editor. Only Condition specific editors require data in their constructor. The constructor DOES NOT CREATE THE BASE WINDOW. 
+
+	Call EditorFrame::OpenEditor(EditorFrame* Item, bool IsPopout = false):
+		This sets up the data for the editor. If the editor can be merged with another editor, it will be merged and the new editor will be deleted. For more on mergin, see (Editor Merging).
+
+	If OpenEditor() allows the editor to continuing after determining that is non-mergeable, the registry will call EditorFrame::GenerateBase(HWND, RECT).
+		This function is in charge of opening the base window. Here is a template of what this editor should look like:
+			
+		"
+			void [EditorClass]::GenerateBase(HWND Parent, RECT Margin)
+			{
+				_Placement = Margin;
+
+				HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(Parent, GWLP_HINSTANCE));
+
+				if (!_EditorAtom)
+					InitBase(ins);
+
+				_Base = CreateWindowExW(0l, MAKEINTATOM(_EditorAtom), L"", WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, Parent, NULL, ins, NULL);
+				SetWindowLongPtrW(_Base, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>([EditorClass]::WndProc));
+				SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+
+				ReSize();
+				LoadControls();
+			}
+		"
+
+		This sets up the base window of the editor, sets the window proc up for this editor, and then binds the editor to the window.
+
+		An example of a WndProc:
+		
+		"
+			LRESULT __stdcall InventoryEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
+			{
+				[EditorClass]* This = reinterpret_cast<[EditorClass]*>(GetWindowLongPtrW(Window, GWLP_USERDATA));
+				if (!This)
+					return DefWindowProcW(Window, Message, wp, lp);
+
+				return EditorProc(This, Window, Message, wp, lp);
+			}
+		"
+
+	The editor is now opened, an EditorButton is assigned to it, and the editor can preform its actions.
+
+Editor Meshing:
+	
+	Editor meshing is the process of determining if another editor is a match to the targeted editor to open. If it is able to be meshed, the new editor will not be opened, and the pre-exisitng match will be bought to focus.
+	Meshing is carred out by the editor registry when an OpenEditor is called.
+
+	Meshing can be broken up into 3 cases:
+		Case 1: The editor is condtion specific.
+		Case 2: The editor is non-applyable and non-conditon specfic;
+		Case 3: The editor is applyable only.
+
+	In case 1, an editor can only be meshed if the arguments of the new editor match the arguments of an exisitng editor.
+	In case 2, an editor can always be meshed as no data is lossed.
+	In case 3, an editor can never be meshed. 
+
