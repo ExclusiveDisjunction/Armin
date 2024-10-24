@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
@@ -13,9 +14,13 @@ namespace Armin::Editors::Inventory
 	OperationInventoryEditor::OperationInventoryEditor(InventorySystem* System)
 	{
 		if (!System)
-			_System = dynamic_cast<InventorySystem*>(LoadedSession);
+			_System = dynamic_cast<InventorySystem*>(LoadedProject);
 		else
 			_System = System;
+	}
+	OperationInventoryEditor::~OperationInventoryEditor()
+	{
+		delete Objects;
 	}
 
 	LRESULT __stdcall OperationInventoryEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -36,7 +41,7 @@ namespace Armin::Editors::Inventory
 		HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
 		AaColor BaseBk = EditorGrey;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		LoadUpperButtons(WndRect, ins);
 
@@ -73,7 +78,7 @@ namespace Armin::Editors::Inventory
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;
 				XCoord += Width / 2;
 
-				Search = new Button(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Search = new StyleButton(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{0, 0, 0, 5});
 				XCoord -= Width / 2;
 				ResetY = YCoord += 10 + Height;
 			}
@@ -115,6 +120,11 @@ namespace Armin::Editors::Inventory
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -129,8 +139,7 @@ namespace Armin::Editors::Inventory
 
 		QuickSort(Items, [](OperationInventoryItem*& One, OperationInventoryItem*& Two) { return static_cast<wstring>(One->SerialNumber) < static_cast<wstring>(Two->SerialNumber); });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Items, ObjectView, NULL, true, true, ObjectScroll);
+		Objects->GenerateList(Items, NULL, true, true);
 	}
 
 	LRESULT OperationInventoryEditor::Command(WPARAM wp, LPARAM lp)
@@ -141,12 +150,12 @@ namespace Armin::Editors::Inventory
 			EditorRegistry::OpenEditor(new InventorySearchEditor(_System, false), nullptr);
 			break;
 		case 5: //Add
-			EditorRegistry::OpenEditor(new AddOperationInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new AddEditOperationInventoryItemEditor(), nullptr);
 			break;
 		case 6: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			Vector<Component*> Targets = ComponentViewer::RetriveFromList(Objects, Selected);
+			Vector<Component*> Targets = Objects->RetriveFromList(Selected);
 
 			if (Targets.Size == 0)
 			{
@@ -167,26 +176,22 @@ namespace Armin::Editors::Inventory
 				delete Item;
 
 				ComponentViewer* Current = Selected[i];
-				Objects.Remove(Current);
 				delete Current;
 			}
 
-			HasEdit = true;
+			AppState |= APS_HasEdit;
 
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 			break;
 		}
 		case 7: //View
-		case 9: //Edit	
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+		case 8: //Edit	
+			Objects->OpenSelectedForEditView(wp == 9);
 			break;
-		case 8: //SelectAll
-			for (ComponentViewer* Item : Objects)
-				Item->CheckState(true);
-			break;
+		case 9: //SelectAll
 		case 10: //DeSelectAll
-			for (ComponentViewer* Item : Objects)
-				Item->CheckState(false);
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+				Obj->CheckState(wp == 9);
 			break;
 		}
 		return 0;
@@ -208,7 +213,7 @@ namespace Armin::Editors::Inventory
 		case 'V':
 		case 'E':
 			if ((GetKeyState(VK_CONTROL) & 0x8000))
-				ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E');
+				Objects->OpenSelectedForEditView(Key == 'E');
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
@@ -221,7 +226,7 @@ namespace Armin::Editors::Inventory
 		GetClientRect(_Base, &WndRect);
 
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		if (!_Loaded)
 			return 0;
@@ -285,7 +290,7 @@ namespace Armin::Editors::Inventory
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;

@@ -7,6 +7,7 @@
 #include "UI\Controls.h"
 #include "..\Enums.h"
 #include "..\Common.h"
+#include "..\UICommon.h"
 #include "..\Files\ComponentTypes.h"
 #include "..\UI\ArminControls.h"
 
@@ -14,19 +15,25 @@ namespace Armin
 {
 	namespace Files
 	{
-		class ArminSessionBase;
+		class ProjectBase;
 		class CompletedTask;
 		class Component;
-		class Image;
+		class InventoryItem;
+		class JobPosition;
 		class InventorySystem;
+		class OperationInventoryItem;
 		class User;
 		class UserSystem;
-		class RefrenceGroup;
-		class ResourceSystem;
+		class ReferenceGroup;
 		class Task;
 		class TaskSystem;
-		class TimecardEntry;
 	}
+
+	enum EditorStates
+	{
+		EDS_None = 0,
+		EDS_AppendError = 1,
+	};
 
 	namespace Editors
 	{
@@ -50,6 +57,7 @@ namespace Armin
 			Button* Close = nullptr, * Move = nullptr, * _Apply = nullptr;
 
 			bool _Loaded = false;
+			const int BaseYCoord = 120;
 
 			virtual void LoadControls() = 0;
 
@@ -60,7 +68,6 @@ namespace Armin
 			virtual LRESULT MouseDown() { return 0; }
 			virtual LRESULT MouseUp() { return 0; }
 			virtual LRESULT Size() = 0;
-			virtual LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) { return 0; }
 
 			void BasicPaint(const String& FontName);
 
@@ -86,6 +93,9 @@ namespace Armin
 				_EditorAtom = RegisterClassW(&wn);
 			}
 
+			int EditorState = EDS_None;
+			Vector<UI::EditorButton*> EditorButtons;
+
 			inline static LRESULT __stdcall DummyProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 			{
 				return DefWindowProcW(Window, Message, wp, lp);
@@ -93,17 +103,23 @@ namespace Armin
 			static LRESULT __stdcall EditorProc(EditorFrame* This, HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 		public:
 			friend EditorRegistry;
+			friend UI::EditorButton;
 			virtual ~EditorFrame();
 
+			int CurrentState() const { return EditorState; }
+			void CurrentState(int New);
+			void ClearState() { CurrentState(0); }
 			EditorHost* const& Host = _Host;
+
 			virtual EditorTypes EditorType() const = 0;
 			virtual bool IsApplyable() const = 0;
 			virtual bool ConditionSpecific() const = 0;
-			virtual bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) = 0; //DOES NOT CLOSE EDITOR AFTER COMPLETION
+			virtual bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) = 0; //DOES NOT CLOSE EDITOR AFTER COMPLETION
 			virtual Vector<void*> CondenseArgs() const = 0;
 			virtual bool TestOnCondition(Vector<void*> Args) const = 0;
 			virtual bool EquatableTo(EditorFrame* Other) const = 0;
 			virtual String GetName() const = 0;
+			virtual String GetNotes() const = 0;
 			virtual void Reset() = 0;
 			virtual WNDPROC ThisProc() const = 0;
 
@@ -139,7 +155,7 @@ namespace Armin
 				Button* Search, * Add, * Remove, * View, * Edit, * SelectAll, * DeSelectAll, * CompleteTask;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -153,15 +169,17 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				TasksEditor(Files::TaskSystem* System);
+				~TasksEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_Tasks; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<TasksEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Tasks"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -177,7 +195,7 @@ namespace Armin
 				Label* Title, * Instructions, * DueBy, * RequiresAssurance;
 				ScrollViewer* AssignedScroll;
 				Grid* AssignedView;
-				Vector<UI::ComponentViewer*> AssignedObjects;
+				UI::ComponentViewerList* AssignedObjects;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -188,69 +206,31 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
-				LRESULT Destroy() override;
-				LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) override;
 			public:
 				ViewTaskEditor(Files::Task* Target, bool EditMode = true);
+				~ViewTaskEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_ViewTask; }
 				Vector<void*> CondenseArgs() const override { return { Source }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View Task"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class EditTaskEditor : public EditorFrame
+			class AddEditTaskEditor : public EditorFrame
 			{
 			private:
 				Files::Task* Target;
-				DateTime DueByD;
 
 				TextBox* Title, * Instructions;
-				Label* DueBy;
-				CheckableButton* RequiresAssurance;
-				Button* DueBySelect, * ModifyAssigned, * ViewAssigned;
-				ScrollViewer* AssignedUsersScroll;
-				Grid* AssignedUsersView;
-				Vector<UI::ComponentViewer*> AssignedUsers;
-
-				bool _Multiselect = false;
-			protected:
-				void LoadControls() override;
-				void FillAssigned();
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			public:
-				EditTaskEditor(Files::Task* Target);
-
-				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override;
-				EditorTypes EditorType() const override { return EDT_EditTask; }
-				Vector<void*> CondenseArgs() const override { return { Target }; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Edit Task"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-			class AddTaskEditor : public EditorFrame
-			{
-			private:
-				TextBox* Title, * Instructions;
-				ScrollViewer* AssignedScroll;
-				Grid* AssignedView;
-				Vector<UI::ComponentViewer*> AssignedTo;
+				Label* AssignedLabel;
+				Vector<Files::User*> AssignedTo;
 				CheckableButton* RequiresAssurance;
 				Label* DueBy;
 				Button* DueBySelect; //ID: 4
@@ -268,16 +248,21 @@ namespace Armin
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
 			public:
-				AddTaskEditor();
+				/// <summary>
+				/// Constructs the AddEditTaskEditor.
+				/// </summary>
+				/// <param name="ToEdit">If ToEdit != nullptr, then the editor is in edit mode, if not then it is in add mode.</param>
+				AddEditTaskEditor(Files::Task* ToEdit);
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
-				EditorTypes EditorType() const override { return EDT_AddTask; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
+				EditorTypes EditorType() const override { return EDT_AddEditTask; }
 				Vector<void*> CondenseArgs() const override { return {}; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Task"; }
+				String GetName() const override { return Target ? L"Edit Task" : L"Add Task"; }
+				String GetNotes() const override { return L"The Title, Due By, and Assigned To feilds as required. By default, the Due By feild is set to No Date.\nA Tilde ('~') is not allowed in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -293,7 +278,7 @@ namespace Armin
 				Button* GoToTasks, * View, *SelectAll, *DeSelectAll;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -307,15 +292,17 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				CompletedTasksEditor(Files::TaskSystem* System);
+				~CompletedTasksEditor();
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_CompletedTasks; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<CompletedTasksEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Completed Tasks"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -352,12 +339,13 @@ namespace Armin
 
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				EditorTypes EditorType() const override { return EDT_CompleteTask; }
 				Vector<void*> CondenseArgs() const override { return { _Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Complete Task"; }
+				String GetNotes() const override { return L"By default, the Date Completed is 1/1/1970.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -386,12 +374,13 @@ namespace Armin
 
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrompErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PrompErrors = true) override { return true; }
 				EditorTypes EditorType() const override { return EDT_ViewCompletedTask; }
 				Vector<void*> CondenseArgs() const override { return { Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View Completed Task"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -409,7 +398,7 @@ namespace Armin
 				Button* Add, * Remove, * View, * Edit, * SelectAll, * DeSelectAll, * Search;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -423,22 +412,25 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				JobPositionsEditor(Files::UserSystem* System);
+				~JobPositionsEditor();
 
 				EditorTypes EditorType() const override { return EDT_JobPositions; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<JobPositionsEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Job Positions"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class AddJobPositionEditor : public EditorFrame
+			class AddEditJobPositionEditor : public EditorFrame
 			{
 			private:
+				Files::JobPosition* Target;
 				TextBox* Title, * Description;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
@@ -451,16 +443,17 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddJobPositionEditor();
+				AddEditJobPositionEditor(Files::JobPosition* Target);
 
-				EditorTypes EditorType() const override { return EDT_AddJobPosition; }
+				EditorTypes EditorType() const override { return EDT_AddJobEditPosition; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				bool ConditionSpecific() const override { return Target != nullptr; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Job Position"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Job Position" : L"Add Job Position"; }
+				String GetNotes() const override { return L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -476,7 +469,7 @@ namespace Armin
 				Button* Search, * SignOut, * Add, * Remove, * Edit, * View, *SelectAll, *DeSelectAll;
 				Grid* ObjectView;
 				ScrollViewer* ObjectScroll;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -490,15 +483,17 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				UsersEditor(Files::UserSystem* System);
+				~UsersEditor();
 
 				EditorTypes EditorType() const override { return EDT_Users; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UsersEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Users"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -511,7 +506,7 @@ namespace Armin
 				Grid* PositionView;
 				Button* Change, * Timecards, *Homepage;
 
-				Vector<UI::ComponentViewer*> Positions;
+				UI::ComponentViewerList* Positions;
 
 				Files::User* Current;
 
@@ -523,8 +518,6 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 				LRESULT KeyDown(WPARAM Key) override;
 				LRESULT Size() override;
-				LRESULT Destroy() override;
-				LRESULT SpecialCommand(HMENU ID, uint Command, LPARAM Sender) override;
 			public:
 				ViewUserEditor(Files::User* Target);
 				~ViewUserEditor();
@@ -532,56 +525,20 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_ViewUser; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { Current }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"View User"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class EditUserEditor : public EditorFrame
+			class CreateEditUserEditor : public EditorFrame
 			{
 			private:
-				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
-				ComboBox* UserType;
-				ScrollViewer* PositionScroll;
-				Grid* PositionView;
-				Button* ModifyPositions, * ViewPosition;
-				Vector<UI::ComponentViewer*> Positions;
-
-				bool _Multiselect;
-				Files::User* Current;
-
-				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
-
-			protected:
-				void LoadControls() override;
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-
-			public:
-				EditUserEditor(Files::User* Target);
-
-				EditorTypes EditorType() const override { return EDT_EditUser; }
-				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PrmoptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return { Current }; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Edit User"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-			class CreateUserEditor : public EditorFrame
-			{
-			private:
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
+				Files::User* Target;
 
 				TextBox* Username, * Password, * FirstName, * MiddleName, * LastName;
 				Button* ModifyPositions, * ViewPosition;
@@ -589,8 +546,9 @@ namespace Armin
 				ComboBox* UserType;
 				ScrollViewer* PositionsScroll;
 				Grid* PositionsView;
-				Vector<UI::ComponentViewer*> Positions;
+				UI::ComponentViewerList* Positions;
 
+				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
 				void LoadControls() override;
 
@@ -599,16 +557,22 @@ namespace Armin
 				LRESULT Size() override;
 
 			public:
-				CreateUserEditor();
+				/// <summary>
+				/// Constructs the CreateEditUser editor.
+				/// </summary>
+				/// <param name="Target">If Target != nullptr, edit mode is enabled, add mode if not.</param>
+				CreateEditUserEditor(Files::User* Target);
+				~CreateEditUserEditor();
 
-				EditorTypes EditorType() const override { return EDT_CreateUser; }
+				EditorTypes EditorType() const override { return EDT_CreateEditUser; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
-				bool TestOnCondition(Vector<void*> Args) const override { return false; }
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Create User"; }
+				bool ConditionSpecific() const override { return Target != nullptr; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
+				Vector<void*> CondenseArgs() const override { return Target ? Target : Vector<void*>(); }
+				bool TestOnCondition(Vector<void*> Args) const override;
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit User" : L"Create User"; }
+				String GetNotes() const override { return L"The Username and Password feilds are required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -622,7 +586,7 @@ namespace Armin
 				UI::ComponentViewer* CurrentUser;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 				Button* SignOut, * Lock, * GoToTasks, * Timecard;
 				Button* CompleteTask, * View, * Edit, *SelectAll, *DeSelectAll;
 
@@ -636,56 +600,23 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
 				UserHomepageEditor(Files::User* Target);
+				~UserHomepageEditor();
 
 				EditorTypes EditorType() const override { return EDT_UserHomepage; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { _Target }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Homepage"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-			class TimecardsEditor : public EditorFrame
-			{
-			private:
-				Files::User* _TargetUser;
-				
-				Button* NextMonth, * LastMonth;
-				Label* CurrentMonth;
-				Vector<CalendarGrid*> Grids;
-				int _ThisMonth, _ThisYear;
-
-				void SetupMonth();
-				void FillRecords();
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			protected:
-				void LoadControls() override;
-
-				LRESULT Size() override;
-				LRESULT KeyDown(WPARAM wp) override;
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-			public:
-				TimecardsEditor(Files::User* Target);
-
-				EditorTypes EditorType() const override { return EDT_Timecards; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override;
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Timecards"; }
+				String GetNotes() const override { return L"Welcome Back!"; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
 
-			class UserSearch : public EditorFrame
+			class UserSearchEditor : public EditorFrame
 			{
 			private:
 				Files::UserSystem* _System;
@@ -698,7 +629,7 @@ namespace Armin
 
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 			protected:
@@ -708,16 +639,18 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
-				UserSearch(Files::UserSystem* System);
+				UserSearchEditor(Files::UserSystem* System);
+				~UserSearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_UserSearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 1 && Args[0] == _System; }
-				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearch*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
+				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<UserSearchEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"User Search"; }
+				String GetNotes() const override { return L"Use commas (',') to separate Usernames and Names.\nA blank record in any feild will result in allowing all data to pass through that filter."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -735,7 +668,7 @@ namespace Armin
 				Button* ImportCSV = nullptr, *InvSearch = nullptr, * Add = nullptr, * Remove = nullptr, * Edit = nullptr, * View = nullptr, *SelectAll = nullptr, *DeSelectAll = nullptr;
 				Grid* ObjectView = nullptr;
 				ScrollViewer* ObjectScroll = nullptr;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -747,15 +680,17 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				InventoryEditor(Files::InventorySystem* System);
+				~InventoryEditor();
 
 				EditorTypes EditorType() const override { return EDT_Inventory; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Inventory"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -769,7 +704,7 @@ namespace Armin
 				Button* Add, * Remove, * View, * Edit, * Search, * SelectAll, * DeSelectAll;
 				Grid* ObjectView;
 				ScrollViewer* ObjectScroll;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -782,26 +717,29 @@ namespace Armin
 				LRESULT Size() override;
 			public:
 				OperationInventoryEditor(Files::InventorySystem* System);
+				~OperationInventoryEditor();
 
 				EditorTypes EditorType() const override { return EDT_OperationInventory; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return _System; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == _System; }
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<OperationInventoryEditor*>(Other) != nullptr && TestOnCondition(Other->CondenseArgs()); }
 				String GetName() const override { return L"Operation Inventory"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class AddInventoryItemEditor : public EditorFrame
+			class AddEditInventoryItemEditor : public EditorFrame
 			{
 			private:
+				Files::ComponentReference* Target; //If Target == nullptr, then it is adding. If Target != nullptr && Target->Target() == nullptr, the component was deleted. 
+
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* IsInPossession;
-				Button* SelectGroup, *SelectImage;
-				UI::ComponentViewer* TargetImage;
+				Button* SelectGroup;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -812,27 +750,29 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddInventoryItemEditor();
+				AddEditInventoryItemEditor(Files::InventoryItem* ToEdit = nullptr);
 
-				EditorTypes EditorType() const override { return EDT_AddInventoryItem; }
+				EditorTypes EditorType() const override { return EDT_AddEditInventoryItem; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				bool ConditionSpecific() const override { return Target != nullptr; }
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
+				Vector<void*> CondenseArgs() const override;
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Inventory Item"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Inventory Item" : L"Add Inventory Item"; }
+				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
-			class AddOperationInventoryItemEditor : public EditorFrame
+			class AddEditOperationInventoryItemEditor : public EditorFrame
 			{
 			private:
+				Files::ComponentReference* Target;
+
 				TextBox* SerialNumber, * Description, * Group;
 				CheckableButton* WorkingOrder, * PartialWorkingOrder, * Broken, * UnderRepair, * NotInPossession;
-				Button* SelectGroup, * SelectImage;
-				UI::ComponentViewer* TargetImage;
+				Button* SelectGroup;
 
 				static LRESULT __stdcall WndProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
@@ -843,16 +783,17 @@ namespace Armin
 				LRESULT Size() override;
 				LRESULT Destroy() override;
 			public:
-				AddOperationInventoryItemEditor();
+				AddEditOperationInventoryItemEditor(Files::OperationInventoryItem* Target = nullptr);
 
-				EditorTypes EditorType() const override { return EDT_AddOperationInventoryItem; }
+				EditorTypes EditorType() const override { return EDT_AddEditOperationInventoryItem; }
 				bool IsApplyable() const override { return true; }
-				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
-				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				bool ConditionSpecific() const override { return Target != nullptr; }
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
+				Vector<void*> CondenseArgs() const override;
 				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override { return false; }
-				String GetName() const override { return L"Add Operation Inventory Item"; }
+				bool EquatableTo(EditorFrame* Other) const override;
+				String GetName() const override { return Target ? L"Edit Operation Inventory Item" : L"Add Operation Inventory Item"; }
+				String GetNotes() const override { return L"The Serial Number feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -869,7 +810,7 @@ namespace Armin
 				ScrollViewer* ObjectScroll = nullptr;
 				Grid* ObjectView = nullptr;
 				Button* View = nullptr, * Edit = nullptr, * DuplicateResult = nullptr;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				TextBox* SerialNumber = nullptr, * Group = nullptr;
 				Button* SelectGroups = nullptr;
@@ -889,15 +830,17 @@ namespace Armin
 				
 			public:
 				InventorySearchEditor(Files::InventorySystem* System, bool Mode = false);
+				~InventorySearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_InventorySearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PropmtErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PropmtErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { (void*)_Mode }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<InventorySearchEditor*>(Other) != nullptr; }
 				String GetName() const override { return L"Inventory Search"; }
+				String GetNotes() const override { return L"Use Commas (',') to separate seperate data in each feild.\nA blank feild will allow all data to pass through that filter."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -912,7 +855,7 @@ namespace Armin
 				TextBox* Name;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 				Button* Modify, * Remove, * View, * Edit;
 
 				bool _Multiselect;
@@ -927,15 +870,17 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
 				AddReferenceGroupEditor();
+				~AddReferenceGroupEditor();
 
 				EditorTypes EditorType() const override { return EDT_AddReferenceGroup; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return false; }
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override { return L"Add Refrence Group"; }
+				String GetNotes() const override { return L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -943,7 +888,8 @@ namespace Armin
 			class ViewEditReferenceGroupEditor : public EditorFrame
 			{
 			private:
-				Files::RefrenceGroup* _Target;
+				Files::ComponentReference* _BTarget;
+				Files::ReferenceGroup* _Target;
 				bool _EditMode = false;
 
 				TextBox* TitleEd;
@@ -951,7 +897,7 @@ namespace Armin
 				Button* Modify, * Remove, * View, * Edit;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				bool _Multiselect = true;
 
@@ -963,16 +909,18 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp);
 			public:
-				ViewEditReferenceGroupEditor(Files::RefrenceGroup* Target, bool EditMode);
+				ViewEditReferenceGroupEditor(Files::ReferenceGroup* Target, bool EditMode);
+				~ViewEditReferenceGroupEditor();
 
 				EditorTypes EditorType() const override { return EDT_ViewEditReferenceGroup; }
 				bool IsApplyable() const override { return _EditMode; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return { _Target, (void*)_EditMode }; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size == 2 && Args[0] == static_cast<void*>(_Target) && Args[1] == (void*)_EditMode; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return _EditMode ? L"Edit Refrence Group" : L"View Refrence Group"; }
+				String GetNotes() const override { return _EditMode ? L"The Title feild is required.\nA Tilde ('~') is not accepted in any feild." : L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -980,13 +928,13 @@ namespace Armin
 			class ReferenceGroupsEditor : public EditorFrame
 			{
 			private:
-				Files::ArminSessionBase* _Source;
+				Files::ProjectBase* _Source;
 
 				Label* ObjectCount;
 				Button* Add, * Remove, * Edit, * View, *SelectAll, *DeSelectAll, *Search;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				void FillObjects();
 
@@ -999,84 +947,18 @@ namespace Armin
 				LRESULT KeyDown(WPARAM wp) override;
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 			public:
-				ReferenceGroupsEditor(Files::ArminSessionBase* Source);
+				ReferenceGroupsEditor(Files::ProjectBase* Source);
+				~ReferenceGroupsEditor();
 
 				EditorTypes EditorType() const override { return EDT_ReferenceGroups; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* DestFile, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* DestFile, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<ReferenceGroupsEditor*>(Other) == this; }
 				String GetName() const override { return L"Refrence Groups"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-		}
-
-		namespace Resources
-		{
-			class ViewImageEditor : public EditorFrame
-			{
-			private:
-				HGLOBAL _Target;
-				ImageViewer* Img;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-			protected:
-				void LoadControls() override;
-
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-				LRESULT KeyDown(WPARAM Key) override;
-				LRESULT Size() override;
-			public:
-				ViewImageEditor(Files::Image* Target);
-				~ViewImageEditor();
-
-				EditorTypes EditorType() const override { return EDT_ViewImage; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override { return _Target; }
-				bool TestOnCondition(Vector<void*> Args) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"View Image"; }
-				WNDPROC ThisProc() const override { return WndProc; }
-
-				void Reset() override;
-			};
-
-			class ImagesEditor : public EditorFrame
-			{
-			private:
-				Files::ResourceSystem* _System;
-
-				Button *Add, * Remove, * View, *Edit, *SelectAll, *DeSelectAll, *Compress;
-				ScrollViewer* ObjectScroll;
-				Grid* ObjectView;
-				Vector<UI::ComponentViewer*> Objects;
-
-				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
-
-				void FillObjects();
-			protected:
-				void LoadControls() override;
-
-				LRESULT Size() override;
-				LRESULT KeyDown(WPARAM wp) override;
-				LRESULT Command(WPARAM wp, LPARAM lp) override;
-			public:
-				ImagesEditor(Files::ResourceSystem* TargetSys = nullptr);
-				
-				EditorTypes EditorType() const override { return EDT_Images; }
-				bool IsApplyable() const override { return false; }
-				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
-				Vector<void*> CondenseArgs() const override { return _System; }
-				bool TestOnCondition(Vector<void*> Other) const override;
-				bool EquatableTo(EditorFrame* Other) const override;
-				String GetName() const override { return L"Images"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1085,6 +967,8 @@ namespace Armin
 
 		namespace Misc
 		{
+			/*
+			
 			class BasicEditorEditor : public EditorFrame
 			{
 			private:
@@ -1099,14 +983,6 @@ namespace Armin
 				Label* L1, * L2; //Labels
 				Vector<ControlBase*> GridList; //For Scroll Viewer
 				Vector<Files::Component*> ComponentList;
-
-				/*
-				* BasicEditor & BasicViewer
-				*
-				* Since the data for each component is diffrent, the basic viewer & editor have 'slot' controls, that can be used to display/edit data about an object.
-				*
-				* Not every slot must be used, and only specific slots will be used/loaded according to which component is targeted.
-				*/
 
 				Files::Component* ThisTarget; //The source and modify location of the current editor.
 				bool _DummySelect;
@@ -1129,15 +1005,18 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_BasicEditor; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return { ThisTarget }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override { return false; }
 				String GetName() const override;
+				String GetNotes() const override { return L"A Tilde ('~') is not accepted in any feild."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
+			*/
+
 			class BasicViewerEditor : public EditorFrame
 			{
 			private:
@@ -1166,15 +1045,17 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_BasicViewer; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return { ThisTarget }; }
 				bool TestOnCondition(Vector<void*> Args) const override;
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override;
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
 			};
+
 			class QuickSearchEditor : public EditorFrame
 			{
 			private:
@@ -1182,10 +1063,10 @@ namespace Armin
 
 				TextBox* SearchCriteria;
 				Button* Remove, * Add, * View, * Edit, * SaveResults, * DuplicateResults, * _RunSearch, * SelectAll, * ClearSelection; //Remove and Add do not actually remove the components from the file. They only add or remove to the search result. DuplicateResults opens the current components in ComponentListRenderer. SaveResulsts creates a new RefrenceGroup object that is stored in the project.
-				CheckableButton* Users, * Tasks, * CompletedTasks, * InventoryItems, * JobPositions, * OperationInventoryItems, * RefrenceGroups, *Images;
+				CheckableButton* Users, * Tasks, * CompletedTasks, * InventoryItems, * JobPositions, * OperationInventoryItems, * RefrenceGroups;
 				ScrollViewer* ObjectScroll, * TypesScroll;
 				Grid* ObjectView, * TypesView;
-				Vector<UI::ComponentViewer*> Objects;
+				UI::ComponentViewerList* Objects;
 
 				bool _Multiselect = true;
 
@@ -1200,15 +1081,17 @@ namespace Armin
 
 			public:
 				QuickSearchEditor(int Filter = Files::ComponentTypes::CT_All);
+				~QuickSearchEditor();
 
 				EditorTypes EditorType() const override { return EDT_QuickSearch; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return Other && dynamic_cast<QuickSearchEditor*>(Other) != nullptr; }
 				String GetName() const override { return L"Quick Search"; }
+				String GetNotes() const override { return L"Type the Title or ID of an object into the search box, or specifiy the criteria you want to search.\nBy clicking on one of the data types, you can filter out data types."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void RunSearch();
@@ -1218,7 +1101,7 @@ namespace Armin
 			class ProjectSettingsEditor : public EditorFrame
 			{
 			private:
-				Files::ArminSessionBase* Target;
+				Files::ProjectBase* Target;
 
 				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 				
@@ -1230,16 +1113,17 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp) override;
 
 			public:
-				ProjectSettingsEditor(Files::ArminSessionBase* File = nullptr);
+				ProjectSettingsEditor(Files::ProjectBase* File = nullptr);
 
 				EditorTypes EditorType() const override { return EDT_ProjectSettings; }
 				bool IsApplyable() const override { return true; }
 				bool ConditionSpecific() const override { return true; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override;
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override;
 				Vector<void*> CondenseArgs() const override { return Target; }
 				bool TestOnCondition(Vector<void*> Args) const override { return Args.Size != 0 && Args[0] == (void*)Target; }
 				bool EquatableTo(EditorFrame* Other) const override;
 				String GetName() const override { return L"Project Settings"; }
+				String GetNotes() const override { return L""; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;
@@ -1271,11 +1155,49 @@ namespace Armin
 				EditorTypes EditorType() const override { return EDT_Settings; }
 				bool IsApplyable() const override { return false; }
 				bool ConditionSpecific() const override { return false; }
-				bool Apply(Files::ArminSessionBase* File, bool PromptErrors = true) override { return true; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
 				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
 				bool TestOnCondition(Vector<void*> Args) const override { return true; }
 				bool EquatableTo(EditorFrame* Other) const override { return true; }
 				String GetName() const override { return L"Settings"; }
+				String GetNotes() const override { return L""; }
+				WNDPROC ThisProc() const override { return WndProc; }
+
+				void Reset() override;
+			};
+			class WelcomeEditor : public EditorFrame
+			{
+			private:
+				Grid* RecentsViewer;
+				ScrollViewer* RecentsScroll;
+				Vector<Button*> Recents;
+				Button* Open, * New, * OpenLast, * Settings, * Quit, * RemoveRecent;
+				ControlList MiscControls;
+
+				StringList Paths;
+
+				static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
+
+				void RefreshList();
+			protected:
+				void LoadControls() override;
+
+				LRESULT Size() override;
+				LRESULT KeyDown(WPARAM wp) override;
+				LRESULT Command(WPARAM wp, LPARAM lp) override;
+
+			public:
+				WelcomeEditor();
+
+				EditorTypes EditorType() const override { return EDT_Welcome; }
+				bool IsApplyable() const override { return false; }
+				bool ConditionSpecific() const override { return false; }
+				bool Apply(Files::ProjectBase* File, bool PromptErrors = true) override { return true; }
+				Vector<void*> CondenseArgs() const override { return Vector<void*>(); }
+				bool TestOnCondition(Vector<void*> Args) const override { return true; }
+				bool EquatableTo(EditorFrame* Other) const override { return dynamic_cast<WelcomeEditor*>(Other) != nullptr; }
+				String GetName() const override { return L"Welcome"; }
+				String GetNotes() const override { return L"Please open a previous project, or create a new one to begin."; }
 				WNDPROC ThisProc() const override { return WndProc; }
 
 				void Reset() override;

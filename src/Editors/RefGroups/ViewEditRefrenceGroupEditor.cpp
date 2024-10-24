@@ -12,10 +12,15 @@ namespace Armin::Editors::RefGroups
 	using namespace UI;
 	using namespace UI::Search;
 
-	ViewEditReferenceGroupEditor::ViewEditReferenceGroupEditor(RefrenceGroup* Target, bool EditMode)
+	ViewEditReferenceGroupEditor::ViewEditReferenceGroupEditor(ReferenceGroup* Target, bool EditMode)
 	{
 		_EditMode = EditMode;
 		_Target = Target;		
+	}
+	ViewEditReferenceGroupEditor::~ViewEditReferenceGroupEditor()
+	{
+		if (Objects)
+			delete Objects;
 	}
 
 	LRESULT __stdcall ViewEditReferenceGroupEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -32,6 +37,9 @@ namespace Armin::Editors::RefGroups
 		if (_Loaded)
 			return;
 
+		if (_Target && _BTarget && !_BTarget->Target())
+			return;
+
 		_Loaded = true;
 
 		RECT WndRect;
@@ -40,7 +48,7 @@ namespace Armin::Editors::RefGroups
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 		
 		{
@@ -74,7 +82,7 @@ namespace Armin::Editors::RefGroups
 
 			{
 				if (_EditMode)
-					TitleEd = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, _Target->Title(), Style, TextStyle);
+					TitleEd = new TextBox(XCoord, YCoord, Width, Height, _Base, ins, _Target ? _Target->Title() : String(), Style, TextStyle);
 				else
 					TitleVi = new Label(XCoord, YCoord, Width, Height, _Base, ins, _Target->Title(), Grey3, TextStyle, false);
 			}
@@ -110,7 +118,7 @@ namespace Armin::Editors::RefGroups
 				ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 				ObjectScroll->SetViewer(ObjectView);
 
-				Objects = ComponentViewer::GenerateListRef(_Target->Targets, ObjectView, NULL, _Multiselect, true, ObjectScroll);
+				Objects->GenerateListRef(!_Target ? ReferenceList() : _Target->Targets, NULL, _Multiselect, true);
 			}
 		}
 	}
@@ -125,7 +133,7 @@ namespace Armin::Editors::RefGroups
 
 		MoveUpperButtons(WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -179,7 +187,7 @@ namespace Armin::Editors::RefGroups
 
 			{
 				ObjectScroll->Move(XCoord, YCoord, Width, Height);
-				ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+				Objects->ReSizeList();
 			}
 		}
 		return 0;
@@ -194,7 +202,7 @@ namespace Armin::Editors::RefGroups
 		{
 		case 4: //Add
 		{
-			Vector<Component*> Old = ComponentViewer::GetAllComponents(Objects);
+			Vector<Component*> Old = Objects->GetAllComponents();
 
 			SearchCriteria Criteria;
 			Criteria.AllowedTypes = CT_All;
@@ -203,24 +211,23 @@ namespace Armin::Editors::RefGroups
 
 			Vector<Component*> New = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
 
-			CloseControls(Objects);
-			Objects = ComponentViewer::GenerateList(New, ObjectView, NULL, _Multiselect, true, ObjectScroll);
+			Objects->GenerateList(New, NULL, _Multiselect, true);
 			break;
 		}
 		case 5: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			ComponentViewer::RetriveFromList(Objects, Selected);
+			Objects->RetriveFromList(Selected);
 
 			for (uint i = 0; i < Selected.Size; i++)
-				Objects.Remove(Selected[i]);
-			CloseControls(Selected);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+				delete Selected[i];
+
+			Objects->ReSizeList();
 			break;
 		}
 		case 6: //View
 		case 7: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 7);
+			Objects->OpenSelectedForEditView(wp == 7);
 			break;
 		}
 		return 0;
@@ -233,21 +240,20 @@ namespace Armin::Editors::RefGroups
 		else
 			TitleVi->SetText(_Target->Title());
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateListRef(_Target->Targets, ObjectView, NULL, _Multiselect, true, ObjectScroll);
+		Objects->GenerateListRef(_Target->Targets, NULL, _Multiselect, true);
 	}
 	bool ViewEditReferenceGroupEditor::EquatableTo(EditorFrame* Other) const
 	{
 		ViewEditReferenceGroupEditor* Conv = dynamic_cast<ViewEditReferenceGroupEditor*>(Other);
 		return Conv && Conv->_EditMode == _EditMode && Conv->_Target == _Target;
 	}
-	bool ViewEditReferenceGroupEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool ViewEditReferenceGroupEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!_EditMode)
 			return true;
 
 		String Title = TitleEd->GetText();
-		Vector<Component*> Targets = ComponentViewer::GetAllComponents(Objects);
+		Vector<Component*> Targets = Objects->GetAllComponents();
 
 		if (Title.Contains(L'~') || Title == L"")
 		{

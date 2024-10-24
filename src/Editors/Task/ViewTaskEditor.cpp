@@ -15,6 +15,11 @@ namespace Armin::Editors::Tasks
         Source = Target;		
 		_EditMode = EditMode;
 	}
+    ViewTaskEditor::~ViewTaskEditor()
+    {
+        if (AssignedObjects)
+            delete AssignedObjects;
+    }
 
 	LRESULT __stdcall ViewTaskEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -37,7 +42,7 @@ namespace Armin::Editors::Tasks
 
         _Loaded = true;
 
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
         AaColor BaseBk = EditorGrey;
 
         {
@@ -109,6 +114,10 @@ namespace Armin::Editors::Tasks
                 AssignedView = new Grid(0, 0, 910, 32, AssignedScroll, ins, Style);
                 AssignedScroll->SetViewer(AssignedView);
 
+                if (AssignedObjects)
+                    delete AssignedObjects;
+                AssignedObjects = new ComponentViewerList(AssignedView, AssignedScroll);
+
                 FillAssigned();
             }
 
@@ -141,9 +150,8 @@ namespace Armin::Editors::Tasks
             return;
 
         Vector<Files::User*> Assigned = ComponentReference::Convert<User>(Source->AssignedTo);
-        CloseControls(AssignedObjects);
 
-        AssignedObjects = ComponentViewer::GenerateList(Assigned, AssignedView, NULL, _DummySelect, true, AssignedScroll);
+        AssignedObjects->GenerateList(Assigned, NULL, _DummySelect, true);
 	}
 
 	LRESULT ViewTaskEditor::Command(WPARAM wp, LPARAM lp)
@@ -156,14 +164,14 @@ namespace Armin::Editors::Tasks
             break;
         case 6:
         {
-            if (!UserRegistry::CurrentUserType() == UT_Admin)
+            if (!(AppState & APS_HasAdminUser))
             {
                 MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user privileges to preform this task.", L"Edit Task:", MB_OK | MB_ICONERROR);
                 EnableWindow(*EditThis, false);
                 break;
             }
 
-            EditorRegistry::OpenEditor(new EditTaskEditor(Source), nullptr);
+            EditorRegistry::OpenEditor(new AddEditTaskEditor(Source), nullptr);
             EditorRegistry::CloseEditor(this, false);
         }
         }
@@ -184,7 +192,7 @@ namespace Armin::Editors::Tasks
 
         _Loaded = true;
 
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
 
         {
             int XCoord = 10;
@@ -230,7 +238,7 @@ namespace Armin::Editors::Tasks
                 Height = WndRect.bottom - (10 + YCoord);
 
                 AssignedScroll->Move(XCoord, YCoord, Width, Height);
-                ComponentViewer::ReSizeList(AssignedObjects, AssignedView, AssignedScroll);
+                AssignedObjects->ReSizeList();
             }
 
             XCoord = (WndRect.right / 2) + 10;
@@ -257,14 +265,6 @@ namespace Armin::Editors::Tasks
             }
         }
 
-        return 0;
-	}
-	LRESULT ViewTaskEditor::Destroy()
-	{
-        return 0;
-	}
-	LRESULT ViewTaskEditor::SpecialCommand(HMENU ID, uint Command, LPARAM Sender)
-	{
         return 0;
 	}
 

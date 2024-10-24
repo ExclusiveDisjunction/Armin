@@ -43,7 +43,7 @@ namespace Armin::Editors::Tasks
 
 		LoadUpperButtons(WndRect, ins);
 		AaColor BaseBk = EditorGrey;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -83,7 +83,7 @@ namespace Armin::Editors::Tasks
 			Width = WndRect.right - 10 - XCoord;
 			TextStyle.Alignment = TA_LeftAlignment;
 
-			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, nullptr, false);
+			AssuredBy = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, nullptr, false, nullptr);
 			YCoord += 10 + Height;
 
 			int ButtonSize = Height;
@@ -130,7 +130,7 @@ namespace Armin::Editors::Tasks
 		GetClientRect(_Base, &WndRect);
 
 		MoveUpperButtons(WndRect);
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -202,7 +202,7 @@ namespace Armin::Editors::Tasks
 		switch (wp)
 		{
 		case 4: //Assured By
-			AssuredBy->Target(UserRegistry::SignInForAssurance());
+			AssuredBy->Target(SignInForAssurance());
 			break;
 		case 5: //Select Date
 			DateCompletedD = DatePicker::Execute(DateCompletedD, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
@@ -251,7 +251,7 @@ namespace Armin::Editors::Tasks
 		AssuredBy->Target(nullptr);
 		TargetTask->Target(_Target);
 	}
-	bool CompleteTaskEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool CompleteTaskEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		if (!File)
 			return false;

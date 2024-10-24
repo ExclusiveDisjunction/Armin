@@ -21,16 +21,16 @@ namespace Armin
 			Editors::EditorHost* Host;
 			bool _Clicked = false, HasMouse;
 
-			StyleSheet Style;
-			TextStyleSheet TextStyle;
+			AaColor _BaseBk;
 
 			static ATOM _ThisAtom;
 			static void InitBase(HINSTANCE ins);
 			static LRESULT __stdcall WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp);
 
 		public:
-			EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle);
-			EditorButton(int XCoord, int YCoord, int Width, int Height, ControlBase* Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle) : EditorButton(XCoord, YCoord, Width, Height, (!Parent ? NULL : *Parent), ins, Source, Host, Style, TextStyle) {}
+			EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, AaColor BaseBk);
+			EditorButton(int XCoord, int YCoord, int Width, int Height, ControlBase* Parent, HINSTANCE ins, Editors::EditorFrame* Source, Editors::EditorHost* Host, AaColor BaseBk) : EditorButton(XCoord, YCoord, Width, Height, (!Parent ? NULL : *Parent), ins, Source, Host, BaseBk) {}
+			~EditorButton();
 
 			LRESULT Paint() override;
 			LRESULT Click() override;

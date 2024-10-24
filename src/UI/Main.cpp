@@ -2,8 +2,8 @@
 
 #include "Files\Stream.h"
 #include "SideHost.h"
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
-#include "..\Config\Ins.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
 #include "..\Files\ArminSessions.h"
@@ -11,7 +11,6 @@
 
 namespace Armin::UI
 {
-	using namespace Config;
 	using namespace Files;
 	using namespace Editors;
 
@@ -23,15 +22,15 @@ namespace Armin::UI
 		EditorRegistry::SetHost(this);
 		EditorRegistry::Track(static_cast<FooterHost*>(this));
 
-		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version) + (Ins::IsLoaded() ? L" - " + FileFullName(LoadedSessionPath) : L" - Unloaded")), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
+		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), static_cast<const wchar_t*>(L"Armin " + String(Version)), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1250, 700, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-		ShowWindow(_Base, InsInstance->LastWindowState);
+		ShowWindow(_Base, SW_MAXIMIZE);
 		UpdateWindow(_Base);
 
 		LoadControls();
 
-		SetRibbonStatusDef();
+		SetRibbonStatus();
 	}
 
 	ATOM Main::_ThisAtom = ATOM();
@@ -159,19 +158,21 @@ namespace Armin::UI
 		EditorPlacement.bottom += Height;
 
 		auto Function = [](HWND Param, UINT Message, UINT_PTR ID, DWORD Milliseconds) -> void
-		{
-			if (LoadedSession) //If a user file was loaded at start, then prompt a sign in.
+		{ //TODO: convert to multithreaded function.
+			if (LoadedProject) //If a user file was loaded at start, then prompt a sign in.
 			{
-				UserSystem* Conv = dynamic_cast<UserSystem*>(LoadedSession);
-				InventoryProject* InvConv = dynamic_cast<InventoryProject*>(LoadedSession);
+				UserSystem* Conv = dynamic_cast<UserSystem*>(LoadedProject);
+				UniProject* InvConv = dynamic_cast<UniProject*>(LoadedProject);
 				if (Conv)
 				{
 					KillTimer(Param, ID);
-					UserRegistry::SignIn();
+					SignIn();
 				}
-				else if (InvConv)
-					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
+				else if (InvConv && InvConv->Config == UPC_Inventory)
+					EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);			
 			}
+			else
+				EditorRegistry::OpenEditor(new Misc::WelcomeEditor(), nullptr);
 
 			KillTimer(Param, ID);
 		};
@@ -204,10 +205,12 @@ namespace Armin::UI
 	}
 	LRESULT Main::Destroy()
 	{
+		/*
 		WINDOWPLACEMENT Place;
 		GetWindowPlacement(_Base, &Place);
 
-		InsInstance->LastWindowState = (WindowState)Place.showCmd;
+		InsInstance->LastWindowState = (WindowStates)Place.showCmd;
+		*/
 
 		PostQuitMessage(0);
 		return 0;

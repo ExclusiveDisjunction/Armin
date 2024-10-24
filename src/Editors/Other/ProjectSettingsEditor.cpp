@@ -8,9 +8,9 @@ namespace Armin::Editors::Misc
 {
 	using namespace Files;
 
-	ProjectSettingsEditor::ProjectSettingsEditor(ArminSessionBase* File)
+	ProjectSettingsEditor::ProjectSettingsEditor(ProjectBase* File)
 	{
-		Target = !File ? LoadedSession: File;
+		Target = !File ? LoadedProject: File;
 	}
 
 	LRESULT __stdcall ProjectSettingsEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -35,7 +35,7 @@ namespace Armin::Editors::Misc
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		{
@@ -65,7 +65,7 @@ namespace Armin::Editors::Misc
 			Width = WndRect.right - (10 + XCoord);
 			TextStyle.Bold = false;
 
-			bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : UserRegistry::CurrentUserType() == UT_Admin;
+			bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : (AppState & APS_HasAdminUser);
 
 			ControlBase* Temp;
 			MiscControls.Add(Temp = new CheckableButton(XCoord, YCoord, Width, Height, _Base, ins, (HMENU)4, Target->RequiresPassword(), L"Requires Password", CBT_CheckBox, Style, TextStyle));
@@ -94,7 +94,7 @@ namespace Armin::Editors::Misc
 		GetClientRect(_Base, &WndRect);
 
 		MoveUpperButtons(WndRect);
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -144,7 +144,7 @@ namespace Armin::Editors::Misc
 		return 0;
 	}
 
-	bool ProjectSettingsEditor::Apply(ArminSessionBase* File, bool PromptErrors)
+	bool ProjectSettingsEditor::Apply(ProjectBase* File, bool PromptErrors)
 	{
 		File = Target;
 
@@ -160,7 +160,7 @@ namespace Armin::Editors::Misc
 		File->RequiresPassword(RequiresPassword);
 		File->Password(Password);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		return true;
 	}
 	bool ProjectSettingsEditor::EquatableTo(EditorFrame* Other) const
@@ -176,7 +176,7 @@ namespace Armin::Editors::Misc
 		dynamic_cast<CheckableButton*>(MiscControls[1])->SetCheckState(Target->RequiresPassword());
 		dynamic_cast<TextBox*>(MiscControls[3])->SetText(Target->Password());
 
-		bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : UserRegistry::CurrentUserType() == UT_Admin;
+		bool AdminCondition = dynamic_cast<UserSystem*>(Target) == nullptr ? true : (AppState & APS_HasAdminUser);
 		EnableWindow(*MiscControls[3], Target->RequiresPassword() && AdminCondition);
 		EnableWindow(*MiscControls[1], AdminCondition);
 	}

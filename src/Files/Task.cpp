@@ -6,13 +6,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	Task::Task(ArminSessionBase* File, TaskList* ParentList) : Component(File, true)
+	Task::Task(ProjectBase* File, TaskList* ParentList) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	Task::Task(ArminSessionBase* File, TaskList* ParentList, Task* ToClone) : Component(File, true)
+	Task::Task(ProjectBase* File, TaskList* ParentList, Task* ToClone) : Component(File, true)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -27,7 +27,7 @@ namespace Armin::Files
 			AssignedTo = ToClone->AssignedTo;
 		}
 	}
-	Task::Task(ArminSessionBase* File, TaskList* ParentList, std::ifstream& InFile) : Component(File, false)
+	Task::Task(ProjectBase* File, TaskList* ParentList, std::ifstream& InFile) : Component(File, false)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

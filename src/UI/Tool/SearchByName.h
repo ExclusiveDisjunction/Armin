@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include "Container.h"
 #include "UI\ControlDef.h"
+#include "..\ComponentViewer.h"
+#include "..\..\UICommon.h"
 #include "..\..\Files\SearchCriteria.h"
 
 namespace Armin
@@ -10,7 +12,7 @@ namespace Armin
 	namespace Files
 	{
 		class Component;
-		class ArminSessionBase;
+		class ProjectBase;
 	}
 
 	namespace UI
@@ -22,13 +24,15 @@ namespace Armin
 			class SearchByName
 			{
 			private:
-				SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, Files::ArminSessionBase* Target);
+				SearchByName(Files::SearchCriteria& Criteria, Files::ProjectBase* Target);
+
+				void Construct(HINSTANCE ins);
 
 				HWND _Base;
 				bool _Loaded, _FirstRefresh = true;
 
 				Files::SearchCriteria Criteria;
-				Files::ArminSessionBase* File;
+				Files::ProjectBase* File;
 				Vector<Files::Component*> Return;
 
 				void LoadControls();
@@ -40,7 +44,7 @@ namespace Armin
 				TextBox* NameToSearch;
 				ScrollViewer* ObjectScroll;
 				Grid* ObjectView, * ButtonHost;
-				Vector<ComponentViewer*> Objects;
+				ComponentViewerList* Objects;
 				Button* Submit, * Cancel, * SelectAll, * ClearSelection, * _RunSearch;
 
 				static ATOM _ThisAtom;
@@ -53,6 +57,13 @@ namespace Armin
 				LRESULT Command(WPARAM wp, LPARAM lp);
 
 			public:
+				SearchByName(const SearchByName& Obj) = delete;
+				SearchByName(const SearchByName&& Obj) = delete;
+				~SearchByName();
+
+				SearchByName& operator=(const SearchByName& Obj) = delete;
+				SearchByName& operator=(const SearchByName&& Obj) = delete;
+
 				/// <summary>
 				/// Opens a window that allows searching and selection of components.
 				/// </summary>
@@ -60,14 +71,9 @@ namespace Armin
 				/// <param name="Instance">The HINSTANCE to use.</param>
 				/// <param name="SourceFile">The source file to retrive all data from the SearchCriteria with. If this parameter is nullptr (default), it uses the currently loaded project.</param>
 				/// <returns>The list of selected components from the window, fitting the bounds of the Criteria.</returns>
-				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ArminSessionBase* SourceFile = nullptr);
+				static Vector<Files::Component*> Execute(Files::SearchCriteria& Criteria, HINSTANCE Instance, Files::ProjectBase* SourceFile = nullptr);
 
-				SearchByName() = delete;
-				SearchByName(const SearchByName& Obj) = delete;
-				SearchByName(const SearchByName&& Obj) = delete;
-
-				SearchByName& operator=(const SearchByName& Obj) = delete;
-				SearchByName& operator=(const SearchByName&& Obj) = delete;
+				static LRESULT RunMessageLoop(SearchByName* Obj, HINSTANCE ins, WindowState* Running);
 			};
 		}
 	}

@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -16,9 +17,14 @@ namespace Armin::Editors::Inventory
 	InventoryEditor::InventoryEditor(InventorySystem* System)
 	{		
 		if (!System)
-			_System = dynamic_cast<InventorySystem*>(LoadedSession);
+			_System = dynamic_cast<InventorySystem*>(LoadedProject);
 		else
 			_System = System;
+	}
+	InventoryEditor::~InventoryEditor()
+	{
+		if (Objects)
+			delete Objects;
 	}
 
 	void InventoryEditor::LoadControls()
@@ -32,7 +38,7 @@ namespace Armin::Editors::Inventory
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		LoadUpperButtons(WndRect, ins);
@@ -69,10 +75,10 @@ namespace Armin::Editors::Inventory
 				YCoord += 10 + Height;
 				Width = (WndRect.right - (10 + XCoord + 10)) / 2;
 
-				ImportCSV = new Button(XCoord, YCoord, Width, Height, L"Import from CSV/Excel", _Base, (HMENU)4, ins, Style, TextStyle);
+				ImportCSV = new StyleButton(XCoord, YCoord, Width, Height, L"Import from CSV/Excel", _Base, (HMENU)4, ins, Style, TextStyle, RECT{0, 0, 0, 5});
 				XCoord += 10 + Width;
 
-				InvSearch = new Button(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)5, ins, Style, TextStyle);
+				InvSearch = new StyleButton(XCoord, YCoord, Width, Height, L"Inventory Search", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 
 				XCoord -= 10 + Width;
 				Width = 130;
@@ -88,19 +94,19 @@ namespace Armin::Editors::Inventory
 				Width = Height = ButtonSize;
 
 				Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)6, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)7, ins, Style, TextStyle);
-				EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Add, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)8, ins, Style, TextStyle);
-				EnableWindow(*View, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*View, (AppState & APS_HasAdminUser));
 				YCoord += 5 + ButtonSize;
 
 				Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)9, ins, Style, TextStyle);
-				EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+				EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 				YCoord += 10 + ButtonSize;
 
 				SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)10, ins, Style, TextStyle);
@@ -120,6 +126,12 @@ namespace Armin::Editors::Inventory
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+			
+			if (Objects)
+				delete Objects;
+
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
 			FillObjects();
 		}
 	}
@@ -134,8 +146,7 @@ namespace Armin::Editors::Inventory
 
 		QuickSort(Items, [](InventoryItem*& One, InventoryItem*& Two) { return static_cast<wstring>(One->SerialNumber) < static_cast<wstring>(Two->SerialNumber); });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Items, ObjectView, NULL, true, true, ObjectScroll);
+		Objects->GenerateList(Items, NULL, true, true);
 	}
 
 	LRESULT InventoryEditor::Command(WPARAM wp, LPARAM lp)
@@ -149,12 +160,12 @@ namespace Armin::Editors::Inventory
 			EditorRegistry::OpenEditor(new InventorySearchEditor(_System, true), nullptr);
 			break;
 		case 6: //Add
-			EditorRegistry::OpenEditor(new AddInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new AddEditInventoryItemEditor(), nullptr);
 			break;
 		case 7: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			Vector<Component*> Targets = ComponentViewer::RetriveFromList(Objects, Selected);
+			Vector<Component*> Targets = Objects->RetriveFromList(Selected);
 
 			if (Targets.Size == 0)
 			{
@@ -175,25 +186,21 @@ namespace Armin::Editors::Inventory
 				delete Item;
 
 				ComponentViewer* Viewer = Selected[i];
-				Objects.Remove(Viewer);
 				delete Viewer;
 			}
 
-			HasEdit = true;
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			AppState |= APS_HasEdit;
+			Objects->ReSizeList();
 			break;
 		}
 		case 9: //Edit		
 		case 8: //View
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+			Objects->OpenSelectedForEditView(wp == 9);
 			break;
 		case 10: //SelectAll
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(true);
-			break;
 		case 11: //DelectAll
-			for (ComponentViewer* Obj : Objects)
-				Obj->CheckState(false);
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+				Obj->CheckState(wp == 10);
 			break;
 		}
 		return 0;
@@ -214,14 +221,14 @@ namespace Armin::Editors::Inventory
 			break;
 		case 'V':
 		case 'E':
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 			{
 				MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user level to view or edit inventory items.", L"View/Edit:", MB_ICONERROR | MB_OK);
 				break;
 			}
 
 			if ((GetKeyState(VK_CONTROL) & 0x8000))
-				ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E');
+				Objects->OpenSelectedForEditView(Key == 'E');
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
@@ -233,7 +240,7 @@ namespace Armin::Editors::Inventory
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		if (!_Loaded)
 			return 0;
@@ -305,7 +312,7 @@ namespace Armin::Editors::Inventory
 		}
 
 		{
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;

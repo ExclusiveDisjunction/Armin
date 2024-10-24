@@ -1,8 +1,9 @@
 #include "Startup.h"
 
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
+#include "..\UICommon.h"
 #include "..\Files\SessionControl.h"
-#include "..\..\resource.h"
+#include "..\resource.h"
 
 #include <time.h>
 #include <ObjIdl.h>
@@ -11,7 +12,6 @@
 #include "Color.h"
 
 using namespace Gdiplus;
-using namespace Armin::Config;
 
 namespace Armin::UI
 {	
@@ -98,41 +98,39 @@ namespace Armin::UI
 		{
 			HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 			HRSRC hResource = FindResourceW(ins, MAKEINTRESOURCE(Armin_StartupImage), L"PNG");
-			if (hResource != nullptr)
+
+			DWORD ImageSize = SizeofResource(ins, hResource);
+			HGLOBAL GlobalResource = LoadResource(ins, hResource);
+			
+			const void* pResourceData = LockResource(GlobalResource);
+			HGLOBAL Buffer = GlobalAlloc(GMEM_MOVEABLE, ImageSize);
+			if (Buffer)
 			{
-				DWORD ImageSize = SizeofResource(ins, hResource);
-				HGLOBAL GlobalResource = LoadResource(ins, hResource);
-
-				const void* pResourceData = LockResource(GlobalResource);
-				HGLOBAL Buffer = GlobalAlloc(GMEM_MOVEABLE, ImageSize);
-				if (Buffer)
+				void* BufferData = GlobalLock(Buffer);
+				if (BufferData)
 				{
-					void* BufferData = GlobalLock(Buffer);
-					if (BufferData)
+					CopyMemory(BufferData, pResourceData, ImageSize);
+					UnlockResource(GlobalResource);
+					FreeResource(GlobalResource);
+
+					IStream* pStream = NULL;
+					if (CreateStreamOnHGlobal(BufferData, FALSE, &pStream) == S_OK)
 					{
-						CopyMemory(BufferData, pResourceData, ImageSize);
-						UnlockResource(GlobalResource);
-						FreeResource(GlobalResource);
-
-						IStream* pStream = NULL;
-						if (CreateStreamOnHGlobal(BufferData, FALSE, &pStream) == S_OK)
+						img = Image::FromStream(pStream);
+						pStream->Release();
+						if (img->GetLastStatus() == Ok)
 						{
-							img = Image::FromStream(pStream);
-							pStream->Release();
-							if (img->GetLastStatus() == Ok)
-							{
-								Graph->DrawImage(img, Area);
-							}
-
-							delete img;
-							img = nullptr;
+							Graph->DrawImage(img, Area);
 						}
+
+						delete img;
 						img = nullptr;
-						GlobalUnlock(Buffer);
 					}
-					GlobalFree(Buffer);
-					Buffer = nullptr;
+					img = nullptr;
+					GlobalUnlock(Buffer);
 				}
+				GlobalFree(Buffer);
+				Buffer = nullptr;
 			}
 		}
 
@@ -152,7 +150,7 @@ namespace Armin::UI
 		Font StdFont(&StdFam, 20);
 		Graph->DrawString(static_cast<const wchar_t*>(Version), -1, &StdFont, VersTextOrig, &WhiteBrush);
 
-		String FooterText = L"Armin | Artwork By: Hollan C. Sellars";
+		String FooterText = L"Armin | Artwork By: Hollan Connor Sellars";
 		Font FooterFont(&StdFam, 13);
 
 		RectF FooterRect(0.0f, Area.Height - 30.0f, static_cast<float>(Area.Width), 30.0f);

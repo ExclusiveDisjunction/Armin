@@ -8,18 +8,23 @@ namespace Armin::UI
 {
 	using namespace Editors;
 
-	EditorButton::EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, EditorFrame* Source, EditorHost* Host, StyleSheet Style, TextStyleSheet TextStyle)
+	EditorButton::EditorButton(int XCoord, int YCoord, int Width, int Height, HWND Parent, HINSTANCE ins, EditorFrame* Source, EditorHost* Host, AaColor BaseBk)
 	{
 		if (!_ThisAtom)
 			InitBase(ins);
 
-		this->Style = Style;
-		this->TextStyle = TextStyle;
+		this->_BaseBk = BaseBk;
 		this->Source = Source;
 		this->Host = Host;
 
+		Source->EditorButtons.Add(this);
+
 		_Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), NULL, WS_CHILD | WS_VISIBLE, XCoord, YCoord, Width, Height, Parent, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+	}
+	EditorButton::~EditorButton()
+	{
+		Source->EditorButtons.Remove(this);
 	}
 
 	ATOM EditorButton::_ThisAtom = ATOM();
@@ -58,14 +63,21 @@ namespace Armin::UI
 
 	LRESULT EditorButton::Paint()
 	{
+		if (!Source || !this)
+			return 0;
+
 		PAINTSTRUCT ps;
 		HDC Dc = BeginPaint(_Base, &ps);
 		SetBkMode(Dc, TRANSPARENT);
 
-		AaColor BkColor = HasMouse ? Accent4 : ((_Clicked || (GetForegroundWindow() == _Base) ? Style.BorderBrush : Style.Background)), BorderColor = Style.BorderBrush, ForegroundColor = TextStyle.Foreground;
+		AaColor BorderColor = Source->EditorState & EDS_AppendError ? 0xFF'FF'00'00 : 0xFF'FF'FF'FF;
+		AaColor BkColor = (HasMouse || _Clicked || IsWindowVisible(*Source)) ? Accent4 : _BaseBk;
+		AaColor ForegroundColor = 0xFF'FF'FF'FF;
 
-		if (GetAncestor(*Source, GA_ROOT) != GetAncestor(_Base, GA_ROOT))
-			BkColor = Accent2;
+		if (HasMouse)
+			BkColor.Reduce(0.8);
+		
+		bool CurrHostIsHost = Host == Source->Host; //Means that the host of the current editor button is the same as the source's host.
 
 		if (!IsEnabled)
 		{
@@ -73,15 +85,20 @@ namespace Armin::UI
 			ForegroundColor.Reduce(0.7f);
 		}
 
-		HBRUSH BkBrush = CreateSolidBrush(BkColor);
-		HPEN Border = CreatePen(PS_SOLID, Style.BorderThickness, BorderColor);
+		HBRUSH BkBrush = CreateSolidBrush(BkColor), Hatchet = CreateHatchBrush(HS_BDIAGONAL, Accent2);;
+		SetBkColor(Dc, BkColor);
+		HPEN Border = CreatePen(PS_SOLID, 3, BorderColor);
 
-		HFONT Font = CreateFontW(-MulDiv(TextStyle.FontSize, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, (TextStyle.Bold ? FW_BOLD : 0), TextStyle.Italic, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(TextStyle.FontFamily));
+		if (!CurrHostIsHost)
+			SelectObject(Dc, Hatchet);
+		else
+			SelectObject(Dc, BkBrush);
+
+		HFONT Font = CreateFontW(-MulDiv(13, GetDeviceCaps(Dc, LOGPIXELSY), 72), 0, 0, 0, false, false, false, false, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, static_cast<LPCWSTR>(StandardFontName));
 		SetTextColor(Dc, ForegroundColor);
 
-		SelectObject(Dc, BkBrush);
 		SelectObject(Dc, Font);
-		if (Style.BorderThickness == 0)
+		if (3 == 0)
 			SelectObject(Dc, GetStockObject(NULL_PEN));
 		else
 			SelectObject(Dc, Border);
@@ -89,10 +106,7 @@ namespace Armin::UI
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 
-		if (Style.Radius > 0)
-			RoundRect(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom, Style.Radius, Style.Radius);
-		else
-			Rectangle(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom);
+		RoundRect(Dc, WndRect.left, WndRect.top, WndRect.right, WndRect.bottom, 20, 20);
 
 		String RawName = Source->GetName();
 		const wchar_t* Text = static_cast<const wchar_t*>(RawName);
@@ -103,6 +117,7 @@ namespace Armin::UI
 		DrawTextW(Dc, Text, TextLen, &WndRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 		DeleteObject(BkBrush);
+		DeleteObject(Hatchet);
 		DeleteObject(Border);
 		DeleteObject(Font);
 

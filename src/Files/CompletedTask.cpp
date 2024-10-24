@@ -6,13 +6,13 @@ using namespace std;
 
 namespace Armin::Files
 {
-	CompletedTask::CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList) : Component(File, true), OperationInventoryItemParent(File), TaskParent(File)
+	CompletedTask::CompletedTask(ProjectBase* File, CompletedTaskList* ParentList) : Component(File, true), OperationInventoryItemParent(File), TaskParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
 		_Parent = _ParentList->Parent;
 	}
-	CompletedTask::CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList, CompletedTask* ToClone) : Component(File, true), TaskParent(File), OperationInventoryItemParent(File)
+	CompletedTask::CompletedTask(ProjectBase* File, CompletedTaskList* ParentList, CompletedTask* ToClone) : Component(File, true), TaskParent(File), OperationInventoryItemParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);
@@ -44,7 +44,7 @@ namespace Armin::Files
 			}
 		}
 	}
-	CompletedTask::CompletedTask(ArminSessionBase* File, CompletedTaskList* ParentList, std::ifstream& InFile) : Component(File, false), OperationInventoryItemParent(File), TaskParent(File)
+	CompletedTask::CompletedTask(ProjectBase* File, CompletedTaskList* ParentList, std::ifstream& InFile) : Component(File, false), OperationInventoryItemParent(File), TaskParent(File)
 	{
 		_ParentList = ParentList;
 		_ParentList->Append(this);

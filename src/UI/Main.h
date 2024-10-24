@@ -48,11 +48,9 @@ namespace Armin
 
 			Button* OpenCmd, * NewCmd, * CloseCmd, * SaveCmd, * SaveAsCmd, * ApplyCmd, * ApplyAllCmd; //File 10-19
 			Button* SettingsCmd, *ProjectSettingsCmd, *RefrenceGroupsCmd, *QuickSearchCmd; //Edit 30 - 37
-			Button* ViewImages, * CreateImage; //38, 39
 			Button* TasksCmd, * AddTaskCmd, * CompletedTasksCmd; //Tasks 40-49
 			Button* InventoryCmd, * AddInvItemCmd, * OperInventoryCmd, * AddOperInvItemCmd, *InvSearch; //Inventory 50-59
-			Button* SignInCmd, * SignOutCmd, * LockCmd, * CurrentUserCmd, * UsersCmd, * AddUserCmd, *UserSearch, *JobPositions; //User 60-67
-			Button* TimecardCmd, * TimeclockCmd; //68, 69
+			Button* SignInCmd, * SignOutCmd, * LockCmd, * CurrentUserCmd, * UsersCmd, * AddUserCmd, *UserSearchEditor, *JobPositions; //User 60-67
 			Button* MaximizeCmd, * MinimizeCmd, * NormalSizeCmd, *SideHost, * Quit; //Window 70 - 79
 			Button* AboutCmd; //Help 80-89
 
@@ -69,7 +67,7 @@ namespace Armin
 			HWND EditorParent() const override { return _Base; }
 			HWND FooterParent() const override { return _Base; }
 
-			void SetRibbonStatus(int State) override;
+			void SetRibbonStatus() override;
 
 			operator HWND() const
 			{

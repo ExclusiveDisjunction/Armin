@@ -1,12 +1,11 @@
 #include "About.h"
 
-#include "..\Config\Ins.h"
-#include "..\..\resource.h"
+#include "..\UICommon.h"
+#include "..\resource.h"
+#include "..\Ins.h"
 
 namespace Armin::UI
 {
-	using namespace Config;
-
 	About::About(HINSTANCE ins)
 	{
 		if (!_ThisAtom)
@@ -187,7 +186,7 @@ namespace Armin::UI
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, Ins::IsLoaded() ? L"Yes" : L"No", BaseBk, TextStyle, false));
 			YCoord += 10 + Height;
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, Ins::IsLoaded() ? LoadedSessionPath : L"No Data", BaseBk, TextStyle, false));
+			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, Ins::IsLoaded() ? LoadedProjectPath : L"No Data", BaseBk, TextStyle, false));
 		}
 	}
 }

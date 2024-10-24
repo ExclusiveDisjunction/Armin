@@ -51,16 +51,9 @@ namespace Armin::Files
 			return Ref;
 		return nullptr;
 	}
-	Component* ComponentReference::operator*() const
+	
+	AString ComponentReference::ToString() const
 	{
-		if (Active)
-			return Ref;
-		return nullptr;
-	}
-	Component* ComponentReference::operator->() const
-	{
-		if (Active)
-			return Ref;
-		return nullptr;
+		return !Active ? "0" : (Ref ? AString(Ref->ID) : "0");
 	}
 }

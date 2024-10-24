@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -14,9 +15,14 @@ namespace Armin::Editors::Users
     JobPositionsEditor::JobPositionsEditor(UserSystem* System)
     {
         if (!System)
-            _System = dynamic_cast<UserSystem*>(LoadedSession);
+            _System = dynamic_cast<UserSystem*>(LoadedProject);
         else
             _System = System;
+    }
+    JobPositionsEditor::~JobPositionsEditor()
+    {
+        if (Objects)
+            delete Objects;
     }
 
     LRESULT __stdcall JobPositionsEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -33,7 +39,7 @@ namespace Armin::Editors::Users
         if (_Loaded)
             return;
 
-        UserSystem* File = dynamic_cast<class UserSystem*>(LoadedSession);
+        UserSystem* File = dynamic_cast<class UserSystem*>(LoadedProject);
         if (!File)
             return;
 
@@ -47,7 +53,7 @@ namespace Armin::Editors::Users
         GetClientRect(_Base, &WndRect);
         HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
         AaColor BaseBk = EditorGrey;
         LoadUpperButtons(WndRect, ins);
 
@@ -84,7 +90,7 @@ namespace Armin::Editors::Users
                 Width = (WndRect.right - (10 + XCoord + 10)) / 2;
                 XCoord += Width / 2;
 
-                Search = new Button(XCoord, YCoord, Width, Height, L"Positions Search", _Base, (HMENU)4, ins, Style, TextStyle);
+                Search = new StyleButton(XCoord, YCoord, Width, Height, L"Positions Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
                 XCoord -= Width / 2;
                 ResetY = YCoord += 10 + Height;
             }
@@ -98,18 +104,18 @@ namespace Armin::Editors::Users
                 Width = Height = ButtonSize;
 
                 Add = new Button(XCoord, YCoord, Width, Height, L"+", _Base, (HMENU)5, ins, Style, TextStyle);
-                EnableWindow(*Add, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Add, (AppState & APS_HasAdminUser));
                 YCoord += 5 + ButtonSize;
 
                 Remove = new Button(XCoord, YCoord, Width, Height, L"-", _Base, (HMENU)6, ins, Style, TextStyle);
-                EnableWindow(*Remove, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Remove, (AppState & APS_HasAdminUser));
                 YCoord += 10 + ButtonSize;
 
                 View = new Button(XCoord, YCoord, Width, Height, L"VI", _Base, (HMENU)7, ins, Style, TextStyle);
                 YCoord += 5 + ButtonSize;
 
                 Edit = new Button(XCoord, YCoord, Width, Height, L"ED", _Base, (HMENU)8, ins, Style, TextStyle);
-                EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+                EnableWindow(*Edit, (AppState & APS_HasAdminUser));
                 YCoord += 10 + ButtonSize;
 
                 SelectAll = new Button(XCoord, YCoord, Width, Height, L"SA", _Base, (HMENU)9, ins, Style, TextStyle);
@@ -129,6 +135,11 @@ namespace Armin::Editors::Users
             ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
             ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
             ObjectScroll->SetViewer(ObjectView);
+
+            if (Objects)
+                delete Objects;
+            Objects = new ComponentViewerList(ObjectView, ObjectScroll);
+
             FillObjects();
         }
     }
@@ -141,9 +152,8 @@ namespace Armin::Editors::Users
         Vector<JobPosition*> Sorted = *List;
         QuickSort(Sorted, [](JobPosition*& One, JobPosition*& Two) { return static_cast<wstring>(One->Title()) < static_cast<wstring>(Two->Title()); });
 
-        CloseControls(Objects);
-        Objects = ComponentViewer::GenerateList(Sorted, ObjectView, NULL, true, true, ObjectScroll);
-        ObjectCount->SetText(Objects.Size);
+        Objects->GenerateList(Sorted, NULL, true, true);
+        ObjectCount->SetText(Objects->Size);
     }
 
     void JobPositionsEditor::Reset()
@@ -159,19 +169,19 @@ namespace Armin::Editors::Users
             EditorRegistry::OpenEditor(new Misc::QuickSearchEditor(CT_JobPosition), nullptr);
             break;
         case 5: //Add
-            if (UserRegistry::CurrentUserType() == UT_Admin)
-                EditorRegistry::OpenEditor(new AddJobPositionEditor(), nullptr);
+            if ((AppState & APS_HasAdminUser))
+                EditorRegistry::OpenEditor(new AddEditJobPositionEditor(nullptr), nullptr);
             break;
         case 6: //Remove
         {
-            if (UserRegistry::CurrentUserType() != UT_Admin)
+            if ((AppState & APS_HasAdminUser))
             {
                 MessageBoxW(GetAncestor(_Base, GA_ROOT), L"You do not have the proper user level to remove inventory items.", L"Remove:", MB_OK | MB_ICONERROR);
                 break;
             }
 
             Vector<ComponentViewer*> Selected;
-            Vector<Component*> RawTargets = ComponentViewer::RetriveFromList(Objects, Selected);
+            Vector<Component*> RawTargets = Objects->RetriveFromList(Selected);
 
             if (RawTargets.Size == 0)
             {
@@ -191,24 +201,20 @@ namespace Armin::Editors::Users
 
                 delete Temp;
                 ComponentViewer* Viewer = Selected[i];
-                Objects.Remove(Viewer);
                 delete Viewer;
             }
 
-            HasEdit = true;
-            ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+            AppState |= APS_HasEdit;
+            Objects->ReSizeList();
             break;
         }
         case 7: //View        
         case 8: //Edit
-            ComponentViewer::OpenSelectedForEditView(Objects, wp == 8 && UserRegistry::CurrentUserType() == UT_Admin);
+            Objects->OpenSelectedForEditView(wp == 8 && (AppState & APS_HasAdminUser));
         case 9: //Select All
-            for (ComponentViewer* Obj : Objects)
-                Obj->CheckState(true);
-            break;
         case 10: //DeSelectAll
-            for (ComponentViewer* Obj : Objects)
-                Obj->CheckState(false);
+            for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
+                Obj->CheckState(wp == 9);
             break;
         }
         return 0;
@@ -230,7 +236,7 @@ namespace Armin::Editors::Users
         case 'V':
         case 'E':
             if (GetKeyState(VK_CONTROL) & 0x8000)
-                ComponentViewer::OpenSelectedForEditView(Objects, Key == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+                Objects->OpenSelectedForEditView(Key == 'E' && (AppState & APS_HasAdminUser));
             break;
         default:
             return SendMessageW(GetParent(_Base), WM_KEYDOWN, Key, 0);
@@ -244,7 +250,7 @@ namespace Armin::Editors::Users
 
         RECT WndRect;
         GetClientRect(_Base, &WndRect);
-        int BaseYCoord = 110;
+        int BaseYCoord = this->BaseYCoord;
 
         MoveUpperButtons(WndRect);
 
@@ -305,7 +311,7 @@ namespace Armin::Editors::Users
             Height = WndRect.bottom - (10 + YCoord);
 
             ObjectScroll->Move(XCoord, YCoord, Width, Height);
-            ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+            Objects->ReSizeList();
         }
 
         return 0;

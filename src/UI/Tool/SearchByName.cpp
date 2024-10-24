@@ -2,18 +2,34 @@
 
 #include "UI\Controls.h"
 #include "..\..\Common.h"
+#include "..\..\UICommon.h"
 #include "..\..\Files\Components.h"
 #include "..\..\UI\ArminControls.h"
+
+#include <thread>
+#include <chrono>
+using namespace std;
 
 namespace Armin::UI::Search
 {
 	using namespace Files;
 
-	SearchByName::SearchByName(Files::SearchCriteria& Criteria, HINSTANCE ins, ArminSessionBase* File)
+	SearchByName::SearchByName(Files::SearchCriteria& Criteria, ProjectBase* File)
 	{
 		this->Criteria = Criteria;
-		this->File = !File ? LoadedSession : File;
+		this->File = !File ? LoadedProject : File;
+	}
+	SearchByName::~SearchByName()
+	{
+		SetWindowLongPtr(_Base, GWLP_USERDATA, 0);
+		DestroyWindow(_Base);
 
+		if (Objects)
+			delete Objects;
+	}
+
+	void SearchByName::Construct(HINSTANCE ins)
+	{
 		if (!_ThisAtom)
 			InitBase(ins);
 
@@ -26,25 +42,40 @@ namespace Armin::UI::Search
 		LoadControls();
 	}
 
-	Vector<Component*> SearchByName::Execute(Files::SearchCriteria& Criteria, HINSTANCE ins, ArminSessionBase* File)
+	Vector<Component*> SearchByName::Execute(Files::SearchCriteria& Criteria, HINSTANCE ins, ProjectBase* File)
 	{
-		SearchByName* Item = new SearchByName(Criteria, ins, File);
+		SearchByName* Item = new SearchByName(Criteria, File);
 
-		MSG msg;
-		int Result;
-		while ((Result = GetMessageW(&msg, Item->_Base, NULL, NULL)) != 0)
-		{
-			if (Result < 0)
-				break;
+		WindowState* Running = new WindowState(true);
+		thread Thread = thread(RunMessageLoop, Item, ins, Running);
+		while ((*Running))
+			this_thread::sleep_for(chrono::milliseconds(100));
 
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
-		}
-
+		Thread.detach();
+		delete Running;
 		Vector<Component*> Return = Item->Return;
 		delete Item;
 
 		return Return;
+	}
+	LRESULT SearchByName::RunMessageLoop(SearchByName* Object, HINSTANCE ins, WindowState* _Running)
+	{
+		Object->Construct(ins);
+		WindowState& Running = *_Running;
+		Running = true;
+
+		int Result;
+		MSG msg;
+		while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
+		{
+			if (Result < 0)
+				break;
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		Running = false;
+		return msg.wParam;
 	}
 
 	void SearchByName::LoadControls()
@@ -139,22 +170,25 @@ namespace Armin::UI::Search
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 		}
 
 		Refresh();
 	}
 	void SearchByName::GetReturn()
 	{
-		Return = ComponentViewer::RetriveFromList(Objects);
+		Return = Objects->RetriveFromList();
 	}
 	void SearchByName::Refresh()
 	{
 		Criteria.Arguments = NameToSearch->GetText();
 		Vector<Component*> Selected = Criteria.GetComponents(File);
 		
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Selected, ObjectView, NULL, Criteria.Multiselect, true, ObjectScroll);
-
+		Objects->GenerateList(Selected, NULL, Criteria.Multiselect, true);
+		
 		if (_FirstRefresh)
 		{
 			Vector<Component*>& PreSelected = Criteria.PreSelected;
@@ -162,9 +196,9 @@ namespace Armin::UI::Search
 			if (!Criteria.Multiselect)
 				PreSelected.Resize(1);
 
-			for (uint i = 0; i < this->Objects.Size; i++)
+			for (uint i = 0; i < this->Objects->Size; i++)
 			{
-				ComponentViewer* This = this->Objects[i];
+				ComponentViewer* This = this->Objects->Item(i);
 				if (PreSelected.Contains(This->Target()))
 				{
 					PreSelected.Remove(This->Target());
@@ -209,6 +243,9 @@ namespace Armin::UI::Search
 			return Item->Command(wp, lp);
 		case WM_KEYDOWN:
 			return Item->KeyDown(wp);
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}
@@ -291,7 +328,7 @@ namespace Armin::UI::Search
 		}
 
 		{
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -325,18 +362,18 @@ namespace Armin::UI::Search
 			DestroyWindow(_Base);
 			break;
 		case 3: //Select All
-			if (Objects.Size != 0 && !Criteria.Multiselect)
+			if (Objects->Size != 0 && !Criteria.Multiselect)
 			{
 				EnableWindow(*SelectAll, false);
 				break;
 			}
 
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(true);
+			for (uint i = 0; i < Objects->Size; i++)
+				Objects->Item(i)->CheckState(true);
 			break;
 		case 4: //Clear Selection
-			for (uint i = 0; i < Objects.Size; i++)
-				Objects[i]->CheckState(false);
+			for (uint i = 0; i < Objects->Size; i++)
+				Objects->Item(i)->CheckState(false);
 			break;
 		}
 		return 0;

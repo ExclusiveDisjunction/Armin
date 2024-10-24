@@ -8,7 +8,7 @@ namespace Armin::Files
 	{
 
 	}
-	ReferenceList::ReferenceList(const String& Param, ArminSessionBase* File) : ReferenceList()
+	ReferenceList::ReferenceList(const String& Param, ProjectBase* File) : ReferenceList()
 	{
 		StringList Parts = Param.Split(L'*');
 
@@ -20,7 +20,7 @@ namespace Armin::Files
 				Add(Target);
 		}
 	}
-	ReferenceList::ReferenceList(const AString& Param, ArminSessionBase* File) : ReferenceList()
+	ReferenceList::ReferenceList(const AString& Param, ProjectBase* File) : ReferenceList()
 	{
 		Clear();
 		
@@ -266,6 +266,19 @@ namespace Armin::Files
 		Type Current = First;
 		for (uint i = 0; i < Size; i++, Current = Current->Next)
 			Return.Add(Current);
+
+		return Return;
+	}
+	ReferenceList::operator Vector<Component*>() const
+	{
+		Vector<Component*> Return;
+		const ReferenceList& This = *this;
+		for (ComponentReference*& Item : This)
+		{
+			Component* Eval = Item->Target();
+			if (Eval)
+				Return.Add(Eval);
+		}
 
 		return Return;
 	}

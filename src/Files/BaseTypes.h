@@ -12,7 +12,7 @@
 
 namespace Armin::Files
 {
-	class ArminSessionBase;
+	class ProjectBase;
 	class ComponentReference;
 
 	class Component
@@ -20,9 +20,9 @@ namespace Armin::Files
 	protected:
 		String _Title;
 		unsigned long long _ID;
-		ArminSessionBase* _ParentFile;
+		ProjectBase* _ParentFile;
 
-		Component(ArminSessionBase* File, bool GetID);
+		Component(ProjectBase* File, bool GetID);
 	public:
 		virtual ~Component();
 
@@ -32,7 +32,7 @@ namespace Armin::Files
 		virtual void Title(String New) { _Title = New; }
 		const unsigned long long& ID = _ID;
 
-		ArminSessionBase* ParentFile() const { return _ParentFile; }
+		ProjectBase* ParentFile() const { return _ParentFile; }
 
 		virtual ComponentTypes ObjectType() const = 0;
 		virtual String ToString() const { return L"No Data"; }
@@ -44,14 +44,14 @@ namespace Armin::Files
 	class ComponentList
 	{
 	protected:
-		ArminSessionBase* _File = nullptr;
+		ProjectBase* _File = nullptr;
 		T* First, * Last;
 		ParentT* _Parent;
 		unsigned int _Count;
 
 	public:
 		ComponentList() = delete;
-		ComponentList(ArminSessionBase* File, ParentT* Parent) : _File(File), First(nullptr), Last(nullptr), _Parent(Parent), _Count(0) {}
+		ComponentList(ProjectBase* File, ParentT* Parent) : _File(File), First(nullptr), Last(nullptr), _Parent(Parent), _Count(0) {}
 		ComponentList(const ComponentList<T, ParentT>& Obj) = delete;
 		ComponentList(const ComponentList<T, ParentT>&& Obj) = delete;
 		~ComponentList()
@@ -84,7 +84,7 @@ namespace Armin::Files
 		}
 
 		const unsigned int& Count = _Count;
-		ArminSessionBase* ParentFile() const { return _File; }
+		ProjectBase* ParentFile() const { return _File; }
 		ParentT* const& Parent = _Parent;
 
 		String Name = T::ThisName + L"List";
@@ -264,6 +264,6 @@ namespace Armin::Files
 	class ComponentParent
 	{
 	public:
-		virtual ArminSessionBase* ParentFile() = 0;
+		virtual ProjectBase* ParentFile() = 0;
 	};
 }

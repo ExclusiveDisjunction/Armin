@@ -1,19 +1,28 @@
 #include "GroupSelector.h"
 
+#include "..\..\UICommon.h"
 #include "..\..\Files\ArminSessions.h"
+
+#include <thread>
+#include <chrono>
+using namespace std;
 
 namespace Armin::UI::Tool
 {
 	using namespace Files;
 
-	GroupSelector::GroupSelector(HINSTANCE ins, Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect)
+	GroupSelector::GroupSelector(Files::InventorySystem* System, GroupSelectorSource Source, bool Multiselect)
+	{
+		_Multi = Multiselect;
+		if (!System)
+			System = dynamic_cast<InventorySystem*>(LoadedProject);
+
+		this->Source = Source;
+	}
+	void GroupSelector::Construct(HINSTANCE ins)
 	{
 		if (!_ThisAtom)
 			InitBase(ins);
-
-		_Multi = Multiselect;
-		if (!System)
-			System = dynamic_cast<InventorySystem*>(LoadedSession);
 
 		_Base = CreateWindowExW(NULL, MAKEINTATOM(_ThisAtom), L"Group Selector", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400, 500, NULL, NULL, ins, NULL);
 		SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -21,16 +30,18 @@ namespace Armin::UI::Tool
 		ShowWindow(_Base, SW_SHOW);
 		UpdateWindow(_Base);
 
-		LoadControls(Source, System, Multiselect);
+		LoadControls();
 	}
 
-	StringList GroupSelector::Execute(HINSTANCE ins, InventorySystem* System, GroupSelectorSource Source, bool Multiselect)
+	LRESULT GroupSelector::RunMessageLoop(GroupSelector* Object, HINSTANCE ins, WindowState* _Running)
 	{
-		GroupSelector* Selector = new GroupSelector(ins, System, Source, Multiselect);
+		Object->Construct(ins);
+		WindowState& Running = *_Running;
+		Running = true;
 
-		MSG msg;
 		int Result;
-		while ((Result = GetMessageW(&msg, Selector->_Base, 0, 0)) != 0)
+		MSG msg;
+		while ((Result = GetMessageW(&msg, nullptr, 0, 0)) != 0)
 		{
 			if (Result < 0)
 				break;
@@ -39,6 +50,21 @@ namespace Armin::UI::Tool
 			DispatchMessageW(&msg);
 		}
 
+		Running = false;
+		return msg.wParam;
+	}
+	StringList GroupSelector::Execute(HINSTANCE ins, InventorySystem* System, GroupSelectorSource Source, bool Multiselect)
+	{
+		GroupSelector* Selector = new GroupSelector(System, Source, Multiselect);
+
+		WindowState* _Running = new WindowState(true);
+		WindowState& Running = *_Running;
+		thread Thread = thread(RunMessageLoop, Selector, ins, _Running);
+		while (Running)
+			this_thread::sleep_for(chrono::milliseconds(100));
+
+		Thread.detach();
+		delete _Running;
 		StringList Return = Selector->Return;
 		delete Selector;
 
@@ -60,7 +86,8 @@ namespace Armin::UI::Tool
 		case WM_COMMAND:
 			return Item->Command(wp, lp);
 		case WM_DESTROY:
-			return Item->Destroy();
+			PostQuitMessage(0);
+			return 0;
 		default:
 			return DefWindowProcW(Window, Message, wp, lp);
 		}
@@ -82,9 +109,9 @@ namespace Armin::UI::Tool
 		_ThisAtom = RegisterClassW(&wn);
 	}
 
-	void GroupSelector::LoadControls(GroupSelectorSource Source, InventorySystem* System, bool Multi)
+	void GroupSelector::LoadControls()
 	{
-		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedSession);
+		InventorySystem* File = dynamic_cast<InventorySystem*>(LoadedProject);
 		if (!File)
 			return;
 
@@ -186,7 +213,7 @@ namespace Armin::UI::Tool
 			Scroll->Reset();
 
 			for (uint i = 0; i < Groups.Size; i++, YCoord += 5 + Height)
-				this->Groups.Add(new ToggleButton(XCoord, YCoord, Width, Height, View, ins, (HMENU)2, Groups[i], Multi, Style, TextStyle));
+				this->Groups.Add(new ToggleButton(XCoord, YCoord, Width, Height, View, ins, (HMENU)2, Groups[i], _Multi, Style, TextStyle));
 		}
 
 		_Loaded = true;

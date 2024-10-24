@@ -53,6 +53,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 ID_ARMINICO             ICON                    "rc\\Armin Logo.ico"
+IDI_NewFileIcon         ICON                    "rc\\NewFile_Icon.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

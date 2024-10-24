@@ -1,5 +1,6 @@
 #include "..\EditorFrame.h"
 
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\Files\ArminSessions.h"
 #include "..\..\Files\SearchCriteria.h"
@@ -14,10 +15,14 @@ namespace Armin::Editors::Inventory
 	InventorySearchEditor::InventorySearchEditor(InventorySystem* System, bool Mode)
 	{
 		if (!System)
-			_System = dynamic_cast<InventorySystem*>(LoadedSession);
+			_System = dynamic_cast<InventorySystem*>(LoadedProject);
 		else
 			_System = System;
 		_Mode = Mode;
+	}
+	InventorySearchEditor::~InventorySearchEditor()
+	{
+		delete Objects;
 	}
 
 	LRESULT __stdcall InventorySearchEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -42,7 +47,7 @@ namespace Armin::Editors::Inventory
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		{
@@ -66,10 +71,10 @@ namespace Armin::Editors::Inventory
 			{
 				Width = ((WndRect.right / 2) - (10 + XCoord + 10)) / 2;
 
-				Run = new Button(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle);
+				Run = new StyleButton(XCoord, YCoord, Width, Height, L"Run Search", _Base, (HMENU)4, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord += 10 + Width;
 
-				SaveResult = new Button(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle);
+				SaveResult = new StyleButton(XCoord, YCoord, Width, Height, L"Save Result", _Base, (HMENU)5, ins, Style, TextStyle, RECT{ 0, 0, 0, 5 });
 				XCoord = 10;
 				YCoord += 10 + Height;
 
@@ -197,6 +202,10 @@ namespace Armin::Editors::Inventory
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 		}
 	}
 	void InventorySearchEditor::RunSearch()
@@ -252,8 +261,8 @@ namespace Armin::Editors::Inventory
 				Filtered.Add(Item);
 		}
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Filtered, ObjectView, NULL, true, true, ObjectScroll);
+		Objects->Clear();
+		Objects->GenerateList(Filtered, nullptr, true, true);
 	}
 	void InventorySearchEditor::SwitchModes()
 	{
@@ -300,7 +309,7 @@ namespace Armin::Editors::Inventory
 			NotInPossession->SetCheckState(true);
 		}
 
-		CloseControls(Objects);
+		Objects->Clear();
 		Size();
 	}
 
@@ -312,7 +321,7 @@ namespace Armin::Editors::Inventory
 			RunSearch();
 			break;
 		case 5: //SaveSearch
-			ComponentViewer::SaveSelectedAsGroup(Objects);
+			Objects->SaveSelectedAsGroup();
 			break;
 		case 6: //StandardToggle
 		case 7: //OperationToggle
@@ -321,9 +330,9 @@ namespace Armin::Editors::Inventory
 			break;
 		case 8: //View
 		case 9: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+			Objects->OpenSelectedForEditView(wp == 9);
 		case 10: //Duplicate Result
-			ComponentViewer::PopoutObjects(Objects, L"Inventory Search Result", reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
+			Objects->PopoutObjects(L"Inventory Search Result", reinterpret_cast<HINSTANCE>(GetWindowLongPtr(_Base, GWLP_HINSTANCE)));
 			break;
 		case 11:			
 		{
@@ -357,7 +366,7 @@ namespace Armin::Editors::Inventory
 
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		MoveUpperButtons(WndRect);
 
@@ -477,7 +486,7 @@ namespace Armin::Editors::Inventory
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;

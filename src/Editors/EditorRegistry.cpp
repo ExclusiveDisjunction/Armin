@@ -2,7 +2,7 @@
 
 #include "EditorFrame.h"
 #include "EditorButtonHost.h"
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
 #include "..\Files\Components.h"
 #include "..\UI\EditorButton.h"
 #include "..\UI\EditorPopout.h"
@@ -10,7 +10,6 @@
 
 namespace Armin::Editors
 {
-    using namespace Config;
     using namespace Files;
     using namespace Editors::Inventory;
     using namespace Editors::Misc;
@@ -75,22 +74,10 @@ namespace Armin::Editors
         ButtonHosts.Clear();
         FooterHosts.Clear();
         BaseHost = nullptr;
+       
+        AppState &= ~APS_EditorOpen;
     }
 
-    bool EditorRegistry::EditorRunning()
-    {
-        return Info.Size > 0u;
-    }
-    bool EditorRegistry::ApplyableEditorRunning()
-    {
-        for (uint i = 0; i < Info.Size; i++)
-        {
-            if (Info[i]->IsApplyable())
-                return true;
-        }
-
-        return false;
-    }
     Vector<EditorFrame*> EditorRegistry::CurrentApplyableEditors()
     {
         Vector<EditorFrame*> Return;
@@ -108,7 +95,7 @@ namespace Armin::Editors
         return Vector<EditorFrame*>(Info);
     }
 
-    EditorFrame* EditorRegistry::GetEditor(int EditorType, EditorHost* Parent)
+    EditorFrame* EditorRegistry::GetEditor(ulong EditorType, EditorHost* Parent)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -119,7 +106,7 @@ namespace Armin::Editors
 
         return nullptr;
     }
-    Vector<EditorFrame*> EditorRegistry::GetEditors(int EditorType, EditorHost* Parent)
+    Vector<EditorFrame*> EditorRegistry::GetEditors(ulong EditorType, EditorHost* Parent)
     {
         Vector<EditorFrame*> Return;
         for (uint i = 0; i < Info.Size; i++)
@@ -134,6 +121,39 @@ namespace Armin::Editors
 
     void EditorRegistry::MoveEditor(EditorFrame* editor, EditorHost* toHost, bool ToPopout)
     {
+        /*To = ToPopout ? new EditorPopout(reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(*Source, GWLP_HINSTANCE))) : (!To ? BaseHost : To);
+        if (!To)
+            return;
+
+        EditorHost* OldHost = Source->Host;
+
+        if (To->SingleHostEditor() && To->Current) //The single host already has an editor child.
+            return;
+
+        HWND NewParent = To->EditorParent();
+        RECT NewPlacement = To->EditorPlacement;
+
+        EditorButtonHost* ConvTo = dynamic_cast<EditorButtonHost*>(To);
+        if (ConvTo)
+        {
+            if (ConvTo->LastEditor)
+                ShowWindow(*ConvTo->LastEditor, SW_HIDE);
+            ConvTo->LastEditor = ConvTo->Current;
+            ConvTo->Current = Source;
+        }
+
+        Source->_Placement = NewPlacement;
+        Source->_Host = To;
+        SetParent(*Source, NewParent);
+
+        Source->ReSize();
+
+        if (To->Current && To->Current != Source)
+            ShowWindow(*To->Current, SW_HIDE);
+        To->Current = Source;
+        ShowWindow(*Source, SW_SHOW);
+        */    
+
         HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(*editor, GWLP_HINSTANCE));
 
         if (ToPopout)
@@ -160,7 +180,7 @@ namespace Armin::Editors
         {
             if (toHost->Current != nullptr)
                 return;
-
+            
             toHost->Current = editor;
             editor->_Host = toHost;
         }
@@ -199,7 +219,7 @@ namespace Armin::Editors
             RedrawWindow(*Hosts, NULL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
     }
 
-    void EditorRegistry::ResetEditorOfType(int Types)
+    void EditorRegistry::ResetEditorOfType(ulong Types)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -208,7 +228,7 @@ namespace Armin::Editors
                 Current->Reset();
         }
     }
-    void EditorRegistry::ResetEditorOfType(int Types, Vector<void*> Condition)
+    void EditorRegistry::ResetEditorOfType(ulong Types, Vector<void*> Condition)
     {
         for (uint i = 0; i < Info.Size; i++)
         {
@@ -218,7 +238,7 @@ namespace Armin::Editors
         }
     }
 
-    bool EditorRegistry::IsOpen(int Types, EditorHost* Host)
+    bool EditorRegistry::IsOpen(ulong Types, EditorHost* Host)
     {
         for (EditorFrame* Frame : Info)
         {
@@ -228,7 +248,7 @@ namespace Armin::Editors
 
         return false;
     }
-    bool EditorRegistry::IsOpen(int Types, Vector<void*> Args, EditorHost* Host)
+    bool EditorRegistry::IsOpen(ulong Types, Vector<void*> Args, EditorHost* Host)
     {
         for (EditorFrame* Frame : Info)
         {
@@ -348,6 +368,9 @@ namespace Armin::Editors
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Opened Editor \"" + Frame->GetName() + L"\".");
 
+        AppState |= APS_EditorOpen;
+        if (Frame->IsApplyable())
+            AppState |= APS_AppendableEditorRunning;
         return Frame;
     }
 
@@ -362,7 +385,7 @@ namespace Armin::Editors
             auto Result = MessageBoxW(GetAncestor(*Editor, GA_ROOT), L"Do you want to apply before closing?", static_cast<LPCWSTR>(Title), MB_YESNOCANCEL | MB_ICONWARNING);
             if (Result == IDYES)
             {
-                if (!Editor->Apply(LoadedSession, true))
+                if (!Editor->Apply(LoadedProject, true))
                 {
                     MessageBoxW(GetAncestor(*Editor, GA_ROOT), L"The editor could not be applied, and it will remain open.", static_cast<LPCWSTR>(Title), MB_OK | MB_ICONERROR);
                     return false;
@@ -389,6 +412,19 @@ namespace Armin::Editors
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Closed Editor \"" + EditorName + L"\".");
 
+        if (Info.Size == 0 && (AppState & APS_EditorOpen))
+            AppState &= ~APS_EditorOpen;
+        if (Info.Size != 0)
+        {
+            bool Apply = false;
+            for (EditorFrame* Item : Info)
+                Apply |= Item->IsApplyable();
+
+            if (Apply)
+                AppState |= APS_AppendableEditorRunning;
+            else
+                AppState &= ~APS_AppendableEditorRunning;
+        }
         return true;
     }
     bool EditorRegistry::CloseAllEditors() 
@@ -428,9 +464,14 @@ namespace Armin::Editors
                     continue;
                 }
 
-                bool Result = Current->Apply(LoadedSession);
+                bool Result = Current->Apply(LoadedProject);
                 if (Result)
+                {
                     ToRemove.Add(Current);
+                    Current->ClearState();
+                }
+                else
+                    Current->CurrentState(Current->CurrentState() | EDS_AppendError);
 
                 Return &= Result;
             }
@@ -463,6 +504,20 @@ namespace Armin::Editors
 
         for (FooterHost* Footer : FooterHosts)
             Footer->SetFooterText(L"Closed " + String(ToRemove.Size) + L" editors.");
+
+        if ((AppState & APS_EditorOpen) && Info.Size == 0)
+            AppState &= ~APS_EditorOpen;
+        if (Info.Size != 0)
+        {
+            bool Apply = false;
+            for (EditorFrame* Item : Info)
+                Apply |= Item->IsApplyable();
+
+            if (Apply)
+                AppState |= APS_AppendableEditorRunning;
+            else
+                AppState &= ~APS_AppendableEditorRunning;
+        }
         return Return;
     }
     bool EditorRegistry::ForceCloseAllEditors()
@@ -483,6 +538,8 @@ namespace Armin::Editors
         }
 
         Info.Clear();
+        if (AppState & APS_EditorOpen)
+            AppState &= ~APS_EditorOpen;
         return true;
     }
 }

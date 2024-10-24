@@ -5,7 +5,7 @@
 
 namespace Armin::Files
 {
-	class ArminSessionBase;
+	class ProjectBase;
 	class Component;
 	class ReferenceList;
 	class ReferenceIterator;
@@ -74,8 +74,8 @@ namespace Armin::Files
 		void SetTarget(Component* New);
 
 		operator Component* () const;
-		Component* operator*() const;
-		Component* operator->() const;
+
+		AString ToString() const;
 	};
 
 	class ReferenceIterator
@@ -115,8 +115,8 @@ namespace Armin::Files
 
 	public:
 		ReferenceList();
-		ReferenceList(const String& Param, ArminSessionBase* File);
-		ReferenceList(const AString& Param, ArminSessionBase* File);
+		ReferenceList(const String& Param, ProjectBase* File);
+		ReferenceList(const AString& Param, ProjectBase* File);
 		ReferenceList(Type Obj);
 		ReferenceList(const Vector<Type>& Obj);
 		ReferenceList(const Vector<Component*>& Obj);
@@ -156,5 +156,6 @@ namespace Armin::Files
 		AString ToAString() const;
 
 		operator Vector<Type>() const;
+		operator Vector<Component*>() const;
 	};
 }

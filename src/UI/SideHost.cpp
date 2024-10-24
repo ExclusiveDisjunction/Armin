@@ -1,6 +1,6 @@
 #include "SideHost.h"
 
-#include "..\Config\Ins.h"
+#include "..\Ins.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
 

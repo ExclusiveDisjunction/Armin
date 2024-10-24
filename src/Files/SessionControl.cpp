@@ -2,34 +2,34 @@
 
 #include "ArminSessions.h"
 #include "Components.h"
+#include "2021.2/ArminSessions.h"
+#include "2021.2/Components.h"
 #include "Files\Stream.h"
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
+#include "..\Recent.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
-#include "..\Config\Ins.h"
-#include "..\Config\Recent.h"
 #include "..\UI\Main.h"
-#include "..\UI\User\CreateUser.h"
 #include "..\UI\Tool\FileProgress.h"
 #include "..\UI\Tool\PasswordInput.h"
+#include "..\UI\Tool\NewFile.h"
 
 #include <cstdio>
 #include <filesystem>
 
 namespace Armin::Files
 {
-    using namespace Config;
     using namespace Editors;
     using namespace UI;
     using namespace UI::Tool;
-    using namespace UI::Users;
 
     bool SessionControl::Open(HINSTANCE ins)
     {
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Opening File...");
 
-        String Path = OpenFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = OpenFileEx(NULL, L"Uni-Projects\0*.arminuni\0Armin 2021.2 Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0", L"");
         if (Path == L"")
         {
             if (FooterOutput)
@@ -51,7 +51,7 @@ namespace Armin::Files
             return false;
         }
 
-        if (Path == LoadedSessionPath)
+        if (Path == LoadedProjectPath)
         {
             if (FooterOutput)
                 FooterOutput->SetFooterText(L"The path provided is the same as the currently loaded project.");
@@ -74,18 +74,37 @@ namespace Armin::Files
 
         try
         {
-            if (Ext == L"arminproj")
-                LoadedSession = new Project(Path);
-            else if (Ext == L"arminrcproj")
-                LoadedSession = new ProjectRc(Path);
-            else if (Ext == L"armininvproj")
-                LoadedSession = new InventoryProject(Path);
-            else if (Ext == L"arminrcinvproj")
-                LoadedSession = new InventoryProjectRc(Path);
-            else if (Ext == L"arminteamproj")
-                LoadedSession = new TeamProject(Path);
-            else if (Ext == L"arminrcteamproj")
-                LoadedSession = new TeamProjectRc(Path);
+            if (Ext == L"arminuni")
+                LoadedProject = new UniProject(Path);
+
+            else
+            {
+                V2021::ArminSessionBase* Proj = nullptr;
+
+                if (Ext == L"arminproj")
+                    Proj = new V2021::Project(Path);
+                else if (Ext == L"arminrcproj")
+                    Proj = new V2021::ProjectRc(Path);
+                else if (Ext == L"armininvproj")
+                    Proj = new V2021::InventoryProject(Path);
+                else if (Ext == L"arminrcinvproj")
+                    Proj = new V2021::InventoryProjectRc(Path);
+                else if (Ext == L"arminteamproj")
+                    Proj = new V2021::TeamProject(Path);
+                else if (Ext == L"arminrcteamproj")
+                    Proj = new V2021::TeamProjectRc(Path);
+
+                int Result = MessageBoxW(nullptr, L"The file type selected is no longer supported. Would you like to upgrade to the current version of file?\n\nIf not, Armin cannot open the file.", L"Unsuported Types:", MB_ICONWARNING | MB_YESNOCANCEL);
+                if (Result == IDYES)
+                {
+                    //Write Converter here.
+                }
+                else if (Result == IDNO || Result == IDCANCEL)
+                {
+                    delete Progress;
+                    return false;
+                }
+            }            
         }
         catch (...)
         {
@@ -97,56 +116,42 @@ namespace Armin::Files
 
         delete Progress;
 
-        if (LoadedSession && LoadedSession->RequiresPassword())
+        if (LoadedProject && LoadedProject->RequiresPassword())
         {
             String Password = PasswordInput::Execute(ins);
-            if (Password != LoadedSession->Password())
+            if (Password != LoadedProject->Password())
             {
                 MessageBoxW(nullptr, L"The password provided was incorrect. Please try again later.", L"Open File:", MB_OK | MB_ICONERROR);
                 if (FooterOutput)
                     FooterOutput->SetFooterText(L"Could not open the selected project.");
 
-                delete LoadedSession;
-                LoadedSession = nullptr;
-                LoadedSessionPath = L"";
+                delete LoadedProject;
+                LoadedProject = nullptr;
+                LoadedProjectPath = L"";
                 return false;
             }
         }
 
-        LoadedSessionPath = Path;
+        LoadedProjectPath = Path;
         InsInstance->LastLoaded = Path;
         RecentInstance->AddRecent(Path);
 
-        UserSystem* UserSys = dynamic_cast<UserSystem*>(LoadedSession);
-        UserRegistry::Initalize(UserSys, ins);
+        AppState = 0;
+        AppState |= APS_FileLoaded;
+
+        UserSystem* UserSys = dynamic_cast<UserSystem*>(LoadedProject);
+        UserRegInit(UserSys, ins);
         if (UserSys && FooterOutput) //If the main window has already been loaded, then prompt a sign in.
-            UserRegistry::SignIn();
-
-        ResourceSystem* Resources = dynamic_cast<ResourceSystem*>(LoadedSession);
-        if (Resources)
-        {
-            Vector<AString> Missing;
-            bool Result = Resources->CheckResources(Missing);
-            if (!Result)
-            {
-                String Text = L"The following resource files could not be found:\n";
-                for (AString Item : Missing)
-                    Text += L'\n' + (String)Item;
-
-                Text += L"\n\nPlease re-locate the files to the current project to access the resources.";
-
-                MessageBoxW(NULL, (LPCWSTR)Text, L"Resources:", MB_OK | MB_ICONWARNING);
-            }
-        }
+            SignIn();
 
         {
-            InventorySystem* Conv = dynamic_cast<InventorySystem*>(LoadedSession);
+            InventorySystem* Conv = dynamic_cast<InventorySystem*>(LoadedProject);
             if (Conv && !UserSys && FooterOutput)
                 EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
         }
 
         if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
+            MasterRibbon->SetRibbonStatus();
 
         if (FooterOutput)
            FooterOutput->SetFooterText(L"Sucessfully Opened File");
@@ -158,7 +163,9 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Closing File...");
 
-        if (HasEdit || EditorRegistry::ApplyableEditorRunning())
+        bool HasEdit = AppState & APS_HasEdit;
+
+        if (HasEdit || (AppState & APS_AppendableEditorRunning))
         {
             int Result = MessageBoxW(NULL, L"Do you want to save before closing the current project?", L"Armin:", MB_YESNOCANCEL | MB_ICONWARNING);
             if (Result == IDYES)
@@ -178,24 +185,21 @@ namespace Armin::Files
             }
         }
 
-        if (!Ins::IsLoaded())
-        {
-            if (FooterOutput)
-                FooterOutput->SetFooterText(L"Sucessfully Closed File");
-            return true;
-        }
+        bool WasLoaded = Ins::IsLoaded();
 
         EditorRegistry::ForceCloseAllEditors();
 
-        delete LoadedSession;
-        LoadedSession = nullptr;
-        LoadedSessionPath = L"";
+        delete LoadedProject;
+        LoadedProject = nullptr;
+        LoadedProjectPath = L"";
+
+        AppState = 0;
 
         if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
+            MasterRibbon->SetRibbonStatus();
 
         if (FooterOutput)
-            FooterOutput->SetFooterText(L"Sucessfully Closed File");
+            FooterOutput->SetFooterText(WasLoaded ? L"Closed all editors, but there was no file loaded prior." : L"Sucessfully Closed File");
 
         return true;
     }
@@ -204,7 +208,25 @@ namespace Armin::Files
         if (FooterOutput)
             FooterOutput->SetFooterTextTillNext(L"Creating New File...");
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        if ((AppState & APS_HasEdit) || (AppState & APS_AppendableEditorRunning))
+        {
+            int Result = MessageBoxW(nullptr, L"Would you like to save first?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
+            if (Result == IDYES)
+            {
+                if (!Save(ins))
+                {
+                    Result = MessageBoxW(nullptr, L"Save failed. Would you still like to create a new file?", L"New File:", MB_YESNOCANCEL | MB_ICONQUESTION);
+                    if (Result == IDNO || Result == IDCANCEL)
+                        return false;
+                }
+            }
+            else if (Result == IDCANCEL)
+                return false;
+        }
+
+        String Username, Password;
+        int Config = 0;
+        String Path = NewFile::Execute(ins, Username, Password, Config);
         bool Return = false;
 
         if (Path == L"")
@@ -217,81 +239,40 @@ namespace Armin::Files
             DeleteFileW(static_cast<const wchar_t*>(Path));
 
         String FileExt = ::FileExt(Path);
-
-        if (FileExt == L"arminproj" || FileExt == L"arminrcproj" || FileExt == L"arminteamproj" || FileExt == L"arminrcteamproj")
+        std::ofstream OutFile(Path);
+        if (!OutFile)
         {
-            std::ofstream OutFile(Path);
-            if (!OutFile)
+            MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        OutFile.close();
+
+        UniProject* Proj = new UniProject();
+        Proj->Config = Config;
+        Proj->ConfigureMemory();
+        Proj->ChangePath(Path);
+
+        if (Config & UPC_Users)
+        {
+            UserSet* Users = Proj->Users;
+            if (Username == String() || Password == String() || !Users)
             {
-                MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
+                MessageBoxW(nullptr, L"The new project cannot be created without a User. Please try again later.", L"New File:", MB_OK | MB_ICONERROR);
                 return false;
             }
 
-            OutFile.close();
-
-            LoadedSessionPath = Path;
-            if (FileExt == L"arminproj")
-                LoadedSession = new Project();
-            else if (FileExt == L"arminrcproj")
-                LoadedSession = new ProjectRc();
-            else if (FileExt == L"arminteamproj")
-                LoadedSession = new TeamProject();
-            else if (FileExt == L"arminrcteamproj")
-                LoadedSession = new TeamProjectRc();
-            LoadedSession->ChangePath(Path);
-
-            if (!CreateUser::Execute(true, ins))
-            {
-                delete LoadedSession;
-                LoadedSession = nullptr;
-                LoadedSessionPath = String();
-
-                MessageBoxW(NULL, L"The file cannot be created without an Admin User.", L"Assign File:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            LoadedSession->Save();
-            HasEdit = false;
-
-            Return = true;
-        }
-        else if (FileExt == L"armininvproj" || FileExt == L"arminrcinvproj")
-        {
-            std::ofstream OutFile(Path);
-            if (!OutFile)
-            {
-                MessageBoxW(NULL, L"The file cannot be created at this time.\n\nPlease try again later.", L"NewFile:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            OutFile.close();
-
-            LoadedSessionPath = Path;
-            if (FileExt == L"armininvproj")
-                LoadedSession = new InventoryProject();
-            else if (FileExt == L"arminrcinvproj")
-                LoadedSession = new InventoryProjectRc();
-            LoadedSession->ChangePath(Path);
-
-            Return = true;
+            User* New = new User(Proj, Users);
+            New->FirstName = New->LastName = New->MiddleName = String();
+            New->IsAdmin = true;
+            New->IsAssurance = false;
+            New->Username = Username;
+            New->Password = Password;
         }
 
-        if (Return)
-        {
-            RecentInstance->AddRecent(Path);
-            InsInstance->LastLoaded = Path;
+        Proj->Save();
+        delete Proj;
 
-            UserSystem* ConvFile = dynamic_cast<UserSystem*>(LoadedSession);
-            UserRegistry::Initalize(ConvFile, ins);
-        }
-
-        if (FooterOutput)
-            FooterOutput->SetFooterText(L"Sucessfully Created New File");
-
-        if (MasterRibbon)
-            MasterRibbon->SetRibbonStatusDef();
-
-        return Return;
+        return Open(Path, ins);
     }
 
     bool SessionControl::Apply(EditorFrame* Host, bool ShowCompleted)
@@ -305,7 +286,7 @@ namespace Armin::Files
             return Host != nullptr;
         }
 
-        ArminSessionBase* File = LoadedSession;
+        ProjectBase* File = LoadedProject;
         if (!File)
             return false;
 
@@ -328,8 +309,10 @@ namespace Armin::Files
 
         if (Return)
             EditorRegistry::CloseEditor(Host, false);
+        else
+            Host->CurrentState(Host->CurrentState() | EDS_AppendError);
 
-        HasEdit |= Return;
+        AppState |= APS_HasEdit;     
         return Return;
     }
     bool SessionControl::ApplyAll()
@@ -338,7 +321,11 @@ namespace Armin::Files
 
         bool Return = true;
         for (uint i = 0; i < Editors.Size; i++)
-            Return &= Apply(Editors[i], false);
+        {
+            EditorFrame* Current = Editors[i];
+            bool Temp = Apply(Current, false);
+            Return &= Temp;
+        }
 
         if (Return)
             MessageBoxW(NULL, L"Apply All was sucessfull.", L"Apply All:", MB_OK | MB_ICONINFORMATION);
@@ -351,7 +338,7 @@ namespace Armin::Files
     bool SessionControl::Save(HINSTANCE ins)
     {
         bool HasError = false;
-        bool Return = HasEdit;
+        bool Return = AppState & APS_HasEdit;
         {
             Vector<EditorFrame*> Apply = EditorRegistry::CurrentApplyableEditors();
             bool DoAppylyable = false;
@@ -371,7 +358,7 @@ namespace Armin::Files
                 Vector<EditorFrame*> ToClose;
                 for (EditorFrame* Current : Apply)
                 {
-                    bool Temp = Current->Apply(LoadedSession);
+                    bool Temp = Current->Apply(LoadedProject);
                     if (Temp)
                         ToClose.Add(Current);
                     Status &= Temp;
@@ -389,8 +376,8 @@ namespace Armin::Files
         {
             FileProgress* Progress = new FileProgress(true, ins);
 
-            LoadedSession->Save();
-            HasEdit = false;
+            LoadedProject->Save();
+            AppState &= ~APS_HasEdit;
 
             delete Progress;
         }
@@ -435,11 +422,11 @@ namespace Armin::Files
             }
         }
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = SaveFileEx(NULL, L"Armin Uni-Project\0*.arminuni\0", L".arminuni");
         if (Path == String())
             return false;
 
-        if (FileExt(Path) != FileExt(LoadedSessionPath))
+        if (FileExt(Path) != FileExt(LoadedProjectPath))
         {
             MessageBoxW(NULL, L"The file type of Save As Copy must be the same as the current loaded project.\n\nPlease try again later.", L"Save As:", MB_OK | MB_ICONERROR);
             return false;
@@ -448,7 +435,7 @@ namespace Armin::Files
         if (FileExists(Path))
             DeleteFileW(static_cast<LPCWSTR>(Path));
 
-        CopyFileW(static_cast<LPCWSTR>(LoadedSessionPath), static_cast<LPCWSTR>(Path), false);
+        CopyFileW(static_cast<LPCWSTR>(LoadedProjectPath), static_cast<LPCWSTR>(Path), false);
         return true;
     }
     bool SessionControl::SaveAs(HINSTANCE ins)
@@ -459,20 +446,20 @@ namespace Armin::Files
             return false;
         }
 
-        String Path = SaveFileEx(NULL, L"All Project Files\0*.arminproj;*.arminrcproj;*.armininvproj;*.arminrcinvproj;*.arminteamproj;*.arminrcteamproj\0Armin Projects\0*.arminproj;*.arminrcproj\0Inventory Projects\0*.armininvproj;*.arminrcinvproj\0Team Projects\0*.arminteamproj;*.arminrcteamproj\0Resource Enabled Projects\0*.arminrcproj;*.arminrcinvproj;*.arminrcteamproj", L"");
+        String Path = SaveFileEx(NULL, L"Armin Uni-Project\0*.arminuni", L".arminuni");
         if (Path == L"")
             return false;
 
-        if (FileExt(Path) != FileExt(LoadedSessionPath))
+        if (FileExt(Path) != FileExt(LoadedProjectPath))
         {
             MessageBoxW(NULL, L"The file type of Save As must be the same as the current loaded project.\n\nPlease try again later.", L"Save As:", MB_OK | MB_ICONERROR);
             return false;
         }
 
-        ArminSessionBase* File = LoadedSession;
+        ProjectBase* File = LoadedProject;
         File->ChangePath(Path);
         File->Save();
-        HasEdit = false;
+        AppState &= ~APS_HasEdit;
 
         if (!Save(ins))
         {

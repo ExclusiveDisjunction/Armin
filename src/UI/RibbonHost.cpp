@@ -1,15 +1,13 @@
 #include "RibbonHost.h"
 
+#include "..\Ins.h"
 #include "..\UserRegistry.h"
-#include "..\Config\Ins.h"
 
 #include <thread>
 #include <chrono>
 
 namespace Armin::UI
 {
-	using namespace Config;
-
 	void FooterHost::SetFooterText(String Text, int Delay)
 	{
 		if (!FooterText)
@@ -27,9 +25,5 @@ namespace Armin::UI
 	{
 		if (FooterText)
 			FooterText->SetText(L"Ready");
-	}
-	void RibbonHost::SetRibbonStatusDef()
-	{
-		SetRibbonStatus((Ins::IsLoaded() ? 0 : RibbonStatus::MRS_NoFile) | (UserRegistry::CurrentUser() ? 0 : MRS_NoUser) | (!UserRegistry::CurrentUser() ? 0 : (UserRegistry::CurrentUserType() == UT_Admin ? 0 : MRS_StandardUser)));
 	}
 }

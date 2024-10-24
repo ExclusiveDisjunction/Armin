@@ -1,6 +1,7 @@
 #include "..\EditorFrame.h"
 
 #include "Sort.h"
+#include "UI\StyleButton.h"
 #include "..\EditorRegistry.h"
 #include "..\..\UserRegistry.h"
 #include "..\..\Files\ArminSessions.h"
@@ -13,6 +14,11 @@ namespace Armin::Editors::Users
 	UserHomepageEditor::UserHomepageEditor(User* Target)
 	{
 		_Target = Target;
+	}
+	UserHomepageEditor::~UserHomepageEditor()
+	{
+		if (Objects)
+			delete Objects;
 	}
 
 	LRESULT __stdcall UserHomepageEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -37,7 +43,7 @@ namespace Armin::Editors::Users
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		{
@@ -63,18 +69,20 @@ namespace Armin::Editors::Users
 			XCoord += 5 + Width;
 			Width = WndRect.right - 10 - XCoord;
 
-			CurrentUser = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, _Target, true);
+			CurrentUser = new ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, _Target, true, nullptr);
 			YCoord += 20 + Height;
 			XCoord = 10;
 			Width = (WndRect.right - 10 - XCoord - 20) / 3;
 
-			SignOut = new Button(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)4, ins, Style, TextStyle);
+			RECT StyleRect = { 0, 0, 0, 5 };
+
+			SignOut = new StyleButton(XCoord, YCoord, Width, Height, L"Sign Out", _Base, (HMENU)4, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
-			Lock = new Button(XCoord, YCoord, Width, Height, L"Lock", _Base, (HMENU)5, ins, Style, TextStyle);
+			Lock = new StyleButton(XCoord, YCoord, Width, Height, L"Lock", _Base, (HMENU)5, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
-			GoToTasks = new Button(XCoord, YCoord, Width, Height, L"Go To Tasks", _Base, (HMENU)6, ins, Style, TextStyle);
+			GoToTasks = new StyleButton(XCoord, YCoord, Width, Height, L"Go To Tasks", _Base, (HMENU)6, ins, Style, TextStyle, StyleRect);
 			XCoord += 10 + Width;
 
 			//Timecard = new Button(XCoord, YCoord, Width, Height, L"Timecard", _Base, (HMENU)7, ins, Style, TextStyle);
@@ -97,7 +105,7 @@ namespace Armin::Editors::Users
 			YCoord += 5 + ButtonSize;
 
 			Edit = new Button(XCoord, YCoord, ButtonSize, ButtonSize, L"ED", _Base, (HMENU)10, ins, Style, TextStyle);
-			EnableWindow(*Edit, UserRegistry::CurrentUserType() == UT_Admin);
+			EnableWindow(*Edit, (AppState & APS_HasAdminUser));
 			YCoord += 10 + ButtonSize;
 
 			SelectAll = new Button(XCoord, YCoord, ButtonSize, ButtonSize, L"SA", _Base, (HMENU)11, ins, Style, TextStyle);
@@ -113,13 +121,17 @@ namespace Armin::Editors::Users
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+			
+			if (Objects)
+				delete Objects;
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 
 			FillObjects();
 		}
 	}
 	void UserHomepageEditor::FillObjects()
 	{
-		TaskSystem* TaskSystem = dynamic_cast<class TaskSystem*>(LoadedSession);
+		TaskSystem* TaskSystem = dynamic_cast<class TaskSystem*>(LoadedProject);
 		TaskList* Tasks = !TaskSystem ? nullptr : TaskSystem->Tasks;
 		if (!Tasks)
 			return;
@@ -134,8 +146,7 @@ namespace Armin::Editors::Users
 
 		QuickSort(Assigned, [](Task* One, Task* Two) { return One->DueBy < Two->DueBy; });
 
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(Assigned, ObjectView, nullptr, true, true, ObjectScroll);
+		Objects->GenerateList(Assigned, nullptr, true, true);
 	}
 
 	LRESULT UserHomepageEditor::Size()
@@ -148,7 +159,7 @@ namespace Armin::Editors::Users
 
 		MoveUpperButtons(WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -206,7 +217,7 @@ namespace Armin::Editors::Users
 			Height = WndRect.bottom - 10 - YCoord;
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 
 		return 0;
@@ -221,7 +232,7 @@ namespace Armin::Editors::Users
 		case 'V':
 		case 'E':
 			if (GetKeyState(VK_CONTROL) & 0x8000)
-				ComponentViewer::OpenSelectedForEditView(Objects, wp == 'E' && UserRegistry::CurrentUserType() == UT_Admin);
+				Objects->OpenSelectedForEditView(wp == 'E' && (AppState & APS_HasAdminUser));
 			break;
 		default:
 			return SendMessageW(GetParent(_Base), WM_KEYDOWN, wp, 0);
@@ -233,10 +244,10 @@ namespace Armin::Editors::Users
 		switch (wp)
 		{
 		case 4: //Sign Out
-			UserRegistry::SignOut();
+			UserSignOut();
 			break;
 		case 5: //Lock
-			UserRegistry::Lock();
+			UserLock();
 			break;
 		case 6: //Tasks
 			EditorRegistry::OpenEditor(new Tasks::TasksEditor(nullptr), nullptr);
@@ -246,28 +257,24 @@ namespace Armin::Editors::Users
 			break;
 		case 8: //Complete Task
 		{
-			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 			{
-				Vector<Task*> Tasks;
-				for (ComponentViewer* Obj : Objects)
-				{
-					Task* Conv = dynamic_cast<Task*>(Obj->Target());
-					if (Conv)
-						Tasks.Add(Conv);
-				}
+				if (!Obj->CheckState())
+					continue;
 
-				for (Task* Obj : Tasks)
-					EditorRegistry::OpenEditor(new Tasks::CompleteTaskEditor(Obj), nullptr);
+				Task* Conv = dynamic_cast<Task*>(Obj->Target());
+				if (Conv)
+					EditorRegistry::OpenEditor(new Tasks::CompleteTaskEditor(Conv), nullptr);
 			}
 			break;
 		}
 		case 9: //View
 		case 10: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 9);
+			Objects->OpenSelectedForEditView(wp == 9);
 			break;
 		case 11: //SelectAll
 		case 12: //DeSelectAll
-			for (ComponentViewer* Obj : Objects)
+			for (ComponentViewer* Obj = Objects->Item(0); Obj != nullptr; Obj = Obj->Next)
 				Obj->CheckState(wp == 11);
 			break;
 		}

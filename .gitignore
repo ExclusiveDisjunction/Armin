@@ -5,6 +5,7 @@
 
 Build/
 Publish/
+.idea/
 *.sln
 *.exe
 

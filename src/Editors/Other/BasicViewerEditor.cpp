@@ -34,7 +34,7 @@ namespace Armin::Editors::Misc
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		int BaseWidth = 175;
 		int BaseHeight = 27;
 		AaColor BaseBk = EditorGrey;
@@ -66,7 +66,7 @@ namespace Armin::Editors::Misc
 			TextStyle.Alignment = TA_LeftAlignment;
 			TextStyle.Bold = false;
 
-			Target = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, ThisTarget, _DummySelect, false, true);
+			Target = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, NULL, ThisTarget, _DummySelect, nullptr, false, true);
 			BaseYCoord = YCoord += 40 + Height;
 		}
 
@@ -103,9 +103,6 @@ namespace Armin::Editors::Misc
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", BaseBk, TextStyle, false));
 			YCoord += (5 + Height);
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Description:", BaseBk, TextStyle, false));
 
 			YCoord = BaseYCoord;
@@ -123,9 +120,6 @@ namespace Armin::Editors::Misc
 			YCoord += 5 + Height;
 
 			Data.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
 			YCoord += 5 + Height;
 
 			Height = WndRect.bottom - 10 - YCoord;
@@ -167,9 +161,6 @@ namespace Armin::Editors::Misc
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Group:", BaseBk, TextStyle, false));
 			YCoord += (5 + Height);
 
-			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Image:", BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
 			MiscControls.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, L"Description:", BaseBk, TextStyle, false));
 
 			YCoord = BaseYCoord;
@@ -187,9 +178,6 @@ namespace Armin::Editors::Misc
 			YCoord += 5 + Height;
 
 			Data.Add(new Label(XCoord, YCoord, Width, Height, _Base, ins, ConvTarget->Group, BaseBk, TextStyle, false));
-			YCoord += 5 + Height;
-
-			CV1 = new UI::ComponentViewer(XCoord, YCoord, Width, Height, _Base, ins, nullptr, !ConvTarget->TargetImage ? nullptr : ConvTarget->TargetImage->Target(), false);
 			YCoord += 5 + Height;
 
 			Height = WndRect.bottom - 10 - YCoord;
@@ -268,7 +256,7 @@ namespace Armin::Editors::Misc
 
 		MoveUpperButtons(WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		int BaseWidth = 175;
 		int BaseHeight = 27;
 
@@ -304,9 +292,6 @@ namespace Armin::Editors::Misc
 			YCoord += (5 + Height);
 
 			MiscControls[4]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 5 + Height;
-
-			MiscControls[5]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;
@@ -345,9 +330,6 @@ namespace Armin::Editors::Misc
 			YCoord += (5 + Height);
 
 			MiscControls[4]->Move(XCoord, YCoord, Width, Height);
-			YCoord += 5 + Height;
-
-			MiscControls[5]->Move(XCoord, YCoord, Width, Height);
 
 			YCoord = BaseYCoord;
 			XCoord += 5 + Width;

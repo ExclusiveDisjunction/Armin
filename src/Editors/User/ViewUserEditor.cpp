@@ -12,12 +12,14 @@ namespace Armin::Editors::Users
 
 	ViewUserEditor::ViewUserEditor(User* Target)
 	{	
-		Current = !Target ? UserRegistry::CurrentUser() : Target;
+		Current = !Target ? CurrentUser : Target;
 	}
 	ViewUserEditor::~ViewUserEditor()
 	{
 		MiscControls.Clear();
-		Positions.Clear();
+		
+		if (Positions)
+			delete Positions;
 	}
 
 	LRESULT __stdcall ViewUserEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
@@ -36,7 +38,7 @@ namespace Armin::Editors::Users
 		RECT WndRect;
 		GetClientRect(_Base, &WndRect);
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		HINSTANCE ins = reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE));
 
@@ -65,7 +67,7 @@ namespace Armin::Editors::Users
 			int TWidth = (WndRect.right - 20 - XCoord - 10) / 2;
 
 			Change = new Button(XCoord, YCoord, TWidth, Height, L"Change Information", _Base, (HMENU)4, ins, Style, TextStyle);
-			EnableWindow(*Change, UserRegistry::CurrentUserType() == UT_Admin);
+			EnableWindow(*Change, (AppState & APS_HasAdminUser));
 			XCoord += 10 + TWidth;
 
 			//Timecards = new Button(XCoord, YCoord, TWidth, Height, L"Timecards", _Base, (HMENU)5, ins, Style, TextStyle);
@@ -130,8 +132,12 @@ namespace Armin::Editors::Users
 			PositionView = new Grid(0, 0, Width, Height, PositionScroll, ins, Style);
 			PositionScroll->SetViewer(PositionView);
 
+			if (Positions)
+				delete Positions;
+			Positions = new ComponentViewerList(PositionView, PositionScroll);
+
 			if (Current != nullptr)
-				Positions = ComponentViewer::GenerateListRef(Current->Positions, PositionView, NULL, true, true, PositionScroll);
+				Positions->GenerateListRef(Current->Positions, NULL, true, true);
 		}
 	}
 
@@ -140,7 +146,7 @@ namespace Armin::Editors::Users
 		switch (wp)
 		{
 		case 4: //Change Info
-			EditorRegistry::OpenEditor(new EditUserEditor(Current), nullptr);
+			EditorRegistry::OpenEditor(new CreateEditUserEditor(Current), nullptr);
 			break;
 		case 5:
 			//EditorRegistry::OpenEditor(new TimecardsEditor(Current), nullptr);
@@ -149,10 +155,6 @@ namespace Armin::Editors::Users
 			EditorRegistry::OpenEditor(new UserHomepageEditor(Current), nullptr);
 			break;
 		}
-		return 0;
-	}
-	LRESULT ViewUserEditor::SpecialCommand(HMENU ID, uint Command, LPARAM Sender)
-	{
 		return 0;
 	}
 	LRESULT ViewUserEditor::KeyDown(WPARAM Key)
@@ -170,7 +172,7 @@ namespace Armin::Editors::Users
 		MoveUpperButtons(WndRect);
 
 		int BaseXCoord = 10;
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = BaseXCoord;
@@ -241,14 +243,8 @@ namespace Armin::Editors::Users
 			Height = WndRect.bottom - 10 - YCoord;
 
 			PositionScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Positions, PositionView, PositionScroll);
+			Positions->ReSizeList();
 		}
-
-		return 0;
-	}
-	LRESULT ViewUserEditor::Destroy()
-	{
-		Current = nullptr;
 
 		return 0;
 	}
@@ -262,10 +258,7 @@ namespace Armin::Editors::Users
 		LastName->SetText(Current->LastName);
 		UserType->SetText(Current->IsAdmin ? L"Admin" : Current->IsAssurance ? L"Assurance" : L"Standard");
 
-		{
-			CloseControls(Positions);
-			Positions = ComponentViewer::GenerateListRef(Current->Positions, PositionView, NULL, true, true, PositionScroll);
-		}
+		Positions->GenerateListRef(Current->Positions, NULL, true, true);
 	}
 	bool ViewUserEditor::TestOnCondition(Vector<void*> Args) const
 	{

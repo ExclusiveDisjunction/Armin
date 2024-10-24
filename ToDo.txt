@@ -1,10 +1,97 @@
-Timecards are children of Users
-Fix View User editor to not include tasks, but include timecards.
-Re-do timecard editor.
-Write Timeclock editor.
-Remove the timecard system.
-Make a new editor that displays basic user information and their tasks, along with timecard info.
 
-PILOT (2022.1)
-	Merge all add/edit editors to one single editor.
-	Create view editor for each control.
+AppStates
+	Centralized numerical value that represents the whole scope of the program, instead of multiple headers. [CURRENT COMPLETE]
+
+File Locking
+	Partitions locked?
+	Locking files for ONLY ONE system to write data (Read Only).
+	Create a seprate file to prevent racing for a file.
+
+EditorButtons Improvements using EditorStates
+	Coloring and shading based on errors, view status, and location.
+	Change their painting status as soon as the editor does.
+
+Editor improving.
+	Dragable editors?
+	Scrolling Editors
+	Right hand editor dock mode
+	Appending rules:
+		Mode 1: Close editor on proper append.
+		Mode 2: Clear editor and leave open.
+		Mode 3: Leave editor open.
+	Editor notes under title.
+	Create const int BaseYCoord in EditorFrame & remove local versions of this variable.
+
+Timecards, Calendars, and Reminders
+	Implement timecards into the UI, use Calendar Pro, and create reminders for users.
+
+UI:
+	When component viewers are all of the same object, format different strings.
+
+		[Type] | Property ...
+		Identifyer Property
+
+	Text Box improvements.
+		Enable multiline text boxes.
+		Add click locations.
+		Better overall experience.
+
+	Multithreaded approach to User Interface. [DONE]
+		Each tool window can be mondal, concurent, or hybrid. Mondal & hybrid use their own thread to pause or work in concurency with the main thread.
+
+	Fix the editor stacking problem where buttons show through the screen. [DONE]
+	Combine Edit & Add editors to one object. [IN PROGRESS]
+
+Server
+	Allow for Aaron Server?
+
+Files:
+	Improvements on how files will be created [DONE]
+		Separate dialouge to create files [DONE] (NewFile tool window)
+		https://docs.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shbrowseforfoldera
+	Custom data storage [DONE] (UniProject)
+
+	References:
+		Project to Project references [DEP]
+			For each project to reference, create an object called ProjectReference that accepts a file path and has an ID.
+		ComponentReference has ToString && operator<< functions: [DONE]
+			Used to give id's the format of [FILE]:[ID]. [DEP]
+			[FILE] = 0 when it is part of the current document. [DEP]
+			[FILE] != 0 when it is not part of the current project, and it is the Id of the ProjectReference object. [DEP]
+			[ID] is the ID of the target.
+	ID Compression:
+		Keep Root Admin as 1, and make each object remove each blank id.
+		Aids in file size.
+	File tree viewer
+		Renders a project with all dependancies, and components.
+		Admin Only.
+	Linked projects
+		Make each project loaded together and linked with dynamic daisy-chain lists.
+		For comparing projects together.
+	ComponentShell class [DEP]
+		A mirror of the Component Model class tree, but each child ONLY contains the data of the object, including ID.
+		A clone PURE clone of a Component, and each Component class will be able to convert to, and a Component can accept a Shell as an input to copy (unique ID).
+
+		Used for when a referenced file's data is loaded without actually loading the whole model.
+
+	Images: [PART]
+		Remove directories and sectors, direct write. [DONE]
+		Make one singlular file for resources instead of doing directories. [DONE]
+		Updated quality issues with image rendering.
+
+	Inventory:
+		Inventory & Oper.Inv Items have more than one image.
+	User:
+		User images are supported.
+		Job position searching in UserSearch editor
+	Tasks:
+		Tasks assigned to no-one are assigned to everyone.
+
+	Requsts: [IN PROGRESS]
+		A new component that is like a task, but created by a standard/assurance user, and does not have any requirement of assurance.
+		Anyone can edit this component.
+		Visible only to those in the receptient list.
+
+	Lists [IN PROGRESS]
+		A list of things to do for someone.
+		Child of User, and can only be seen by a user.

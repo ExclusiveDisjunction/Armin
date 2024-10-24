@@ -1,6 +1,7 @@
 #include "FileProgress.h"
 
 #include "..\..\Common.h"
+#include "..\..\UICommon.h"
 
 namespace Armin::UI::Tool
 {

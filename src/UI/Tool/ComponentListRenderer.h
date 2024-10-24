@@ -24,7 +24,7 @@ namespace Armin
 			Button* View, * Edit, * SaveResult;
 			ScrollViewer* ObjectScroll;
 			Grid* ObjectView;
-			Vector<ComponentViewer*> Objects;
+			ComponentViewerList* Objects;
 
 			bool MultiselectMode = true, _Loaded = false, _CanEdit = true;
 			HWND _Base;
@@ -48,13 +48,7 @@ namespace Armin
 			ComponentListRenderer(const Vector<Files::ComponentReference*>& Source, HINSTANCE Ins, String WindowTitle = L"Component List", bool CanEdit = true);
 			ComponentListRenderer(const ComponentListRenderer& Obj) = delete;
 			ComponentListRenderer(const ComponentListRenderer&& Obj) = delete;
-			~ComponentListRenderer()
-			{
-				SetWindowLongPtrW(_Base, GWLP_USERDATA, 0);
-				DestroyWindow(_Base);
-
-				Destroy();
-			}
+			~ComponentListRenderer();
 
 			ComponentListRenderer& operator=(const ComponentListRenderer& Obj) = delete;
 			ComponentListRenderer& operator=(const ComponentListRenderer&& Obj) = delete;

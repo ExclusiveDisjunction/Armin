@@ -3,7 +3,6 @@
 #include "Files\Stream.h"
 #include "About.h"
 #include "SideHost.h"
-#include "Tool\CreateImage.h"
 #include "..\UserRegistry.h"
 #include "..\Editors\EditorFrame.h"
 #include "..\Editors\EditorRegistry.h"
@@ -15,43 +14,37 @@ namespace Armin::UI
 	using namespace Files;
 	using namespace Editors;
 
-	void Main::SetRibbonStatus(int New)
+	void Main::SetRibbonStatus()
 	{
-		ArminSessionBase* Current = LoadedSession;
+		ProjectBase* Current = LoadedProject;
 		InventorySystem* RInvFile = dynamic_cast<InventorySystem*>(Current);
 		UserSystem* RUsrFile = dynamic_cast<UserSystem*>(Current);
 		TaskSystem* RTskFile = dynamic_cast<TaskSystem*>(Current);
-		ResourceSystem* RRcFile = dynamic_cast<ResourceSystem*>(Current);
 
 		bool InventoryFile = RInvFile != nullptr,
 			UserFile = RUsrFile != nullptr,
-			TaskFile = RTskFile != nullptr,
-			ResourceFile = RRcFile != nullptr;
+			TaskFile = RTskFile != nullptr;
 
-		bool File = !(New & MRS_NoFile);
-		bool User = !UserFile ? true : !(New & MRS_NoUser);
-		bool AdminUser = UserRegistry::CurrentUserType() == UT_Admin;
+		bool File = AppState & APS_FileLoaded;
+		bool User = !UserFile ? true : (AppState & APS_HasUser);
+		bool AdminUser = !UserFile ? true : (AppState & APS_HasAdminUser);
 
 		bool SignedIn = (!UserFile && File) ? true : File && User;
-		bool AdminSignedIn = (!UserFile && File) ? true  : File && AdminUser;
+		bool AdminSignedIn = (!UserFile && File) ? true : File && AdminUser;
 
 		int AllowedForView = !File ? 0 :
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
 			(InventoryFile && SignedIn ? CT_OperationInventoryItem : 0) |
 			(TaskFile && SignedIn ? CT_Task | CT_CompletedTask : 0) |
-			(UserFile && SignedIn ? CT_User | CT_JobPosition : 0) | 
-			(File && SignedIn ? CT_RefrenceGroup : 0) |
-			(ResourceFile && SignedIn ? CT_Image : 0) | 
-			(ResourceFile && SignedIn ? CT_Directory : 0);
+			(UserFile && SignedIn ? CT_User | CT_JobPosition : 0) |
+			(File && SignedIn ? CT_RefrenceGroup : 0);
 		int AllowedForEdit = !File ? 0 :
 			(InventoryFile && AdminSignedIn ? CT_InventoryItem : 0) |
 			(InventoryFile && SignedIn ? CT_OperationInventoryItem : 0) |
 			(TaskFile && AdminSignedIn ? CT_Task : 0) |
 			(UserFile && AdminSignedIn ? CT_User : 0) |
 			(UserFile && SignedIn ? CT_JobPosition : 0) |
-			(File && SignedIn ? CT_RefrenceGroup : 0) | 
-			(ResourceFile && SignedIn ? CT_Image : 0) | 
-			(ResourceFile && SignedIn ? CT_Directory : 0);
+			(File && SignedIn ? CT_RefrenceGroup : 0);
 
 		HideRibbonGrids();
 		ShowWindow(*FileGrid, SW_SHOW);
@@ -74,9 +67,6 @@ namespace Armin::UI
 			EnableWindow(*ProjectSettingsCmd, AdminSignedIn);
 			EnableWindow(*RefrenceGroupsCmd, SignedIn);
 			EnableWindow(*QuickSearchCmd, SignedIn);
-
-			EnableWindow(*ViewImages, AllowedForEdit & CT_Image);
-			EnableWindow(*CreateImage, AllowedForEdit & CT_Image);
 		}
 
 		//Tasks
@@ -103,7 +93,7 @@ namespace Armin::UI
 			EnableWindow(*CurrentUserCmd, SignedIn);
 			EnableWindow(*UsersCmd, AllowedForView & CT_User);
 			EnableWindow(*AddUserCmd, AllowedForEdit & CT_User);
-			EnableWindow(*UserSearch, AdminSignedIn);
+			EnableWindow(*UserSearchEditor, AdminSignedIn);
 			EnableWindow(*JobPositions, SignedIn);
 
 			//(*TimecardCmd, SignedIn);
@@ -259,12 +249,6 @@ namespace Armin::UI
 			XCoord += 12 + Width;
 
 			QuickSearchCmd = new Button(XCoord, YCoord, Width, Height, L"Quick Search", EditGrid, (HMENU)33, ins, Style, TextStyle);
-			XCoord += 12 + Width;
-
-			ViewImages = new Button(XCoord, YCoord, Width, Height, L"Images", EditGrid, (HMENU)38, ins, Style, TextStyle);
-			XCoord += 3 + Width;
-
-			CreateImage = new Button(XCoord, YCoord, Width, Height, L"Create Image", EditGrid, (HMENU)39, ins, Style, TextStyle);
 		}
 
 		{
@@ -339,16 +323,11 @@ namespace Armin::UI
 			AddUserCmd = new Button(XCoord, YCoord, Width, Height, L"Add User", UserGrid, (HMENU)65, ins, Style, TextStyle);
 			XCoord += 12 + Width;
 
-			UserSearch = new Button(XCoord, YCoord, Width, Height, L"User Search", UserGrid, (HMENU)66, ins, Style, TextStyle);
+			UserSearchEditor = new Button(XCoord, YCoord, Width, Height, L"User Search", UserGrid, (HMENU)66, ins, Style, TextStyle);
 			XCoord += 12 + Width;
 
 			JobPositions = new Button(XCoord, YCoord, Width, Height, L"Positions", UserGrid, (HMENU)67, ins, Style, TextStyle);
 			XCoord += 12 + Width;
-
-			//TimecardCmd = new Button(XCoord, YCoord, Width, Height, L"Timecard", UserGrid, (HMENU)68, ins, Style, TextStyle);
-			//XCoord += 3 + Width;
-
-			//TimeclockCmd = new Button(XCoord, YCoord, Width, Height, L"Timeclock", UserGrid, (HMENU)69, ins, Style, TextStyle);
 		}
 
 		{
@@ -477,16 +456,17 @@ namespace Armin::UI
 			//File
 		case 10: //Open
 			if (SessionControl::Open(ins))
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedSessionPath)));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedProjectPath)));
 			break;
 		case 11: //New
 			if (SessionControl::NewFile(ins))
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedSessionPath)));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - " + FileFullName(LoadedProjectPath)));
 			break;
 		case 12: //Close
 			if (SessionControl::Close(ins))
 			{
-				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version) + L" - Unloaded"));
+				SetWindowTextW(_Base, static_cast<LPCWSTR>(L"Armin " + String(Version)));
+				EditorRegistry::OpenEditor(new Misc::WelcomeEditor(), nullptr);
 				CurrentEdtBttnY = 5;
 			}
 			break;
@@ -537,26 +517,19 @@ namespace Armin::UI
 		case 35: //Unused
 		case 36: //Unused
 		case 37: //Unused
-		case 38: //Images
-			EditorRegistry::OpenEditor(new Resources::ImagesEditor(), nullptr);
+		case 38: //Unused
+		case 39: //Unused
 			break;
-		case 39: //CreateImage			
-		{
-			Image* Target = Tool::CreateImage::Execute(ins);
-			if (Target)
-				EditorRegistry::OpenEditor(new Resources::ViewImageEditor(Target), nullptr);
-			break;
-		}
 
 			//Tasks
 		case 40: //Tasks
 			EditorRegistry::OpenEditor(new Tasks::TasksEditor(nullptr), nullptr);
 			break;
 		case 41: //AddTask
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 				MessageBoxW(_Base, L"You must be an admin to add tasks.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Tasks::AddTaskEditor(), nullptr);
+				EditorRegistry::OpenEditor(new Tasks::AddEditTaskEditor(nullptr), nullptr);
 			break;
 		case 42: //Completed Tasks
 			EditorRegistry::OpenEditor(new Tasks::CompletedTasksEditor(nullptr), nullptr);
@@ -575,13 +548,13 @@ namespace Armin::UI
 			EditorRegistry::OpenEditor(new Inventory::InventoryEditor(nullptr), nullptr);
 			break;
 		case 51: //AddInvItem
-			EditorRegistry::OpenEditor(new Inventory::AddInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new Inventory::AddEditInventoryItemEditor(), nullptr);
 			break;
 		case 52: //Oper inventory
 			EditorRegistry::OpenEditor(new Inventory::OperationInventoryEditor(nullptr), nullptr);
 			break;
 		case 53: //Add oper inventory item
-			EditorRegistry::OpenEditor(new Inventory::AddOperationInventoryItemEditor(), nullptr);
+			EditorRegistry::OpenEditor(new Inventory::AddEditOperationInventoryItemEditor(), nullptr);
 			break;
 		case 54: //Inventory Search
 			EditorRegistry::OpenEditor(new Inventory::InventorySearchEditor(nullptr, true), nullptr);
@@ -595,41 +568,38 @@ namespace Armin::UI
 
 			//User
 		case 60: //Sign In
-			UserRegistry::SignIn();
+			SignIn();
 			break;
 		case 61: //Sign Out
-			UserRegistry::SignOut();
+			UserSignOut();
 			break;
 			//case 42:
 		case 62: //Lock
-			UserRegistry::Lock();
+			UserLock();
 			break;
 		case 63: //CurrentUser
-			if (!UserRegistry::CurrentUser())
+			if (!CurrentUser)
 				MessageBoxW(_Base, L"There is no user currently signed in.\n\nPlease sign in and then try again.", L"Current User:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Users::UserHomepageEditor(UserRegistry::CurrentUser()), nullptr);
+				EditorRegistry::OpenEditor(new Users::UserHomepageEditor(CurrentUser), nullptr);
 			break;
 		case 64: //Users
 			EditorRegistry::OpenEditor(new Users::UsersEditor(nullptr), nullptr);
 			break;
 		case 65: //Add User
-			if (UserRegistry::CurrentUserType() != UT_Admin)
+			if (!(AppState & APS_HasAdminUser))
 				MessageBoxW(_Base, L"You must be an admin to create users.", L"Armin:", MB_OK | MB_ICONERROR);
 			else
-				EditorRegistry::OpenEditor(new Users::CreateUserEditor(), nullptr);
+				EditorRegistry::OpenEditor(new Users::CreateEditUserEditor(nullptr), nullptr);
 			break;
 		case 66: //UserSearch
-			EditorRegistry::OpenEditor(new Users::UserSearch(nullptr), nullptr);
+			EditorRegistry::OpenEditor(new Users::UserSearchEditor(nullptr), nullptr);
 			break;
 		case 67: //JobPositions
 			EditorRegistry::OpenEditor(new Users::JobPositionsEditor(nullptr), nullptr);
 			break;
-		case 68: //Timecard
-			EditorRegistry::OpenEditor(new Users::TimecardsEditor(UserRegistry::CurrentUser()), nullptr);
-			break;
-		case 69: //Timeclock
-			//EditorRegistry::OpenEditor(new Timecards::TimeclockEditor(), nullptr);
+		case 68: //Unused
+		case 69: //Unused
 			break;
 
 			//Window

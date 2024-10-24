@@ -1,17 +1,25 @@
 #include "DatePicker.h"
 
+#include "..\..\UICommon.h"
+
+#include <thread>
+#include <chrono>
+using namespace std;
+
 namespace Armin::UI::Tool
 {
-    DatePicker::DatePicker(const DateTime& Prev, HINSTANCE ins, bool HasDate) : _HasDate(HasDate)
+    DatePicker::DatePicker(const DateTime& Prev)
     {
         Return = Prev;
-
+    }
+    void DatePicker::Construct(HINSTANCE ins)
+    {
         if (!_ThisAtom)
             InitBase(ins);
 
         _Base = CreateWindowExW(0l, MAKEINTATOM(_ThisAtom), L"Date Picker", WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 470, 250, NULL, NULL, ins, NULL);
         SetWindowLongPtrW(_Base, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-        
+
         ShowWindow(_Base, SW_NORMAL);
         UpdateWindow(_Base);
 
@@ -49,7 +57,8 @@ namespace Armin::UI::Tool
         case WM_COMMAND:
             return Item->Command(wp, lp);
         case WM_DESTROY:
-            return Item->Destroy();
+            PostQuitMessage(0);
+            return 0;
         case WM_KEYDOWN:
             return Item->KeyDown(wp);
         default:
@@ -168,82 +177,64 @@ namespace Armin::UI::Tool
 
     bool DatePicker::Process()
     {
-        if (HasDate->GetCheckState())
+        int Month, Day, Year, Hour, Minute;
+        bool AMPM = IsAM->GetCheckState();
+
+        Month = MM->GetText().ToInt();
+        Day = DD->GetText().ToInt();
+        Year = YYYY->GetText().ToInt();
+        Hour = HH->GetText().ToInt();
+        Minute = MiMi->GetText().ToInt();
+
+        if (Month < 1 || Month > 12)
         {
-            int Month, Day, Year, Hour, Minute;
-            bool AMPM = IsAM->GetCheckState();
-
-            Month = MM->GetText().ToInt();
-            Day = DD->GetText().ToInt();
-            Year = YYYY->GetText().ToInt();
-            Hour = HH->GetText().ToInt();
-            Minute = MiMi->GetText().ToInt();
-
-            if (Month < 1 || Month > 12)
-            {
-                MessageBoxW(_Base, L"The month must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            if (Day < 1)
-            {
-                MessageBoxW(_Base, L"The day must be greater than 1.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (Day > 30 && (Month == 4 || Month == 6 || Month == 9 || Month == 11))
-            {
-                MessageBoxW(_Base, L"In the months of April, June, September, and November, there are only 30 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 31 && (Month == 1 || Month == 3 || Month == 5 || Month == 7 || Month == 8 || Month == 10 || Month == 12))
-            {
-                MessageBoxW(_Base, L"In the months of January, March, May, July, August, October, and December, there are only 31 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 29 && Month == 2 && Year % 4 == 0)
-            {
-                MessageBoxW(_Base, L"In February, there are only 29 days in a leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            else if (Day > 28 && Month == 2)
-            {
-                MessageBoxW(_Base, L"In February, there are only 28 days in a non-leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (Hour > 12 || Hour < 1)
-            {
-                MessageBoxW(_Base, L"The hour must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            if (Minute > 59 || Minute < 0)
-            {
-                MessageBoxW(_Base, L"The monute must be between 0 and 59.", L"Date Picker:", MB_OK | MB_ICONERROR);
-                return false;
-            }
-
-            if (!AMPM)
-                Hour += 12;
-
-            Return = DateTime(Month, Day, Year, Hour, Minute, 0, 0);
+            MessageBoxW(_Base, L"The month must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
         }
-        else
-            Return = DateTime();
+        if (Day < 1)
+        {
+            MessageBoxW(_Base, L"The day must be greater than 1.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (Day > 30 && (Month == 4 || Month == 6 || Month == 9 || Month == 11))
+        {
+            MessageBoxW(_Base, L"In the months of April, June, September, and November, there are only 30 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 31 && (Month == 1 || Month == 3 || Month == 5 || Month == 7 || Month == 8 || Month == 10 || Month == 12))
+        {
+            MessageBoxW(_Base, L"In the months of January, March, May, July, August, October, and December, there are only 31 days.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 29 && Month == 2 && Year % 4 == 0)
+        {
+            MessageBoxW(_Base, L"In February, there are only 29 days in a leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        else if (Day > 28 && Month == 2)
+        {
+            MessageBoxW(_Base, L"In February, there are only 28 days in a non-leap year.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (Hour > 12 || Hour < 1)
+        {
+            MessageBoxW(_Base, L"The hour must be between 1 and 12.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (Minute > 59 || Minute < 0)
+        {
+            MessageBoxW(_Base, L"The monute must be between 0 and 59.", L"Date Picker:", MB_OK | MB_ICONERROR);
+            return false;
+        }
+
+        if (!AMPM)
+            Hour += 12;
+
+        Return = DateTime(Month, Day, Year, Hour, Minute, 0, 0);
 
         return true;
-    }
-    void DatePicker::MessageLoop()
-    {
-        MSG Msg;
-        int Result;
-        while ((Result = GetMessageW(&Msg, _Base, NULL, NULL)) != 0)
-        {
-            if (Result < 0)
-                return;
-
-            TranslateMessage(&Msg);
-            DispatchMessageW(&Msg);
-        }
     }
     LRESULT DatePicker::Paint()
     {
@@ -258,10 +249,6 @@ namespace Armin::UI::Tool
 
         DeleteObject(Bk);
         EndPaint(_Base, &ps);
-        return 0;
-    }
-    LRESULT DatePicker::Destroy()
-    {
         return 0;
     }
     LRESULT DatePicker::Command(WPARAM wp, LPARAM lp)
@@ -311,13 +298,38 @@ namespace Armin::UI::Tool
         return 0;
     }
 
-    DateTime DatePicker::Execute(const DateTime& Prev, HINSTANCE ins, bool HasDate)
+    LRESULT DatePicker::RunMessageLoop(DatePicker* Obj, HINSTANCE ins, WindowState* _Running)
     {
-        DatePicker* Item = new DatePicker(Prev, ins, HasDate);
-        Item->MessageLoop();
+        Obj->Construct(ins);
+        WindowState& Running = *_Running;
+        Running = true;
 
-        DateTime Return = Item->Return;
-        delete Item;
+        int Result;
+        MSG msg;
+        while ((Result = GetMessage(&msg, nullptr, 0, 0)) != 0)
+        {
+            if (Result < 0)
+                break;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        Running = false;
+        return msg.wParam;
+    }
+    DateTime DatePicker::Execute(const DateTime& Prev, HINSTANCE ins)
+    {
+        DatePicker* Obj = new DatePicker(Prev);
+
+        WindowState* Running = new WindowState(true);
+        thread Thread = thread(RunMessageLoop, Obj, ins, Running);
+        while ((*Running))
+            this_thread::sleep_for(chrono::milliseconds(100));
+
+        Thread.detach();
+        delete Running;
+        DateTime Return = Obj->Return;
+        delete Obj;
 
         return Return;
     }

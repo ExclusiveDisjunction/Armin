@@ -5,7 +5,7 @@
 
 namespace Armin::Files
 {
-	Component::Component(ArminSessionBase* File, bool GetID)
+	Component::Component(ProjectBase* File, bool GetID)
 	{
 		if (GetID)
 			_ID = File->GetNextID();
@@ -17,7 +17,7 @@ namespace Armin::Files
 			Obj->Active = false;
 	}
 
-	bool ArminSessionBase::RequiresPassword() const
+	bool ProjectBase::RequiresPassword() const
 	{
 		if (!ConfigItems)
 			return false;
@@ -31,7 +31,7 @@ namespace Armin::Files
 
 		return false;
 	}
-	void ArminSessionBase::RequiresPassword(bool New)
+	void ProjectBase::RequiresPassword(bool New)
 	{
 		if (!ConfigItems)
 			return;
@@ -51,7 +51,7 @@ namespace Armin::Files
 		CNew->Title(L"RequiresPassword");
 		CNew->Value = New ? L"True" : L"False";
 	}
-	String ArminSessionBase::Password() const
+	String ProjectBase::Password() const
 	{
 		if (!ConfigItems)
 			return String();
@@ -65,7 +65,7 @@ namespace Armin::Files
 
 		return String();
 	}
-	void ArminSessionBase::Password(String New)
+	void ProjectBase::Password(String New)
 	{
 		if (!ConfigItems)
 			return;

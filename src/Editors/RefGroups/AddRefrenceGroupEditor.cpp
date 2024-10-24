@@ -15,6 +15,11 @@ namespace Armin::Editors::RefGroups
 	{
 		
 	}
+	AddReferenceGroupEditor::~AddReferenceGroupEditor()
+	{
+		if (Objects)
+			delete Objects;
+	}
 
 	LRESULT __stdcall AddReferenceGroupEditor::WndProc(HWND Window, UINT Message, WPARAM wp, LPARAM lp)
 	{
@@ -36,7 +41,7 @@ namespace Armin::Editors::RefGroups
 
 		LoadUpperButtons(WndRect, ins);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 		AaColor BaseBk = EditorGrey;
 
 		{
@@ -92,6 +97,9 @@ namespace Armin::Editors::RefGroups
 			ObjectScroll = new ScrollViewer(XCoord, YCoord, Width, Height, _Base, ins, Style);
 			ObjectView = new Grid(0, 0, 910, 32, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			if (Objects)
+				delete Objects;
 		}
 	}
 
@@ -105,7 +113,7 @@ namespace Armin::Editors::RefGroups
 
 		MoveUpperButtons(WndRect);
 
-		int BaseYCoord = 110;
+		int BaseYCoord = this->BaseYCoord;
 
 		{
 			int XCoord = 10;
@@ -146,7 +154,7 @@ namespace Armin::Editors::RefGroups
 			Height = WndRect.bottom - (10 + YCoord);
 
 			ObjectScroll->Move(XCoord, YCoord, Width, Height);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+			Objects->ReSizeList();
 		}
 		return 0;
 	}
@@ -160,7 +168,7 @@ namespace Armin::Editors::RefGroups
 		{
 		case 4: //Modify
 		{
-			Vector<Component*> Current = ComponentViewer::GetAllComponents(Objects);
+			Vector<Component*> Current = Objects->GetAllComponents();
 
 			SearchCriteria Criteria;
 			Criteria.AllowedTypes = CT_All;
@@ -169,33 +177,32 @@ namespace Armin::Editors::RefGroups
 
 			Vector<Component*> New = SearchByName::Execute(Criteria, reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(_Base, GWLP_HINSTANCE)));
 
-			CloseControls(Objects);
-			Objects = ComponentViewer::GenerateList(New, ObjectView, NULL, _Multiselect, true, ObjectScroll);
+			Objects->GenerateList(New, NULL, _Multiselect, true);
 			break;
 		}
 		case 5: //Remove
 		{
 			Vector<ComponentViewer*> Selected;
-			ComponentViewer::RetriveFromList(Objects, Selected);
+			Objects->RetriveFromList(Selected);
 
 			for (uint i = 0; i < Selected.Size; i++)
-				Objects.Remove(Selected[i]);
-			CloseControls(Selected);
-			ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+				delete Selected[i];
+
+			Objects->ReSizeList();
 			break;
 		}
 		case 6: //View
 		case 7: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 7);
+			Objects->OpenSelectedForEditView(wp == 7);
 			break;
 		}
 		return 0;
 	}
 
-	bool AddReferenceGroupEditor::Apply(Files::ArminSessionBase* File, bool PromptErrors)
+	bool AddReferenceGroupEditor::Apply(Files::ProjectBase* File, bool PromptErrors)
 	{
 		String Title = this->Name->GetText();
-		Vector<Component*> Targets = ComponentViewer::GetAllComponents(Objects);
+		Vector<Component*> Targets = Objects->GetAllComponents();
 
 		if (Title.Contains(L'~') || Title == L"")
 		{
@@ -211,7 +218,7 @@ namespace Armin::Editors::RefGroups
 				return false;
 		}
 
-		RefrenceGroupList* Groups = File->RefrenceGroups;
+		ReferenceGroupList* Groups = File->RefrenceGroups;
 		if (!Groups)
 		{
 			if (PromptErrors)
@@ -219,17 +226,18 @@ namespace Armin::Editors::RefGroups
 			return false;
 		}
 
-		RefrenceGroup* New = new RefrenceGroup(File, Groups);
+		ReferenceGroup* New = new ReferenceGroup(File, Groups);
 		New->Title(Title);
 		New->Targets = ComponentReference::Generate(Targets);
 
-		HasEdit = true;
+		AppState |= APS_HasEdit;
 		EditorRegistry::ResetEditorOfType(EDT_ReferenceGroups);
 		return true;
 	}
 	void AddReferenceGroupEditor::Reset()
 	{
-		Name->SetText(String());
-		CloseControls(Objects);
+		String Blank;
+		Name->SetText(Blank);
+		Objects->Clear();
 	}
 }

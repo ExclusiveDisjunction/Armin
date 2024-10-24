@@ -1,7 +1,8 @@
 #include "ComponentListRenderer.h"
 
+#include "..\..\Ins.h"
 #include "..\..\UserRegistry.h"
-#include "..\..\Config\Ins.h"
+#include "..\..\UICommon.h"
 #include "..\..\Files\Components.h"
 #include "..\..\Editors\EditorRegistry.h"
 
@@ -27,6 +28,16 @@ namespace Armin::UI::Tool
 	}
 	ComponentListRenderer::ComponentListRenderer(const ReferenceList& Source, HINSTANCE ins, String WindowTitle, bool CanEdit) : ComponentListRenderer(Source.operator Vector<ComponentReference*>(), ins, WindowTitle, CanEdit) {}
 	ComponentListRenderer::ComponentListRenderer(const Vector<ComponentReference*>& Source, HINSTANCE ins, String WindowTitle, bool CanEdit) : ComponentListRenderer(ComponentReference::Convert<Component>(Source), ins, WindowTitle, CanEdit) {}
+	ComponentListRenderer::~ComponentListRenderer()
+	{
+		SetWindowLongPtrW(_Base, GWLP_USERDATA, 0);
+		DestroyWindow(_Base);
+
+		if (Objects)
+			delete Objects;
+
+		Destroy();
+	}
 
 	void ComponentListRenderer::ChangeSource(const Vector<Component*>& Source)
 	{
@@ -137,18 +148,19 @@ namespace Armin::UI::Tool
 
 			ObjectView = new Grid(XCoord, YCoord, Width, Height, ObjectScroll, ins, Style);
 			ObjectScroll->SetViewer(ObjectView);
+
+			Objects = new ComponentViewerList(ObjectView, ObjectScroll);
 		}
 
 		FillObjects();
 	}
 	void ComponentListRenderer::ResizeObjects()
 	{
-		ComponentViewer::ReSizeList(Objects, ObjectView, ObjectScroll);
+		Objects->ReSizeList();
 	}
 	void ComponentListRenderer::FillObjects()
 	{
-		CloseControls(Objects);
-		Objects = ComponentViewer::GenerateList(_Source, ObjectView, NULL, MultiselectMode, _CanEdit, ObjectScroll);
+		Objects->GenerateList(_Source, NULL, MultiselectMode, _CanEdit);
 	}
 
 	LRESULT ComponentListRenderer::Paint()
@@ -176,10 +188,10 @@ namespace Armin::UI::Tool
 		{
 		case 1: //View
 		case 2: //Edit
-			ComponentViewer::OpenSelectedForEditView(Objects, wp == 2 && _CanEdit);
+			Objects->OpenSelectedForEditView(wp == 2 && _CanEdit);
 			break;
 		case 3: //SaveResult
-			ComponentViewer::SaveSelectedAsGroup(Objects);
+			Objects->SaveSelectedAsGroup();
 			break;
 		}
 

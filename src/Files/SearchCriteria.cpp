@@ -3,11 +3,12 @@
 #include "ArminSessions.h"
 #include "Components.h"
 #include "Mapping.h"
+#include "..\Common.h"
 #include "..\UserRegistry.h"
 
 namespace Armin::Files
 {
-    Vector<Component*> SearchCriteria::GetComponents(ArminSessionBase* File) const
+    Vector<Component*> SearchCriteria::GetComponents(ProjectBase* File) const
     {
         if (!File)
             return Vector<Component*>();
@@ -16,10 +17,9 @@ namespace Armin::Files
             JobPositions = AllowedTypes & CT_JobPosition,
             Tasks = AllowedTypes & CT_Task,
             CompletedTasks = AllowedTypes & CT_CompletedTask,
-            InventoryItems = (AllowedTypes & CT_InventoryItem) && UserRegistry::CurrentUserType() == UT_Admin,
+            InventoryItems = (AllowedTypes & CT_InventoryItem) && (AppState & APS_HasAdminUser),
             OperationInventoryItems = AllowedTypes & CT_OperationInventoryItem,
-            RefrenceGroups = AllowedTypes & CT_RefrenceGroup,
-            Images = AllowedTypes & CT_Image;
+            RefrenceGroups = AllowedTypes & CT_RefrenceGroup;
 
         String Args = Arguments;
         if (!Args.Contains(L'\"'))
@@ -115,7 +115,6 @@ namespace Armin::Files
         UserSystem* UserFile = dynamic_cast<class UserSystem*>(File);
         TaskSystem* TaskFile = dynamic_cast<class TaskSystem*>(File);
         InventorySystem* InventoryFile = dynamic_cast<class InventorySystem*>(File);
-        ResourceSystem* ResourceFile = dynamic_cast<class ResourceSystem*>(File);
 
         if (Users && UserFile && UserFile->Users)
         {
@@ -173,15 +172,9 @@ namespace Armin::Files
         }
         if (RefrenceGroups && File->RefrenceGroups)
         {
-            RefrenceGroupList* Groups = File->RefrenceGroups;
+            ReferenceGroupList* Groups = File->RefrenceGroups;
             for (uint i = 0; i < Groups->Count; i++)
                 Return.Add(Groups->Item(i));
-        }
-        if (Images && ResourceFile && ResourceFile->Images)
-        {
-            ImageList* Images = ResourceFile->Images;
-            for (uint i = 0; i < Images->Count; i++)
-                Return.Add(Images->Item(i));
         }
 
         //The masking filter is not working properly. It needs to apply one mask, then another, and keep with this process until everything is masked. This will need to be done in an order, for example
@@ -274,7 +267,7 @@ namespace Armin::Files
 
         return Return;
     }
-    bool SearchCriteria::IsWithinCriteria(Component* Object, ArminSessionBase* File) const
+    bool SearchCriteria::IsWithinCriteria(Component* Object, ProjectBase* File) const
     {
         Vector<Component*> Range = GetComponents(File);
 
