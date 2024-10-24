@@ -5,14 +5,10 @@ NOTE: CURRENTLY (5/10/2022), THIS PROGRAM IS NOT IN PROGRESS ANYMORE. THE ONLY R
 
 Armin is a program that is used to store data such as inventory, task, user, and resources in one combined document. This program also is a team management software that keeps records and informs users of what they need to be doing.
 
-Config/ - stores configuration and settings for a global scope.
+src/Config/ - stores configuration and settings for a global scope.
+src/Editors/ - stores the UI for Editors, the main power of Armin. Also stores the EditorRegistry
+src/Files/ - Stores the Component Model and the Session Control class (a pseudo-registry)
+rc/ - Stores Icons and various resources for Armin's UI.
+src/UI/ - Contains the basic used User Interface, along with any Importing and Tool windows.
 
-Editors/ - stores the UI for Editors, the main power of Armin. Also stores the EditorRegistry
-
-Files/ - Stores the Component Model and the Session Control class (a pseudo-registry)
-
-Resource/ - Stores Icons and various resources for Armin's UI.
-
-UI/ - Contains the basic used User Interface, along with any Importing and Tool windows.
-
-Root Directory - Stores the Entry point, common headers, and the UserRegistry.
+Root Directory - Stores the Entry point & resource headers.
